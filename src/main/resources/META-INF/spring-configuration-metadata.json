@@ -1,0 +1,137 @@
+{
+  "groups": [
+    {
+      "name": "ccs.dispatcher",
+      "type": "br.com.ccs.dispatcher.config.CcsDispatcherProperties",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "ccs.dispatcher.queue-name",
+      "type": "java.lang.String",
+      "description": "Nome da fila RabbitMQ. Se não configurado, usa o nome da aplicação.",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties"
+    },
+    {
+      "name": "ccs.dispatcher.exchange-name",
+      "type": "java.lang.String",
+      "description": "Nome da exchange RabbitMQ.",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties",
+      "defaultValue": "ccs.dispatcher.ex"
+    },
+    {
+      "name": "ccs.dispatcher.exchange-type",
+      "type": "java.lang.String",
+      "description": "Tipo da exchange RabbitMQ.",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties",
+      "defaultValue": "topic"
+    },
+    {
+      "name": "ccs.dispatcher.routing-key",
+      "type": "java.lang.String",
+      "description": "Routing key para binding.",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties",
+      "defaultValue": "#"
+    },
+    {
+      "name": "ccs.dispatcher.concurrency",
+      "type": "java.lang.String",
+      "description": "Configuração de concorrência do consumidor.",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties",
+      "defaultValue": "1-10"
+    },
+    {
+      "name": "ccs.dispatcher.queue-durable",
+      "type": "java.lang.Boolean",
+      "description": "Se true, a fila será durável.",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "ccs.dispatcher.exchange-durable",
+      "type": "java.lang.Boolean",
+      "description": "Se true, a exchange será durável.",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "ccs.dispatcher.host",
+      "type": "java.lang.String",
+      "description": "Ip ou Nome do Host do RabbitMQ",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties",
+      "defaultValue": "localhost"
+    },
+    {
+      "name": "ccs.dispatcher.port",
+      "type": "java.lang.Integer",
+      "description": "Porta do RabbitMQ. Padrão é 5672",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties",
+      "defaultValue": 5672
+    },
+    {
+      "name": "ccs.dispatcher.username",
+      "type": "java.lang.String",
+      "description": "Usuário do RabbitMQ. Padrão é 'guest'",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties",
+      "defaultValue": "guest"
+    },
+    {
+      "name": "ccs.dispatcher.password",
+      "type": "java.lang.String",
+      "description": "Senha do RabbitMQ. Padrão é 'guest'",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties",
+      "defaultValue": "guest"
+    },
+    {
+      "name": "ccs.dispatcher.virtual-host",
+      "type": "java.lang.String",
+      "description": "Virtual host do RabbitMQ. Padrão é '/'",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties",
+      "defaultValue": "/"
+    },
+    {
+      "name": "ccs.dispatcher.dead-letter-queue-name",
+      "type": "java.lang.String",
+      "description": "Nome da fila de mensagens de erro.",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties"
+    },
+    {
+      "name": "ccs.dispatcher.dead-letter-exchange-name",
+      "type": "java.lang.String",
+      "description": "Nome da exchange de mensagens de erro.",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties"
+    },
+    {
+      "name": "ccs.dispatcher.dead-letter-routing-key",
+      "type": "java.lang.String",
+      "description": "Routing key para mensagens de erro.",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties"
+    },
+    {
+      "name": "ccs.dispatcher.max-retry-attempts",
+      "type": "java.lang.Integer",
+      "description": "Número máximo de tentativas de reenvio.",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties"
+    },
+    {
+      "name": "ccs.dispatcher.initial-interval",
+      "type": "java.lang.Integer",
+      "description": "Intervalo inicial entre tentativas de reenvio (em milissegundos).",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties"
+    },
+    {
+      "name": "ccs.dispatcher.multiplier",
+      "type": "java.lang.Integer",
+      "description": "Multiplicador para o intervalo entre tentativas de reenvio.",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties"
+    },
+    {
+      "name": "ccs.dispatcher.max-interval",
+      "type": "java.lang.Integer",
+      "description": "Intervalo máximo entre tentativas de reenvio (em milissegundos).",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties"
+    }
+  ],
+  "hints": []
+}
