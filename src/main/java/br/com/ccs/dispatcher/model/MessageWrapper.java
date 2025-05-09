@@ -11,7 +11,10 @@ public class MessageWrapper {
     private Map<String, String> headers;
     private Object body;
 
-    MessageWrapper(String path, String method, Map<String, String> headers, Object body) {
+    public MessageWrapper() {
+    }
+
+    public MessageWrapper(String path, String method, Map<String, String> headers, Object body) {
         this.path = path;
         this.method = method;
         this.headers = headers;
