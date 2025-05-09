@@ -11,6 +11,7 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -82,11 +83,16 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    @Qualifier("deadLetterExchange")
     public Exchange deadLetterExchange() {
-        return ExchangeBuilder
+        log.info("Configurando Dead Letter Exchange: " + properties.getDeadLetterExchangeName());
+        var dlqEx = ExchangeBuilder
                 .topicExchange(properties.getDeadLetterExchangeName())
                 .durable(true)
                 .build();
+
+        log.info("Dead Letter Exchange criada: " + dlqEx);
+        return dlqEx;
     }
 
     @Bean
@@ -94,29 +100,49 @@ public class RabbitMQConfig {
     public Queue dispatcherQueue() {
         log.info("Configurando queue: " + properties.getQueueName());
 
-        return QueueBuilder
+        var q =  QueueBuilder
                 .durable(properties.getQueueName())
                 .deadLetterRoutingKey(properties.getDeadLetterRoutingKey())
                 .deadLetterExchange(properties.getDeadLetterExchangeName())
                 .build();
-    }
 
-    @Bean
-    public Queue deadLetterQueue() {
-        return QueueBuilder
-                .durable(properties.getDeadLetterQueueName())
-                .build();
+        log.info("Queue criada: " + q);
+        return q;
     }
 
     @Bean
     @Primary
-    public Binding dispatcherBinding(Queue ccsDispatcherQueue,
-                                     Exchange ccsDispatcherExchange) {
+    public Binding dispatcherQueueBinding(Queue ccsDispatcherQueue,
+                                          Exchange ccsDispatcherExchange) {
         log.info("Configurando binding: " + properties.getRoutingKey());
         return BindingBuilder
                 .bind(ccsDispatcherQueue)
                 .to(ccsDispatcherExchange)
                 .with(properties.getRoutingKey())
+                .noargs();
+    }
+
+    @Bean
+    @Qualifier("deadLetterQueue")
+    public Queue deadLetterQueue() {
+        log.info("Configurando Dead Letter Queue: " + properties.getDeadLetterQueueName());
+
+        var dlqQueue = QueueBuilder
+                .durable(properties.getDeadLetterQueueName())
+                .build();
+        log.info("Dead Letter Queue criada: " + dlqQueue);
+        return dlqQueue;
+    }
+
+    @Bean
+    @Qualifier("deadLetterQueueBinding")
+    public Binding deadLetterQueueBinding(@Qualifier("deadLetterQueue") Queue deadLetterQueue,
+                                          @Qualifier("deadLetterExchange") Exchange deadLetterExchange) {
+        log.info("Configurando binding da Dead Letter Queue: " + properties.getDeadLetterRoutingKey());
+        return BindingBuilder
+                .bind(deadLetterQueue)
+                .to(deadLetterExchange)
+                .with(properties.getDeadLetterRoutingKey())
                 .noargs();
     }
 
@@ -132,35 +158,7 @@ public class RabbitMQConfig {
                         .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL));
     }
 
-//    @Bean
-//    @Primary
-//    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
-//            ConnectionFactory connectionFactory,
-//            MessageConverter messageConverter) {
-//
-//        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-//        factory.setConnectionFactory(connectionFactory);
-//        factory.setMessageConverter(messageConverter);
-//
-//        // Configuração de retry
-//        RetryInterceptorBuilder<?> retryInterceptorBuilder = RetryInterceptorBuilder.stateless()
-//                .maxAttempts(properties.getMaxRetryAttempts())
-//                .backOffOptions(
-//                        properties.getInitialInterval(),
-//                        properties.getMultiplier(),
-//                        properties.getMaxInterval()
-//                );
-//
-//        factory.setAdviceChain(retryInterceptorBuilder.build());
-//
-//        // Configurações adicionais
-//        factory.setConcurrentConsumers(
-//                Integer.parseInt(properties.getConcurrency().split("-")[0]));
-//        factory.setMaxConcurrentConsumers(
-//                Integer.parseInt(properties.getConcurrency().split("-")[1]));
-//
-//        return factory;
-//    }
+
 
     @Bean
     @Primary
@@ -193,4 +191,34 @@ public class RabbitMQConfig {
 
         return template;
     }
+
+    //    @Bean
+//    @Primary
+//    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
+//            ConnectionFactory connectionFactory,
+//            MessageConverter messageConverter) {
+//
+//        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+//        factory.setConnectionFactory(connectionFactory);
+//        factory.setMessageConverter(messageConverter);
+//
+//        // Configuração de retry
+//        RetryInterceptorBuilder<?> retryInterceptorBuilder = RetryInterceptorBuilder.stateless()
+//                .maxAttempts(properties.getMaxRetryAttempts())
+//                .backOffOptions(
+//                        properties.getInitialInterval(),
+//                        properties.getMultiplier(),
+//                        properties.getMaxInterval()
+//                );
+//
+//        factory.setAdviceChain(retryInterceptorBuilder.build());
+//
+//        // Configurações adicionais
+//        factory.setConcurrentConsumers(
+//                Integer.parseInt(properties.getConcurrency().split("-")[0]));
+//        factory.setMaxConcurrentConsumers(
+//                Integer.parseInt(properties.getConcurrency().split("-")[1]));
+//
+//        return factory;
+//    }
 }
