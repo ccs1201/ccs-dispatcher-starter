@@ -5,6 +5,7 @@ import br.com.ccs.dispatcher.exceptions.MessageDispatcherException;
 import br.com.ccs.dispatcher.model.MessageWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -39,39 +40,39 @@ public class CcsMessageDispatcher {
         log.info("Mensagem recebida: " + message);
 
         try {
-            MessageWrapper envelope = objectMapper.readValue(message.getBody(), MessageWrapper.class);
+            MessageWrapper messageWrapper = objectMapper.readValue(message.getBody(), MessageWrapper.class);
 
             // Cria request com método e path
             MockHttpServletRequest request = new MockHttpServletRequest(
-                    envelope.getMethod(),
-                    envelope.getPath()
+                    messageWrapper.getMethod(),
+                    messageWrapper.getPath()
             );
 
             // Configura content type e corpo da requisição
-            String contentType = envelope.getHeaders() != null ?
-                    envelope.getHeaders().get("Content-Type") : "application/json";
-            request.setContentType(contentType != null ? contentType : "application/json");
+            String contentType = messageWrapper.getHeaders() != null ?
+                    messageWrapper.getHeaders().get("Content-Type") : MessageProperties.CONTENT_TYPE_JSON;
+            request.setContentType(contentType != null ? contentType : MessageProperties.CONTENT_TYPE_JSON);
 
-            if (envelope.getBody() != null) {
-                byte[] bodyContent = objectMapper.writeValueAsBytes(envelope.getBody());
+            if (messageWrapper.getBody() != null) {
+                byte[] bodyContent = objectMapper.writeValueAsBytes(messageWrapper.getBody());
                 request.setContent(bodyContent);
             }
 
             // Adiciona headers
-            if (envelope.getHeaders() != null) {
-                envelope.getHeaders().forEach(request::addHeader);
+            if (messageWrapper.getHeaders() != null) {
+                messageWrapper.getHeaders().forEach(request::addHeader);
             }
 
 //            // Adiciona query parameters se existirem
-//            if (envelope.getQueryParams() != null) {
-//                envelope.getQueryParams().forEach(request::addParameter);
+//            if (messageWrapper.getQueryParams() != null) {
+//                messageWrapper.getQueryParams().forEach(request::addParameter);
 //            }
 
             // Busca o handler
             HandlerExecutionChain handler = handlerMapping.getHandler(request);
             if (handler == null) {
                 throw new IllegalArgumentException(
-                        "Nenhum handler encontrado para path: " + envelope.getPath()
+                        "Nenhum handler encontrado para path: " + messageWrapper.getPath()
                 );
             }
 
@@ -83,7 +84,7 @@ public class CcsMessageDispatcher {
             byte[] responseBody = response.getContentAsByteArray();
             if (responseBody.length > 0) {
                 String responseContentType = response.getContentType();
-                if (responseContentType != null && responseContentType.contains("application/json")) {
+                if (responseContentType != null && responseContentType.contains(MessageProperties.CONTENT_TYPE_JSON)) {
                     return objectMapper.readValue(responseBody, Object.class);
                 }
                 return responseBody;
