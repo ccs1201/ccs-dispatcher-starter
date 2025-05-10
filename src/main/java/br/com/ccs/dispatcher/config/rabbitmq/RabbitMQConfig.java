@@ -16,10 +16,12 @@
 
 package br.com.ccs.dispatcher.config.rabbitmq;
 
-import br.com.ccs.dispatcher.config.CcsDispatcherAutoConfiguration;
+import br.com.ccs.dispatcher.config.CcsDispatcherAutoConfig;
 import br.com.ccs.dispatcher.config.properties.DispatcherConfigurationProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -36,7 +38,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.text.DateFormat;
-import java.util.logging.Logger;
 
 
 /**
@@ -50,14 +51,14 @@ import java.util.logging.Logger;
  */
 
 @Configuration
-@AutoConfigureAfter(CcsDispatcherAutoConfiguration.class)
+@AutoConfigureAfter(CcsDispatcherAutoConfig.class)
 @ConditionalOnProperty(name = "ccs.dispatcher.enabled", havingValue = "true", matchIfMissing = true)
 public class RabbitMQConfig {
 
-    private final Logger log = Logger.getLogger(RabbitMQConfig.class.getName());
+    private final Logger log = LoggerFactory.getLogger(RabbitMQConfig.class);
     private final DispatcherConfigurationProperties properties;
 
-    public RabbitMQConfig(DispatcherConfigurationProperties properties) {
+    public RabbitMQConfig(@Qualifier("ccsDispatcherProperties") DispatcherConfigurationProperties properties) {
         this.properties = properties;
     }
 
@@ -66,8 +67,8 @@ public class RabbitMQConfig {
         if (properties.getQueueName() == null || properties.getQueueName().trim().isEmpty()) {
             throw new IllegalStateException("Queue name não pode ser null ou vazio");
         }
-        log.info("Propriedades validadas com sucesso");
-        log.info("Propriedades carregas: ".concat(properties.toString()));
+        log.debug("Propriedades validadas com sucesso");
+        log.debug("Propriedades carregas: ".concat(properties.toString()));
 
         log.info("RabbitMQConfig inicializado.");
     }
@@ -75,7 +76,7 @@ public class RabbitMQConfig {
     @Bean
     @Primary
     public ConnectionFactory connectionFactory() {
-        log.info("Configurando ConnectionFactory");
+        log.debug("Configurando ConnectionFactory");
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
         connectionFactory.setHost(properties.getHost());
         connectionFactory.setPort(properties.getPort());
@@ -85,21 +86,21 @@ public class RabbitMQConfig {
         connectionFactory.setPublisherConfirmType(CachingConnectionFactory.ConfirmType.CORRELATED);
         connectionFactory.setPublisherReturns(true);
 
-        log.info("ConnectionFactory configurada");
+        log.debug("ConnectionFactory configurada");
         return connectionFactory;
     }
 
     @Bean
     @Primary
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
-        log.info("Configurando RabbitAdmin");
+        log.debug("Configurando RabbitAdmin");
         return new RabbitAdmin(connectionFactory);
     }
 
     @Bean
     @Primary
     public Exchange dispatcherExchange() {
-        log.info("Configurando exchange: " + properties.getExchangeName());
+        log.debug("Configurando exchange: " + properties.getExchangeName());
         var ex = ExchangeBuilder
                 .topicExchange(properties.getExchangeName())
                 .durable(properties.isExchangeDurable())
@@ -112,7 +113,7 @@ public class RabbitMQConfig {
     @Bean
     @Qualifier("deadLetterExchange")
     public Exchange deadLetterExchange() {
-        log.info("Configurando Dead Letter Exchange: " + properties.getDeadLetterExchangeName());
+        log.debug("Configurando Dead Letter Exchange: " + properties.getDeadLetterExchangeName());
         var dlqEx = ExchangeBuilder
                 .topicExchange(properties.getDeadLetterExchangeName())
                 .durable(true)
@@ -125,7 +126,7 @@ public class RabbitMQConfig {
     @Bean
     @Primary
     public Queue dispatcherQueue() {
-        log.info("Configurando queue: " + properties.getQueueName());
+        log.debug("Configurando queue: " + properties.getQueueName());
 
         var q = QueueBuilder
                 .durable(properties.getQueueName())
@@ -133,7 +134,7 @@ public class RabbitMQConfig {
                 .deadLetterExchange(properties.getDeadLetterExchangeName())
                 .build();
 
-        log.info("Queue criada: " + q);
+        log.info("Default Queue criada: " + q);
         return q;
     }
 
@@ -141,7 +142,7 @@ public class RabbitMQConfig {
     @Primary
     public Binding dispatcherQueueBinding(Queue ccsDispatcherQueue,
                                           Exchange ccsDispatcherExchange) {
-        log.info("Configurando binding: " + properties.getRoutingKey());
+        log.debug("Configurando binding: " + properties.getRoutingKey());
         return BindingBuilder
                 .bind(ccsDispatcherQueue)
                 .to(ccsDispatcherExchange)
@@ -152,7 +153,7 @@ public class RabbitMQConfig {
     @Bean
     @Qualifier("deadLetterQueue")
     public Queue deadLetterQueue() {
-        log.info("Configurando Dead Letter Queue: " + properties.getDeadLetterQueueName());
+        log.debug("Configurando Dead Letter Queue: " + properties.getDeadLetterQueueName());
 
         var dlqQueue = QueueBuilder
                 .durable(properties.getDeadLetterQueueName())
@@ -165,7 +166,7 @@ public class RabbitMQConfig {
     @Qualifier("deadLetterQueueBinding")
     public Binding deadLetterQueueBinding(@Qualifier("deadLetterQueue") Queue deadLetterQueue,
                                           @Qualifier("deadLetterExchange") Exchange deadLetterExchange) {
-        log.info("Configurando binding da Dead Letter Queue: " + properties.getDeadLetterRoutingKey());
+        log.debug("Configurando binding da Dead Letter Queue: " + properties.getDeadLetterRoutingKey());
         return BindingBuilder
                 .bind(deadLetterQueue)
                 .to(deadLetterExchange)
@@ -176,7 +177,7 @@ public class RabbitMQConfig {
     @Bean
     @Primary
     public MessageConverter jackson2JsonMessageConverter() {
-        log.info("Configurando Jackson2JsonMessageConverter");
+        log.debug("Configurando Jackson2JsonMessageConverter");
         return new Jackson2JsonMessageConverter(
                 Jackson2ObjectMapperBuilder
                         .json()
@@ -185,11 +186,10 @@ public class RabbitMQConfig {
                         .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL));
     }
 
-
     @Bean
     @Primary
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
-        log.info("Configurando RabbitTemplate");
+        log.debug("Configurando RabbitTemplate");
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter);
 
@@ -203,7 +203,7 @@ public class RabbitMQConfig {
             if (ack) {
                 log.info("Mensagem confirmada: " + correlationData);
             } else {
-                log.warning("Mensagem não confirmada: " + cause);
+                log.error("Mensagem não confirmada: " + cause);
             }
         });
 
