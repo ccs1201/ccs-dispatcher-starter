@@ -47,7 +47,7 @@ public class MessageWrapper {
     @NotNull(message = "must not be null")
     private Map<String, String> headers;
     private Map<String, String> queryParams;
-    private Object body;
+    private String body;
 
     public MessageWrapper() {
     }
@@ -56,7 +56,7 @@ public class MessageWrapper {
                           String method,
                           Map<String, String> headers,
                           Map<String, String> queryParams,
-                          Object body) {
+                          String body) {
         this.path = path;
         this.method = method;
         this.headers = headers;
@@ -80,7 +80,7 @@ public class MessageWrapper {
         return headers;
     }
 
-    public Object getBody() {
+    public String getBody() {
         return body;
     }
 
@@ -94,7 +94,7 @@ public class MessageWrapper {
         private String method;
         private Map<String, String> headers;
         Map<String, String> queryParams;
-        private Object body;
+        private String body;
 
         MessageWrapperBuilder() {
         }
@@ -149,15 +149,26 @@ public class MessageWrapper {
             return queryParams(HttpServletRequestUtil.getQueryParams());
         }
 
-        public MessageWrapperBuilder body(Object body) {
+        public MessageWrapperBuilder body(String body) {
             this.body = body;
             return this;
         }
 
         public MessageWrapper build() {
-            MessageWrapper messageWrapper = new MessageWrapper(path, method, headers, queryParams, body);
+            var messageWrapper = new MessageWrapper(path, method, headers, queryParams, body);
             BeanValidatorUtil.validate(messageWrapper);
             return messageWrapper;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "MessageWrapper{" +
+                "path='" + path + '\'' +
+                ", method='" + method + '\'' +
+                ", headers=" + headers +
+                ", queryParams=" + queryParams +
+                ", body='" + body + '\'' +
+                '}';
     }
 }

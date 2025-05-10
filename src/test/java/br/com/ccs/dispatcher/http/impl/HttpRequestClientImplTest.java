@@ -2,6 +2,7 @@ package br.com.ccs.dispatcher.http.impl;
 
 import br.com.ccs.dispatcher.exceptions.HttpRequestClientException;
 import br.com.ccs.dispatcher.model.MessageWrapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,6 +43,9 @@ class HttpRequestClientImplTest {
     @Mock
     private WebServer mockWebServer;
 
+    @Mock
+    private ObjectMapper objectMapper;
+
     /**
      * Tests the doRequest method when an IOException occurs during the HTTP request.
      * This test ensures that the method properly handles IO-related exceptions by wrapping them in a RuntimeException.
@@ -74,7 +78,7 @@ class HttpRequestClientImplTest {
 
         // Verify
         verify(messageWrapper, times(3)).getPath();
-        verify(messageWrapper, times(2)).getMethod();
+        verify(messageWrapper, times(1)).getMethod();
         verify(mockHttpClient).send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class));
     }
 
@@ -115,7 +119,7 @@ class HttpRequestClientImplTest {
         MessageWrapper messageWrapper = MessageWrapper.builder()
                 .path("/test")
                 .method("GET")
-                .headers(Map.of())
+                .headers(Map.of("a", "b"))
                 .build();
 
         when(mockResponse.body()).thenReturn("Test response");

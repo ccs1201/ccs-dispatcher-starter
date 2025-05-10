@@ -1,5 +1,6 @@
 package br.com.ccs.dispatcher.config.objectMapper;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -8,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import java.text.DateFormat;
 import java.util.logging.Logger;
 
 @Configuration
@@ -22,8 +22,9 @@ public class ObjectMapperConfig {
         final ObjectMapper objectMapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                .registerModule(new JavaTimeModule())
-                .setDateFormat(DateFormat.getDateTimeInstance());
+                .configure(SerializationFeature.INDENT_OUTPUT, true) // Habilita pretty-printing
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .registerModule(new JavaTimeModule());
         log.info("Jackson ObjectMapper initialized");
 
         return objectMapper;

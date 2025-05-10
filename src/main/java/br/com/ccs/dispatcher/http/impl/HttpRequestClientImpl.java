@@ -19,6 +19,8 @@ package br.com.ccs.dispatcher.http.impl;
 import br.com.ccs.dispatcher.exceptions.HttpRequestClientException;
 import br.com.ccs.dispatcher.http.HttpRequestClient;
 import br.com.ccs.dispatcher.model.MessageWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
@@ -31,6 +33,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementação do {@link HttpRequestClient} que utiliza a API de
@@ -50,8 +55,15 @@ import java.time.Duration;
 @Component
 public class HttpRequestClientImpl implements HttpRequestClient, ApplicationListener<WebServerInitializedEvent> {
 
+    private final List<String> headersToIgnore = List.of("host", "content-length", "connection");
+
     private final Logger log = LoggerFactory.getLogger(HttpRequestClientImpl.class);
     private URI BASE_URL;
+    private final ObjectMapper objectMapper;
+
+    public HttpRequestClientImpl(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public void onApplicationEvent(WebServerInitializedEvent event) {
@@ -74,11 +86,13 @@ public class HttpRequestClientImpl implements HttpRequestClient, ApplicationList
         addUri(messageWrapper, httpRequest);
         addHeaders(messageWrapper, httpRequest);
         addParams(messageWrapper, httpRequest);
-        addMethodAndBody(messageWrapper, httpRequest);
-        addMethodAndBody(messageWrapper, httpRequest);
 
         try (var httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build()) {
-            return httpClient.send(httpRequest.build(), HttpResponse.BodyHandlers.ofString()).body();
+            addMethodAndBody(messageWrapper, httpRequest);
+            var request = httpRequest.build();
+            var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            return response.body();
         } catch (InterruptedException | IOException e) {
             throw new HttpRequestClientException("Erro ao encaminhar a mensagem recebida no message dispatcher para " +
                     "o Controller: " + messageWrapper.getPath(), e);
@@ -94,9 +108,11 @@ public class HttpRequestClientImpl implements HttpRequestClient, ApplicationList
         builder.uri(BASE_URL.resolve("/".concat(messageWrapper.getPath())));
     }
 
-    private void addMethodAndBody(MessageWrapper messageWrapper, HttpRequest.Builder builder) {
+    private void addMethodAndBody(MessageWrapper messageWrapper, HttpRequest.Builder builder) throws JsonProcessingException {
         if (messageWrapper.getBody() != null) {
-            builder.method(messageWrapper.getMethod(), HttpRequest.BodyPublishers.ofString(messageWrapper.getBody().toString()));
+            builder.method(messageWrapper.getMethod(), HttpRequest
+                    .BodyPublishers
+                    .ofString(objectMapper.writeValueAsString(messageWrapper.getBody())));
             return;
         }
 
@@ -105,7 +121,12 @@ public class HttpRequestClientImpl implements HttpRequestClient, ApplicationList
 
     private void addParams(MessageWrapper messageWrapper, HttpRequest.Builder builder) {
         if (messageWrapper.getQueryParams() != null) {
-            String queryParams = messageWrapper.getQueryParams().entrySet().stream().map(entry -> entry.getKey().concat("=").concat(entry.getValue())).reduce((s, s2) -> s.concat("&").concat(s2)).orElse("");
+            String queryParams = messageWrapper
+                    .getQueryParams()
+                    .entrySet()
+                    .stream()
+                    .map(entry -> entry.getKey().concat("=").concat(entry.getValue()))
+                    .reduce((s, s2) -> s.concat("&").concat(s2)).orElseGet(()->"");
 
             builder.uri(BASE_URL.resolve("?".concat(queryParams)));
         }
@@ -113,7 +134,15 @@ public class HttpRequestClientImpl implements HttpRequestClient, ApplicationList
 
     private void addHeaders(MessageWrapper messageWrapper, HttpRequest.Builder builder) {
         if (messageWrapper.getHeaders() != null) {
-            messageWrapper.getHeaders().forEach(builder::header);
+            var headers = sanitiseHeaders(messageWrapper.getHeaders());
+            headers.keySet()
+                    .forEach(k -> builder.header(k, messageWrapper.getHeaders().get(k)));
         }
+    }
+
+    private Map<String, String> sanitiseHeaders(Map<String, String> headers) {
+        var newHeaders = new HashMap<String, String>(headers);
+        headersToIgnore.forEach(newHeaders::remove);
+        return newHeaders;
     }
 }

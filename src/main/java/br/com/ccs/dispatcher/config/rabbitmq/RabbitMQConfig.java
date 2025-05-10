@@ -18,7 +18,7 @@ package br.com.ccs.dispatcher.config.rabbitmq;
 
 import br.com.ccs.dispatcher.config.CcsDispatcherAutoConfig;
 import br.com.ccs.dispatcher.config.properties.DispatcherConfigurationProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +35,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-
-import java.text.DateFormat;
 
 
 /**
@@ -176,14 +173,9 @@ public class RabbitMQConfig {
 
     @Bean
     @Primary
-    public MessageConverter jackson2JsonMessageConverter() {
+    public MessageConverter jackson2JsonMessageConverter(ObjectMapper objectMapper) {
         log.debug("Configurando Jackson2JsonMessageConverter");
-        return new Jackson2JsonMessageConverter(
-                Jackson2ObjectMapperBuilder
-                        .json()
-                        .dateFormat(DateFormat.getDateTimeInstance())
-                        .build()
-                        .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL));
+        return new Jackson2JsonMessageConverter(objectMapper);
     }
 
     @Bean

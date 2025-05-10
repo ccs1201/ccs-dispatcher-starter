@@ -57,11 +57,14 @@ public class CcsMessageDispatcher {
     public Object onMessage(Message message) {
 
         try {
-            MessageWrapper messageWrapper = objectMapper.readValue(message.getBody(), MessageWrapper.class);
-            log.info("Mensagem recebida: " + messageWrapper);
+            var messageWrapper = objectMapper.readValue(message.getBody(), MessageWrapper.class);
+            log.debug("Mensagem recebida: {}", messageWrapper);
 
-            // chamar o client web
+            var response = requestClient.doRequest(messageWrapper);
 
+            if(response != null && !response.toString().isBlank()){
+                return objectMapper.readValue(response.toString(), Object.class);
+            }
 
             return null;
 
