@@ -241,6 +241,6 @@ Para suporte e dúvidas:
 
 - Abra uma issue no GitHub
 - Consulte a documentação completa
-- Entre em contato com o desenvolvedor principal no LinkedIn: [Cleber Souza](https://www.linkedin.com/feed/update/urn:li:activity:7242648326699913219/)
+- Entre em contato com o desenvolvedor principal no LinkedIn: [Cleber Souza](https://www.linkedin.com/feed/update/urn:li:activity:7326769792856600576/)
 
 > **Nota:** Este README está em constante evolução. Sugestões de melhorias são sempre bem-vindas!
