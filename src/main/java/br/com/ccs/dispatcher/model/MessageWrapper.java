@@ -17,8 +17,16 @@
 package br.com.ccs.dispatcher.model;
 
 
+import br.com.ccs.dispatcher.util.validator.BeanValidatorUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpMethod;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,15 +43,21 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public class MessageWrapper {
+    @NotBlank(message = "must not be null or empty")
     private String path;
+    @NotBlank(message = "method must not be null or empty")
     private String method;
+    @NotNull(message = "must not be null")
     private Map<String, String> headers;
     private Object body;
 
     public MessageWrapper() {
     }
 
-    public MessageWrapper(String path, String method, Map<String, String> headers, Object body) {
+    public MessageWrapper(String path,
+                          String method,
+                          Map<String, String> headers,
+                          Object body) {
         this.path = path;
         this.method = method;
         this.headers = headers;
@@ -70,7 +84,9 @@ public class MessageWrapper {
         return body;
     }
 
+
     public static class MessageWrapperBuilder {
+
         private String path;
         private String method;
         private Map<String, String> headers;
@@ -99,13 +115,42 @@ public class MessageWrapper {
             return this;
         }
 
+        public MessageWrapperBuilder header(String key, String value) {
+            if (this.headers == null) {
+                this.headers = new HashMap<>();
+            }
+            this.headers.put(key, value);
+            return this;
+        }
+
+
+        public MessageWrapperBuilder autoSetHeaders() {
+
+            var localHeaders = new HashMap<String, String>();
+
+            try {
+                ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+                if (attributes != null) {
+                    HttpServletRequest request = attributes.getRequest();
+                    Collections.list(request.getHeaderNames())
+                            .forEach(headerName -> localHeaders.put(headerName, request.getHeader(headerName)));
+                }
+            } catch (ClassCastException | IllegalStateException e) {
+                throw new IllegalStateException("Failed to access request context", e);
+            }
+
+            return headers(localHeaders);
+        }
+
         public MessageWrapperBuilder body(Object body) {
             this.body = body;
             return this;
         }
 
         public MessageWrapper build() {
-            return new MessageWrapper(path, method, headers, body);
+            MessageWrapper messageWrapper = new MessageWrapper(path, method, headers, body);
+            BeanValidatorUtil.validate(messageWrapper);
+            return messageWrapper;
         }
     }
 }
