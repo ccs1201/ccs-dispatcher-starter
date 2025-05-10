@@ -17,23 +17,20 @@
 package br.com.ccs.dispatcher.model;
 
 
+import br.com.ccs.dispatcher.util.httpservlet.HttpServletRequestUtil;
 import br.com.ccs.dispatcher.util.validator.BeanValidatorUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Esta classe representa um wrapper de mensagem que contém o caminho, método, cabeçalhos e corpo de uma mensagem.
+ * Esta classe representa um wrapper de mensagem que contém o caminho, método, cabeçalhos, queryParams e corpo de uma mensagem.
  * É utilizada para encapsular a mensagem antes de enviá-la ao despachante de mensagens.
  * <p>
- * This class represents a message wrapper that contains the path, method, headers, and body of a message.
+ * This class represents a message wrapper that contains the path, method, headers, queryParams and body of a message.
  * It is used to wrap the message before sending it to the message dispatcher.
  *
  * @author Cleber Souza
@@ -49,6 +46,7 @@ public class MessageWrapper {
     private String method;
     @NotNull(message = "must not be null")
     private Map<String, String> headers;
+    private Map<String, String> queryParams;
     private Object body;
 
     public MessageWrapper() {
@@ -57,10 +55,12 @@ public class MessageWrapper {
     public MessageWrapper(String path,
                           String method,
                           Map<String, String> headers,
+                          Map<String, String> queryParams,
                           Object body) {
         this.path = path;
         this.method = method;
         this.headers = headers;
+        this.queryParams = queryParams;
         this.body = body;
     }
 
@@ -84,12 +84,16 @@ public class MessageWrapper {
         return body;
     }
 
+    public Map<String, String> getQueryParams() {
+        return queryParams;
+    }
 
     public static class MessageWrapperBuilder {
 
         private String path;
         private String method;
         private Map<String, String> headers;
+        Map<String, String> queryParams;
         private Object body;
 
         MessageWrapperBuilder() {
@@ -125,21 +129,24 @@ public class MessageWrapper {
 
 
         public MessageWrapperBuilder autoSetHeaders() {
+            return headers(HttpServletRequestUtil.getHeaders());
+        }
 
-            var localHeaders = new HashMap<String, String>();
+        public MessageWrapperBuilder queryParams(Map<String, String> queryParams) {
+            this.queryParams = queryParams;
+            return this;
+        }
 
-            try {
-                ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-                if (attributes != null) {
-                    HttpServletRequest request = attributes.getRequest();
-                    Collections.list(request.getHeaderNames())
-                            .forEach(headerName -> localHeaders.put(headerName, request.getHeader(headerName)));
-                }
-            } catch (ClassCastException | IllegalStateException e) {
-                throw new IllegalStateException("Failed to access request context", e);
+        public MessageWrapperBuilder queryParams(String key, String Param) {
+            if (this.queryParams == null) {
+                this.queryParams = new HashMap<>();
             }
+            this.queryParams.put(key, Param);
+            return this;
+        }
 
-            return headers(localHeaders);
+        public MessageWrapperBuilder autoSetQueryParams() {
+            return queryParams(HttpServletRequestUtil.getQueryParams());
         }
 
         public MessageWrapperBuilder body(Object body) {
@@ -148,7 +155,7 @@ public class MessageWrapper {
         }
 
         public MessageWrapper build() {
-            MessageWrapper messageWrapper = new MessageWrapper(path, method, headers, body);
+            MessageWrapper messageWrapper = new MessageWrapper(path, method, headers, queryParams, body);
             BeanValidatorUtil.validate(messageWrapper);
             return messageWrapper;
         }
