@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 Cleber Souza
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package br.com.ccs.dispatcher.config.rabbitmq;
 
 import br.com.ccs.dispatcher.config.CcsDispatcherAutoConfiguration;
@@ -21,6 +37,17 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.text.DateFormat;
 import java.util.logging.Logger;
+
+
+/**
+ * Configuração do RabbitMQ. Cria as exchanges, filas e bindings
+ * <p>
+ * RabbitMQ configuration. Creates exchanges, queues and bindings
+ *
+ * @author Cleber Souza
+ * @version 1.0
+ * @since 09/05/2025
+ */
 
 @Configuration
 @AutoConfigureAfter(CcsDispatcherAutoConfiguration.class)
@@ -100,7 +127,7 @@ public class RabbitMQConfig {
     public Queue dispatcherQueue() {
         log.info("Configurando queue: " + properties.getQueueName());
 
-        var q =  QueueBuilder
+        var q = QueueBuilder
                 .durable(properties.getQueueName())
                 .deadLetterRoutingKey(properties.getDeadLetterRoutingKey())
                 .deadLetterExchange(properties.getDeadLetterExchangeName())
@@ -157,7 +184,6 @@ public class RabbitMQConfig {
                         .build()
                         .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL));
     }
-
 
 
     @Bean

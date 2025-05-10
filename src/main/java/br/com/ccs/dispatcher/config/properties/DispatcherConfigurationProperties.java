@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 Cleber Souza
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package br.com.ccs.dispatcher.config.properties;
 
 import br.com.ccs.dispatcher.config.CcsDispatcherAutoConfiguration;
@@ -9,6 +25,52 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.logging.Logger;
+
+
+/**
+ * Propriedades de configuração do Dispatcher.
+ * Configuration properties for the Dispatcher.
+ * <p>
+ * As propriedades podem ser configuradas no arquivo application.properties ou application.yml ou através de variáveis de ambiente.
+ * Properties can be configured in the application.properties or application.yml file or through environment variables.
+ * <p>
+ * Para configurar as propriedades, basta adicionar o prefixo "ccs.dispatcher" antes do nome da propriedade.
+ * To configure the properties, just add the prefix "ccs.dispatcher" before the property name.
+ * <p>
+ * Exemplo:
+ * <p>
+ * ccs.dispatcher.host=127.0.0.1
+ * <p>
+ * ccs.dispatcher.port=5672
+ * <p>
+ * ccs.dispatcher.username=guest
+ * <p>
+ * ccs.dispatcher.password=guest
+ * <p>
+ * ccs.dispatcher.virtualHost=/
+ * <p>
+ * ccs.dispatcher.exchangeName=ccs.dispatcher.ex
+ * <p>
+ * ccs.dispatcher.exchangeType=topic
+ * <p>
+ * ccs.dispatcher.queueName=ccs.dispatcher.queue
+ * <p>
+ * ccs.dispatcher.routingKey=ccs.dispatcher.queue
+ * <p>
+ * ccs.dispatcher.concurrency=1-10
+ * <p>
+ * ccs.dispatcher.queueDurable=true
+ * <p>
+ * ccs.dispatcher.deadLetterQueueName=ccs.dispatcher.queue.dlq
+ * <p>
+ * ccs.dispatcher.deadLetterExchangeName=ccs.dispatcher.ex.dlx
+ * <p>
+ * ccs.dispatcher.deadLetterRoutingKey=ccs.dispatcher.queue.dlq
+ *
+ * @author Cleber Souza
+ * @version 1.0
+ * @since 09/05/2025
+ */
 
 @AutoConfigureBefore(CcsDispatcherAutoConfiguration.class)
 @Component("ccsDispatcherProperties")
