@@ -16,15 +16,15 @@
 
 package br.com.ccs.dispatcher.config.properties;
 
-import br.com.ccs.dispatcher.config.CcsDispatcherAutoConfiguration;
+import br.com.ccs.dispatcher.config.CcsDispatcherAutoConfig;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.logging.Logger;
 
 
 /**
@@ -72,7 +72,7 @@ import java.util.logging.Logger;
  * @since 09/05/2025
  */
 
-@AutoConfigureBefore(CcsDispatcherAutoConfiguration.class)
+@AutoConfigureBefore(CcsDispatcherAutoConfig.class)
 @Component("ccsDispatcherProperties")
 @ConfigurationProperties(prefix = "ccs.dispatcher")
 @Validated
@@ -80,7 +80,7 @@ public class DispatcherConfigurationProperties {
 
     @PostConstruct
     public void init() {
-        final Logger log = Logger.getLogger(DispatcherConfigurationProperties.class.getName());
+        final Logger log = LoggerFactory.getLogger(DispatcherConfigurationProperties.class);
         // Se não foram configurados, criar nomes padrão para DLQ
         if (deadLetterQueueName == null) {
             deadLetterQueueName = queueName.concat(".dlq");
@@ -97,7 +97,7 @@ public class DispatcherConfigurationProperties {
             routingKey = queueName;
         }
 
-        log.info("DispatcherProperties inicializado com os seguintes valores:\n" + this);
+        log.debug("DispatcherProperties inicializado com os seguintes valores:" + this);
     }
 
     /**
