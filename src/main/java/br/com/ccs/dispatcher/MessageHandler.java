@@ -32,15 +32,15 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
  * @version 1.0
  * @since 09/05/2025
  */
-public class CcsMessageDispatcher {
+public class MessageHandler {
 
-    private final Logger log = LoggerFactory.getLogger(CcsMessageDispatcher.class);
+    private final Logger log = LoggerFactory.getLogger(MessageHandler.class);
 
     private final MessageRouter messageRouter;
 
-    public CcsMessageDispatcher(MessageRouter messageRouter) {
+    public MessageHandler(MessageRouter messageRouter) {
         this.messageRouter = messageRouter;
-        log.info("CcsMessageDispatcher inicializado.");
+        log.info("MessageHandler inicializado.");
     }
 
     @RabbitListener(queues = "#{@ccsDispatcherProperties.queueName}",
