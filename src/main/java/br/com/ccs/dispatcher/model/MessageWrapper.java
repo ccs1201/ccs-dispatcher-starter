@@ -16,7 +16,6 @@
 
 package br.com.ccs.dispatcher.model;
 
-
 import br.com.ccs.dispatcher.util.httpservlet.HttpServletRequestUtil;
 import br.com.ccs.dispatcher.util.validator.BeanValidatorUtil;
 import jakarta.validation.constraints.NotBlank;

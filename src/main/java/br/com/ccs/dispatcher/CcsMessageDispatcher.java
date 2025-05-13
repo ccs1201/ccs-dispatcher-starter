@@ -17,10 +17,7 @@
 
 package br.com.ccs.dispatcher;
 
-import br.com.ccs.dispatcher.exceptions.MessageDispatcherException;
-import br.com.ccs.dispatcher.http.HttpRequestClient;
-import br.com.ccs.dispatcher.model.MessageWrapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import br.com.ccs.dispatcher.resolver.MessageRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -39,15 +36,10 @@ public class CcsMessageDispatcher {
 
     private final Logger log = LoggerFactory.getLogger(CcsMessageDispatcher.class);
 
-    private final ObjectMapper objectMapper;
-    private final HttpRequestClient requestClient;
+    private final MessageRouter messageRouter;
 
-    public CcsMessageDispatcher(ObjectMapper objectMapper, HttpRequestClient requestClient) {
-        log.info("Iniciando CcsMessageDispatcher");
-
-        this.objectMapper = objectMapper;
-        this.requestClient = requestClient;
-
+    public CcsMessageDispatcher(MessageRouter messageRouter) {
+        this.messageRouter = messageRouter;
         log.info("CcsMessageDispatcher inicializado.");
     }
 
@@ -55,22 +47,6 @@ public class CcsMessageDispatcher {
             concurrency = "#{@ccsDispatcherProperties.concurrency}",
             returnExceptions = "true")
     public Object onMessage(Message message) {
-
-        try {
-            var messageWrapper = objectMapper.readValue(message.getBody(), MessageWrapper.class);
-            log.debug("Mensagem recebida: {}", messageWrapper);
-
-            var response = requestClient.doRequest(messageWrapper);
-
-            if(response != null && !response.toString().isBlank()){
-                return objectMapper.readValue(response.toString(), Object.class);
-            }
-
-            return null;
-
-        } catch (Exception e) {
-            log.error("Erro ao processar mensagem: " + e.getMessage());
-            throw new MessageDispatcherException("Erro ao processar mensagem", e);
-        }
+        return messageRouter.handleMessage(message);
     }
 }
