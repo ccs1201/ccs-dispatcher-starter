@@ -1,0 +1,29 @@
+package br.com.ccs.dispatcher.util.validator;
+
+
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.NotEmpty;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class BeanValidatorUtilTest {
+
+    @Test
+    public void validate() {
+
+        var testBean = new testeBean();
+
+        var ex = assertThrows(ConstraintViolationException.class, () -> BeanValidatorUtil.validate(testBean));
+        assertEquals(ConstraintViolationException.class, ex.getClass());
+        assertTrue(ex.getMessage().contains("teste: must not be empty"));
+    }
+
+}
+
+class testeBean {
+
+    @NotEmpty
+    private String teste;
+
+}

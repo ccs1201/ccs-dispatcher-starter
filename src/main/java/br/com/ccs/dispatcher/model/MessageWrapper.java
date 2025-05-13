@@ -16,16 +16,20 @@
 
 package br.com.ccs.dispatcher.model;
 
-
+import br.com.ccs.dispatcher.util.httpservlet.HttpServletRequestUtil;
+import br.com.ccs.dispatcher.util.validator.BeanValidatorUtil;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpMethod;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Esta classe representa um wrapper de mensagem que contém o caminho, método, cabeçalhos e corpo de uma mensagem.
+ * Esta classe representa um wrapper de mensagem que contém o caminho, método, cabeçalhos, queryParams e corpo de uma mensagem.
  * É utilizada para encapsular a mensagem antes de enviá-la ao despachante de mensagens.
  * <p>
- * This class represents a message wrapper that contains the path, method, headers, and body of a message.
+ * This class represents a message wrapper that contains the path, method, headers, queryParams and body of a message.
  * It is used to wrap the message before sending it to the message dispatcher.
  *
  * @author Cleber Souza
@@ -35,18 +39,27 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public class MessageWrapper {
+    @NotBlank(message = "must not be null or empty")
     private String path;
+    @NotBlank(message = "method must not be null or empty")
     private String method;
+    @NotNull(message = "must not be null")
     private Map<String, String> headers;
-    private Object body;
+    private Map<String, String> queryParams;
+    private String body;
 
     public MessageWrapper() {
     }
 
-    public MessageWrapper(String path, String method, Map<String, String> headers, Object body) {
+    public MessageWrapper(String path,
+                          String method,
+                          Map<String, String> headers,
+                          Map<String, String> queryParams,
+                          String body) {
         this.path = path;
         this.method = method;
         this.headers = headers;
+        this.queryParams = queryParams;
         this.body = body;
     }
 
@@ -66,15 +79,21 @@ public class MessageWrapper {
         return headers;
     }
 
-    public Object getBody() {
+    public String getBody() {
         return body;
     }
 
+    public Map<String, String> getQueryParams() {
+        return queryParams;
+    }
+
     public static class MessageWrapperBuilder {
+
         private String path;
         private String method;
         private Map<String, String> headers;
-        private Object body;
+        Map<String, String> queryParams;
+        private String body;
 
         MessageWrapperBuilder() {
         }
@@ -99,13 +118,56 @@ public class MessageWrapper {
             return this;
         }
 
-        public MessageWrapperBuilder body(Object body) {
+        public MessageWrapperBuilder header(String key, String value) {
+            if (this.headers == null) {
+                this.headers = new HashMap<>();
+            }
+            this.headers.put(key, value);
+            return this;
+        }
+
+
+        public MessageWrapperBuilder autoSetHeaders() {
+            return headers(HttpServletRequestUtil.getHeaders());
+        }
+
+        public MessageWrapperBuilder queryParams(Map<String, String> queryParams) {
+            this.queryParams = queryParams;
+            return this;
+        }
+
+        public MessageWrapperBuilder queryParams(String key, String Param) {
+            if (this.queryParams == null) {
+                this.queryParams = new HashMap<>();
+            }
+            this.queryParams.put(key, Param);
+            return this;
+        }
+
+        public MessageWrapperBuilder autoSetQueryParams() {
+            return queryParams(HttpServletRequestUtil.getQueryParams());
+        }
+
+        public MessageWrapperBuilder body(String body) {
             this.body = body;
             return this;
         }
 
         public MessageWrapper build() {
-            return new MessageWrapper(path, method, headers, body);
+            var messageWrapper = new MessageWrapper(path, method, headers, queryParams, body);
+            BeanValidatorUtil.validate(messageWrapper);
+            return messageWrapper;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "MessageWrapper{" +
+                "path='" + path + '\'' +
+                ", method='" + method + '\'' +
+                ", headers=" + headers +
+                ", queryParams=" + queryParams +
+                ", body='" + body + '\'' +
+                '}';
     }
 }

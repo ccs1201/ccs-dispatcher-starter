@@ -1,72 +1,42 @@
-/*
- * Copyright 2024 Cleber Souza
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package br.com.ccs.dispatcher.resolver.impl;
 
-
-package br.com.ccs.dispatcher;
-
-import br.com.ccs.dispatcher.exceptions.MessageDispatcherException;
+import br.com.ccs.dispatcher.exceptions.MessageRouterException;
 import br.com.ccs.dispatcher.model.MessageWrapper;
+import br.com.ccs.dispatcher.resolver.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import java.util.logging.Logger;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
-/**
- * Classe responsável por receber as mensagens do RabbitMQ e despachá-las para o handler correto.
- * <p>
- * Class responsible for receiving RabbitMQ messages and dispatching them to the correct handler.
- *
- * @author Cleber Souza
- * @version 1.0
- * @since 09/05/2025
- */
-public class CcsMessageDispatcher {
+@Component
+public class MockedMessageRouterImpl implements MessageRouter {
 
-    private static final Logger log = Logger.getLogger(CcsMessageDispatcher.class.getName());
-
+    private final Logger log = LoggerFactory.getLogger(MockedMessageRouterImpl.class);
     private final ObjectMapper objectMapper;
     private final RequestMappingHandlerMapping handlerMapping;
     private final RequestMappingHandlerAdapter handlerAdapter;
 
-    public CcsMessageDispatcher(ObjectMapper objectMapper,
-                                RequestMappingHandlerMapping handlerMapping,
-                                RequestMappingHandlerAdapter handlerAdapter) {
-        log.info("Iniciando CcsMessageDispatcher");
+    public MockedMessageRouterImpl(ObjectMapper objectMapper, RequestMappingHandlerMapping handlerMapping,
+                                   RequestMappingHandlerAdapter handlerAdapter) {
         this.objectMapper = objectMapper;
         this.handlerMapping = handlerMapping;
         this.handlerAdapter = handlerAdapter;
-        log.info("CcsMessageDispatcher inicializado.");
     }
 
-    @RabbitListener(queues = "#{@ccsDispatcherProperties.queueName}",
-            concurrency = "#{@ccsDispatcherProperties.concurrency}",
-            returnExceptions = "true")
-    public Object onMessage(Message message) {
-
+    public Object handleMessage(Message message) {
+        var messageWrapper = getMessageWrapper(message);
         try {
-            MessageWrapper messageWrapper = objectMapper.readValue(message.getBody(), MessageWrapper.class);
-            log.info("Mensagem recebida: " + messageWrapper);
-
             // Cria request com método e path
             MockHttpServletRequest request = new MockHttpServletRequest(
                     messageWrapper.getMethod(),
@@ -79,8 +49,7 @@ public class CcsMessageDispatcher {
             request.setContentType(contentType != null ? contentType : MessageProperties.CONTENT_TYPE_JSON);
 
             if (messageWrapper.getBody() != null) {
-                byte[] bodyContent = objectMapper.writeValueAsBytes(messageWrapper.getBody());
-                request.setContent(bodyContent);
+                request.setContent(messageWrapper.getBody().getBytes(StandardCharsets.UTF_8));
             }
 
             // Adiciona headers
@@ -88,10 +57,10 @@ public class CcsMessageDispatcher {
                 messageWrapper.getHeaders().forEach(request::addHeader);
             }
 
-//            // Adiciona query parameters se existirem
-//            if (messageWrapper.getQueryParams() != null) {
-//                messageWrapper.getQueryParams().forEach(request::addParameter);
-//            }
+            // Adiciona query parameters se existirem
+            if (messageWrapper.getQueryParams() != null) {
+                messageWrapper.getQueryParams().forEach(request::addParameter);
+            }
 
             // Busca o handler
             HandlerExecutionChain handler = handlerMapping.getHandler(request);
@@ -118,8 +87,18 @@ public class CcsMessageDispatcher {
             return null;
 
         } catch (Exception e) {
-            log.severe("Erro ao processar mensagem: " + e.getMessage());
-            throw new MessageDispatcherException("Erro ao processar mensagem", e);
+            log.error("Erro ao processar mensagem: {}", e.getMessage());
+            throw new MessageRouterException("Nenhum handler encontrado para path: ".concat(messageWrapper.getPath()), e);
+        }
+    }
+
+    private MessageWrapper getMessageWrapper(Message message) {
+        try {
+            var messageWrapper = objectMapper.readValue(message.getBody(), MessageWrapper.class);
+            log.info("Mensagem recebida: " + messageWrapper);
+            return messageWrapper;
+        } catch (IOException e) {
+            throw new MessageRouterException("Erro ao ler mensagem: " + Arrays.toString(message.getBody()), e);
         }
     }
 }
