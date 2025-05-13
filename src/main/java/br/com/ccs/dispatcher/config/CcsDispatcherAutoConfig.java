@@ -16,10 +16,9 @@
 
 package br.com.ccs.dispatcher.config;
 
-import br.com.ccs.dispatcher.CcsMessageDispatcher;
+import br.com.ccs.dispatcher.MessageHandler;
 import br.com.ccs.dispatcher.config.rabbitmq.RabbitMQConfig;
-import br.com.ccs.dispatcher.http.HttpRequestClient;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import br.com.ccs.dispatcher.resolver.MessageRouter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -27,9 +26,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuração do CcsDispatcherAutoConfiguration
+ * Configuração do {@link MessageHandler}
  * <p>
- * Configuration of CcsDispatcherAutoConfiguration
+ * Configuration of {@link MessageHandler}
  *
  * @author Cleber Souza
  * @version 1.0
@@ -41,7 +40,7 @@ import org.springframework.context.annotation.Configuration;
 public class CcsDispatcherAutoConfig {
 
     @Bean
-    public CcsMessageDispatcher ccsMessageDispatcher(ObjectMapper objectMapper, HttpRequestClient requestClient) {
-        return new CcsMessageDispatcher(objectMapper, requestClient);
+    public MessageHandler messageHandler(MessageRouter messageRouter) {
+        return new MessageHandler(messageRouter);
     }
 }

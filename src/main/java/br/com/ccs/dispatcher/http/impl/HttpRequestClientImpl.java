@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Cleber Souza
+ * Copyright 2025 Cleber Souza
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package br.com.ccs.dispatcher.http.impl;
 
+import br.com.ccs.dispatcher.MessageHandler;
 import br.com.ccs.dispatcher.exceptions.HttpRequestClientException;
 import br.com.ccs.dispatcher.http.HttpRequestClient;
 import br.com.ccs.dispatcher.model.MessageWrapper;
@@ -40,12 +41,12 @@ import java.util.Map;
 /**
  * Implementação do {@link HttpRequestClient} que utiliza a API de
  * {@link HttpClient} para fazer as requisições HTTP.
- * Primariamente utilizada para encaminhar as mensagens recebidas no {@link br.com.ccs.dispatcher.CcsMessageDispatcher}
+ * Primariamente utilizada para encaminhar as mensagens recebidas no {@link MessageHandler}
  * para servidor web da aplicação.
  * <p>
  * Implementation of {@link HttpRequestClient} that uses the
  * {@link HttpClient} API to make HTTP requests.
- * Primarily used to forward the messages received in {@link br.com.ccs.dispatcher.CcsMessageDispatcher}
+ * Primarily used to forward the messages received in {@link MessageHandler}
  * to the web server of the application.
  *
  * @author Cleber Souza
@@ -126,7 +127,7 @@ public class HttpRequestClientImpl implements HttpRequestClient, ApplicationList
                     .entrySet()
                     .stream()
                     .map(entry -> entry.getKey().concat("=").concat(entry.getValue()))
-                    .reduce((s, s2) -> s.concat("&").concat(s2)).orElseGet(()->"");
+                    .reduce((s, s2) -> s.concat("&").concat(s2)).orElseGet(() -> "");
 
             builder.uri(BASE_URL.resolve("?".concat(queryParams)));
         }
@@ -141,7 +142,7 @@ public class HttpRequestClientImpl implements HttpRequestClient, ApplicationList
     }
 
     private Map<String, String> sanitiseHeaders(Map<String, String> headers) {
-        var newHeaders = new HashMap<String, String>(headers);
+        var newHeaders = new HashMap<>(headers);
         headersToIgnore.forEach(newHeaders::remove);
         return newHeaders;
     }
