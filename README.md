@@ -114,16 +114,8 @@ public class ExampleController {
 @Service
 public class ExampleService {
     
-    @Autowired
-    private CcsMessageDispatcher dispatcher;
+    //todo
     
-    public void sendMessage(Message message) {
-        dispatcher.send("api/process", message);
-    }
-    
-    public Result sendAndReceive(Message message) {
-        return dispatcher.sendAndReceive("api/process", message, Result.class);
-    }
 }
 ```
 
