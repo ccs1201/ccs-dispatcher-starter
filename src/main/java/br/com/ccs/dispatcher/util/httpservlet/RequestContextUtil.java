@@ -23,6 +23,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Classe utilitária para obter informações do objeto HttpServletRequest atual.
@@ -35,9 +36,9 @@ import java.util.Map;
  * @version 1.0
  * @since 10/05/2025
  */
-public class HttpServletRequestUtil {
+public class RequestContextUtil {
 
-    private HttpServletRequestUtil() {
+    private RequestContextUtil() {
     }
 
     /**
@@ -57,24 +58,24 @@ public class HttpServletRequestUtil {
 
     /**
      * Obtém o cabeçalho especificado do objeto HttpServletRequest atual.
-     * Se o objeto HttpServletRequest não estiver disponível, retorna um mapa vazio.
+     * Se o objeto HttpServletRequest não estiver disponível, retorna um Optional vazio.
      * <p>
      * Retrieves the specified header from the current HttpServletRequest object.
-     * If the HttpServletRequest object is not available, it returns an empty map.
+     * If the HttpServletRequest object is not available, it returns an empty Optional.
      *
      * @param headerName O nome do cabeçalho a ser obtido.
-     * @return Map<String, String> Um mapa contendo o nome do cabeçalho e seu valor.
+     * @return Optional<String> com o valor do cabeçalho ou empty se o cabeçalho não estiver presente.
      * @see HttpServletRequest
      */
-    public static Map<String, String> getHeader(String headerName) {
+    public static Optional<String> getHeader(String headerName) {
 
         var request = getCurrentRequest();
 
-        if (request != null) {
-            return Map.of(headerName, request.getHeader(headerName));
+        if (request == null) {
+            return Optional.empty();
         }
 
-        return Map.of();
+        return Optional.ofNullable(request.getHeader(headerName));
     }
 
     /**
