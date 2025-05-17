@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>br.com.ccs</groupId>
     <artifactId>ccs-dispatcher-starter</artifactId>
-    <version>1.0.0</version>
+    <version>0.0.1-ALPHA</version>
     <packaging>jar</packaging>
     <licenses>
         <license>
