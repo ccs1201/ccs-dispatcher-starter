@@ -1,4 +1,4 @@
-package br.com.ccs.dispatcher.resolver;
+package br.com.ccs.dispatcher.router;
 
 import org.springframework.amqp.core.Message;
 

@@ -1,8 +1,8 @@
-package br.com.ccs.dispatcher.resolver.impl;
+package br.com.ccs.dispatcher.router.impl;
 
-import br.com.ccs.dispatcher.exceptions.MessageRouterException;
-import br.com.ccs.dispatcher.model.MessageWrapper;
-import br.com.ccs.dispatcher.resolver.MessageRouter;
+import br.com.ccs.dispatcher.messaging.exceptions.MessageRouterException;
+import br.com.ccs.dispatcher.messaging.model.MessageWrapper;
+import br.com.ccs.dispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

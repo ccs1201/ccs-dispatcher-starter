@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package br.com.ccs.dispatcher.model;
+package br.com.ccs.dispatcher.messaging.model;
 
-import br.com.ccs.dispatcher.util.httpservlet.HttpServletRequestUtil;
+import br.com.ccs.dispatcher.util.httpservlet.RequestContextUtil;
 import br.com.ccs.dispatcher.util.validator.BeanValidatorUtil;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -128,7 +128,7 @@ public class MessageWrapper {
 
 
         public MessageWrapperBuilder autoSetHeaders() {
-            return headers(HttpServletRequestUtil.getHeaders());
+            return headers(RequestContextUtil.getHeaders());
         }
 
         public MessageWrapperBuilder queryParams(Map<String, String> queryParams) {
@@ -145,7 +145,7 @@ public class MessageWrapper {
         }
 
         public MessageWrapperBuilder autoSetQueryParams() {
-            return queryParams(HttpServletRequestUtil.getQueryParams());
+            return queryParams(RequestContextUtil.getQueryParams());
         }
 
         public MessageWrapperBuilder body(String body) {

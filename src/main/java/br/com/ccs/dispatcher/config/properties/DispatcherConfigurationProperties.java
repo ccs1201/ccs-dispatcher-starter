@@ -26,6 +26,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Arrays;
+
 
 /**
  * Propriedades de configuração do Dispatcher.
@@ -66,6 +68,8 @@ import org.springframework.validation.annotation.Validated;
  * ccs.dispatcher.deadLetterExchangeName=ccs.dispatcher.ex.dlx
  * <p>
  * ccs.dispatcher.deadLetterRoutingKey=ccs.dispatcher.queue.dlq
+ * <p>
+ * ccs.dispatcher.mapped.headers
  *
  * @author Cleber Souza
  * @version 1.0
@@ -97,8 +101,19 @@ public class DispatcherConfigurationProperties {
             routingKey = queueName;
         }
 
+        if (mappedHeaders != null) {
+            mappedHeadersArray = Arrays.stream(mappedHeaders.split(","))
+                    .filter(s -> !s.isEmpty())
+                    .map(String::trim)
+                    .toArray(String[]::new);
+        }
+
         log.debug("DispatcherProperties inicializado com os seguintes valores:" + this);
     }
+
+    @Value("${ccs.dispatcher.mapped.headers}")
+    private String mappedHeaders;
+    private String[] mappedHeadersArray;
 
     /**
      * Ip ou Nome do Host do RabbitMQ
@@ -362,6 +377,10 @@ public class DispatcherConfigurationProperties {
         this.maxInterval = maxInterval;
     }
 
+    public String[] getMappedHeaders() {
+        return mappedHeadersArray;
+    }
+
     @Override
     public String toString() {
         return "DispatcherConfigurationProperties{" +
@@ -380,6 +399,10 @@ public class DispatcherConfigurationProperties {
                 ", deadLetterQueueName='" + deadLetterQueueName + '\'' +
                 ", deadLetterRoutingKey='" + deadLetterRoutingKey + '\'' +
                 ", maxRetryAttempts=" + maxRetryAttempts +
+                ", initialInterval=" + initialInterval +
+                ", multiplier=" + multiplier +
+                ", maxInterval=" + maxInterval +
+                ", mappedHeaders=" + mappedHeaders +
                 '}';
     }
 }

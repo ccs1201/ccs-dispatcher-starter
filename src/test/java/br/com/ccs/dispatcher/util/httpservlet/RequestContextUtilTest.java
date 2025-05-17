@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class HttpServletRequestUtilTest {
+public class RequestContextUtilTest {
 
     @Mock
     private ServletRequestAttributes servletRequestAttributes;
@@ -27,7 +27,7 @@ public class HttpServletRequestUtilTest {
     public void testGetCurrentRequestWhenNoRequestAttributeIsSet() {
         RequestContextHolder.resetRequestAttributes();
 
-        assertNull(HttpServletRequestUtil.getCurrentRequest());
+        assertNull(RequestContextUtil.getCurrentRequest());
     }
 
     /**
@@ -39,7 +39,7 @@ public class HttpServletRequestUtilTest {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(mockRequest));
 
-        assertNotNull(HttpServletRequestUtil.getCurrentRequest());
+        assertNotNull(RequestContextUtil.getCurrentRequest());
 
         RequestContextHolder.resetRequestAttributes();
     }
@@ -55,7 +55,7 @@ public class HttpServletRequestUtilTest {
         RequestContextHolder.resetRequestAttributes();
 
         // Call the method under test
-        var result = HttpServletRequestUtil.getCurrentRequest();
+        var result = RequestContextUtil.getCurrentRequest();
 
         // Assert that the result is null
         assertNull(result, "getCurrentRequest should return null when no request attributes are set");
@@ -72,10 +72,10 @@ public class HttpServletRequestUtilTest {
         RequestContextHolder.resetRequestAttributes();
 
         // Call the method under test
-        Map<String, String> result = HttpServletRequestUtil.getHeader("SomeHeader");
+        var result = RequestContextUtil.getHeader("SomeHeader");
 
         // Verify that an empty map is returned
-        assertEquals(Map.of(), result, "Expected an empty map when no request context is available");
+        assertTrue(result.isEmpty(), "Expected an empty map when no request context is available");
     }
 
     /**
@@ -89,7 +89,7 @@ public class HttpServletRequestUtilTest {
         RequestContextHolder.resetRequestAttributes();
 
         // Call the method under test
-        Map<String, String> headers = HttpServletRequestUtil.getHeaders();
+        Map<String, String> headers = RequestContextUtil.getHeaders();
 
         // Assert that the result is an empty map
         assertTrue(headers.isEmpty(), "Headers should be empty when there's no request context");
@@ -107,7 +107,7 @@ public class HttpServletRequestUtilTest {
 
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(mockRequest));
 
-        Map<String, String> headers = HttpServletRequestUtil.getHeaders();
+        Map<String, String> headers = RequestContextUtil.getHeaders();
 
         assertNotNull(headers);
         assertEquals(2, headers.size());
@@ -128,7 +128,7 @@ public class HttpServletRequestUtilTest {
         request.setMethod("GET");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-        String result = HttpServletRequestUtil.getMethod();
+        String result = RequestContextUtil.getMethod();
 
         assertEquals("GET", result);
         RequestContextHolder.resetRequestAttributes();
@@ -145,7 +145,7 @@ public class HttpServletRequestUtilTest {
         RequestContextHolder.resetRequestAttributes();
 
         // Call the method under test
-        String result = HttpServletRequestUtil.getPath();
+        String result = RequestContextUtil.getPath();
 
         // Verify that an empty string is returned when there's no current request
         assertEquals("", result);
@@ -162,7 +162,7 @@ public class HttpServletRequestUtilTest {
         RequestContextHolder.resetRequestAttributes();
 
         // Call the method under test
-        String result = HttpServletRequestUtil.getQueryParam("anyParam");
+        String result = RequestContextUtil.getQueryParam("anyParam");
 
         // Verify that an empty string is returned when there's no current request
         assertEquals("", result);
@@ -179,7 +179,7 @@ public class HttpServletRequestUtilTest {
         RequestContextHolder.resetRequestAttributes();
 
         // Call the method under test
-        Map<String, String> result = HttpServletRequestUtil.getQueryParams();
+        Map<String, String> result = RequestContextUtil.getQueryParams();
 
         // Verify that an empty map is returned
         assertTrue(result.isEmpty());
@@ -195,10 +195,9 @@ public class HttpServletRequestUtilTest {
         request.addHeader("Test-Header", "Test-Value");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-        Map<String, String> result = HttpServletRequestUtil.getHeader("Test-Header");
+        var result = RequestContextUtil.getHeader("Test-Header");
 
-        assertEquals(1, result.size());
-        assertEquals("Test-Value", result.get("Test-Header"));
+        assertEquals("Test-Value", result.get());
 
         RequestContextHolder.resetRequestAttributes();
     }
@@ -210,7 +209,7 @@ public class HttpServletRequestUtilTest {
     @Test
     public void test_getHeader_whenRequestIsNull() {
         String headerName = "Test-Header";
-        Map<String, String> result = HttpServletRequestUtil.getHeader(headerName);
+        var result = RequestContextUtil.getHeader(headerName);
         assertTrue(result.isEmpty(), "The result should be an empty map when the request is null");
     }
 
@@ -225,7 +224,7 @@ public class HttpServletRequestUtilTest {
         RequestContextHolder.resetRequestAttributes();
 
         // Call the method under test
-        String result = HttpServletRequestUtil.getMethod();
+        String result = RequestContextUtil.getMethod();
 
         // Verify that an empty string is returned
         assertEquals("", result);
@@ -242,7 +241,7 @@ public class HttpServletRequestUtilTest {
         when(servletRequestAttributes.getRequest()).thenReturn(mockRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
 
-        String result = HttpServletRequestUtil.getPath();
+        String result = RequestContextUtil.getPath();
 
         assertEquals("/test/path", result);
 
@@ -262,7 +261,7 @@ public class HttpServletRequestUtilTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(mockRequest));
 
         // Act
-        String result = HttpServletRequestUtil.getQueryParam("testParam");
+        String result = RequestContextUtil.getQueryParam("testParam");
 
         // Assert
         assertEquals("testValue", result);
@@ -282,7 +281,7 @@ public class HttpServletRequestUtilTest {
         request.setParameter("param2", "value2");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-        Map<String, String> result = HttpServletRequestUtil.getQueryParams();
+        Map<String, String> result = RequestContextUtil.getQueryParams();
 
         assertEquals(2, result.size());
         assertEquals("value1", result.get("param1"));

@@ -15,7 +15,7 @@
  */
 
 
-package br.com.ccs.dispatcher.annotations;
+package br.com.ccs.dispatcher.messaging.annotations;
 
 import br.com.ccs.dispatcher.config.CcsDispatcherAutoConfig;
 import org.springframework.context.annotation.Import;
@@ -23,16 +23,16 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
-* Annotation para habilitar o uso do CcsDispatcher.
+* Anotação para habilitar o uso do CcsDispatcher.
 * Annotation to enable the use of CcsDispatcher.
  * <p>
- * Para habilitar o uso do CcsDispatcher, basta adicionar a anotação {@code @EnableCcsDispatcher} na classe de configuração do Spring.
- * To enable the use of CcsDispatcher, just add the {@code @EnableCcsDispatcher} annotation to the Spring configuration class.
+ * Para habilitar o uso do CcsDispatcher, basta adicionar a anotação {@code @EnableMessageDispatcher} na classe de configuração do Spring.
+ * To enable the use of CcsDispatcher, just add the {@code @EnableMessageDispatcher} annotation to the Spring configuration class.
  * <p>
  * Exemplo/Example:
  * <pre>
  * {@literal @}Configuration
- * {@literal @}EnableCcsDispatcher
+ * {@literal @}EnableMessageDispatcher
  * public class AppConfig {
  *     // ...
  * }
@@ -48,5 +48,5 @@ import java.lang.annotation.*;
 @Documented
 @Import(CcsDispatcherAutoConfig.class)
 @SuppressWarnings("unused")
-public @interface EnableCcsDispatcher {
+public @interface EnableMessageDispatcher {
 }

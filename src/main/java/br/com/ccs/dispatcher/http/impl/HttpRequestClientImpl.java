@@ -16,10 +16,10 @@
 
 package br.com.ccs.dispatcher.http.impl;
 
-import br.com.ccs.dispatcher.MessageHandler;
-import br.com.ccs.dispatcher.exceptions.HttpRequestClientException;
+import br.com.ccs.dispatcher.DispatcherMessageHandler;
+import br.com.ccs.dispatcher.messaging.exceptions.HttpRequestClientException;
 import br.com.ccs.dispatcher.http.HttpRequestClient;
-import br.com.ccs.dispatcher.model.MessageWrapper;
+import br.com.ccs.dispatcher.messaging.model.MessageWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -41,12 +41,12 @@ import java.util.Map;
 /**
  * Implementação do {@link HttpRequestClient} que utiliza a API de
  * {@link HttpClient} para fazer as requisições HTTP.
- * Primariamente utilizada para encaminhar as mensagens recebidas no {@link MessageHandler}
+ * Primariamente utilizada para encaminhar as mensagens recebidas no {@link DispatcherMessageHandler}
  * para servidor web da aplicação.
  * <p>
  * Implementation of {@link HttpRequestClient} that uses the
  * {@link HttpClient} API to make HTTP requests.
- * Primarily used to forward the messages received in {@link MessageHandler}
+ * Primarily used to forward the messages received in {@link DispatcherMessageHandler}
  * to the web server of the application.
  *
  * @author Cleber Souza

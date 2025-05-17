@@ -131,6 +131,12 @@
       "type": "java.lang.Integer",
       "description": "Intervalo máximo entre tentativas de reenvio (em milissegundos).",
       "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties"
+    },
+    {
+      "name": "ccs.dispatcher.mapped.headers ",
+      "type": "java.lang.Iterable<java.lang.String>",
+      "description": "Um array dos Headers presentes na request que serão injetados como headers das mensagens publicadas pelo MessagePublisher",
+      "sourceType": "br.com.ccs.dispatcher.config.CcsDispatcherProperties"
     }
   ],
   "hints": []
