@@ -75,15 +75,15 @@ import java.util.Arrays;
  * @since 09/05/2025
  */
 
-@AutoConfigureBefore(CcsDispatcherAutoConfig.class)
-@Component("ccsDispatcherProperties")
+@AutoConfigureBefore(DispatcherAutoConfig.class)
+@Component("DispatcherProperties")
 @ConfigurationProperties(prefix = "ccs.dispatcher")
 @Validated
-public class DispatcherConfigurationProperties {
+public class DispatcherProperties {
 
     @PostConstruct
     public void init() {
-        final Logger log = LoggerFactory.getLogger(DispatcherConfigurationProperties.class);
+        final Logger log = LoggerFactory.getLogger(DispatcherProperties.class);
         // Se não foram configurados, criar nomes padrão para DLQ
         if (deadLetterQueueName == null) {
             deadLetterQueueName = queueName.concat(".dlq");

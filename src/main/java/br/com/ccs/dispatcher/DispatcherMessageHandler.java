@@ -32,6 +32,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
  * @version 1.0
  * @since 09/05/2025
  */
+
+
 public class DispatcherMessageHandler {
 
     private final Logger log = LoggerFactory.getLogger(DispatcherMessageHandler.class);

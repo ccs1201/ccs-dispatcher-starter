@@ -1,6 +1,6 @@
 package br.com.ccs.dispatcher.messaging;
 
-import br.com.ccs.dispatcher.config.DispatcherConfigurationProperties;
+import br.com.ccs.dispatcher.config.DispatcherProperties;
 import br.com.ccs.dispatcher.messaging.exceptions.MessagePublishException;
 import br.com.ccs.dispatcher.util.httpservlet.RequestContextUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +8,7 @@ import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -33,6 +34,7 @@ import java.util.Arrays;
  */
 
 @Component
+@DependsOn("rabbitMQConfig")
 public class MessagePublisher {
 
     private final String HEADER_PREFIX = "x-message-dispatcher-";
@@ -44,12 +46,12 @@ public class MessagePublisher {
 
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
-    private final DispatcherConfigurationProperties properties;
+    private final DispatcherProperties properties;
     @Value("${spring.application.name}")
     private String applicationName;
 
 
-    public MessagePublisher(RabbitTemplate rabbitTemplate, ObjectMapper objectMapper, DispatcherConfigurationProperties properties) {
+    public MessagePublisher(RabbitTemplate rabbitTemplate, ObjectMapper objectMapper, DispatcherProperties properties) {
         this.rabbitTemplate = rabbitTemplate;
         this.objectMapper = objectMapper;
         this.properties = properties;

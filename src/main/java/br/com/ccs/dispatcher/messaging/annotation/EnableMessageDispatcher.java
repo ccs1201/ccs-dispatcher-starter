@@ -17,7 +17,7 @@
 
 package br.com.ccs.dispatcher.messaging.annotation;
 
-import br.com.ccs.dispatcher.config.CcsDispatcherAutoConfig;
+import br.com.ccs.dispatcher.config.DispatcherAutoConfig;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -46,7 +46,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(CcsDispatcherAutoConfig.class)
+@Import(DispatcherAutoConfig.class)
 @SuppressWarnings("unused")
 public @interface EnableMessageDispatcher {
 }

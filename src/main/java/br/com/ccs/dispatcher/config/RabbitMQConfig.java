@@ -44,14 +44,14 @@ import org.springframework.context.annotation.Primary;
  */
 
 @Configuration
-@AutoConfigureAfter(CcsDispatcherAutoConfig.class)
+@AutoConfigureAfter(DispatcherAutoConfig.class)
 @ConditionalOnProperty(name = "ccs.dispatcher.enabled", havingValue = "true", matchIfMissing = true)
 public class RabbitMQConfig {
 
     private final Logger log = LoggerFactory.getLogger(RabbitMQConfig.class);
-    private final DispatcherConfigurationProperties properties;
+    private final DispatcherProperties properties;
 
-    public RabbitMQConfig(@Qualifier("ccsDispatcherProperties") DispatcherConfigurationProperties properties) {
+    public RabbitMQConfig(@Qualifier("DispatcherProperties") DispatcherProperties properties) {
         this.properties = properties;
     }
 

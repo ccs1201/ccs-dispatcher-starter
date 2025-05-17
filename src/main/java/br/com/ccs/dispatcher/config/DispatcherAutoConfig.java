@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @AutoConfigureBefore({RabbitAutoConfiguration.class, RabbitMQConfig.class})
 @ComponentScan(basePackages = "br.com.ccs.dispatcher")
-public class CcsDispatcherAutoConfig {
+public class DispatcherAutoConfig {
 
     @Bean
     public DispatcherMessageHandler messageHandler(MessageRouter messageRouter) {
