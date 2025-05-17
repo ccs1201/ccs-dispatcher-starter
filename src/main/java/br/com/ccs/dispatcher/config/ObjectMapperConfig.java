@@ -1,4 +1,4 @@
-package br.com.ccs.dispatcher.config.objectMapper;
+package br.com.ccs.dispatcher.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;

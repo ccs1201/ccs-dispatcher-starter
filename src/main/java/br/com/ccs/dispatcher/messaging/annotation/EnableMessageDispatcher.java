@@ -15,7 +15,7 @@
  */
 
 
-package br.com.ccs.dispatcher.messaging.annotations;
+package br.com.ccs.dispatcher.messaging.annotation;
 
 import br.com.ccs.dispatcher.config.CcsDispatcherAutoConfig;
 import org.springframework.context.annotation.Import;

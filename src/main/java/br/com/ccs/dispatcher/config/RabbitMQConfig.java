@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package br.com.ccs.dispatcher.config.rabbitmq;
+package br.com.ccs.dispatcher.config;
 
-import br.com.ccs.dispatcher.config.CcsDispatcherAutoConfig;
-import br.com.ccs.dispatcher.config.properties.DispatcherConfigurationProperties;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

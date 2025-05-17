@@ -113,25 +113,25 @@ public class ExampleController {
 ### Exemplo de MessagePublisher
 
 ```java
-import br.com.ccs.dispatcher.config.rabbitmq.MessagePublisher;
+import br.com.ccs.dispatcher.config.MessagePublisher;
 
 @Service
 public class ExampleService {
 
    private final MessagePublisher publisher;
 
-   public ExampleService(MessagePublisher publisher){
-       this.publisher = publisher;
+   public ExampleService(MessagePublisher publisher) {
+      this.publisher = publisher;
    }
 
    @PostMapping("Publish")
    public void publica(@RequestBody MessageInput input) {
-       //Publica um evento / Publish an event (Fire and Forget) no return
-       publisher.sendEvent(input);
-       
-       //Executa uma chamada RPC utilizando o broker de menssageria
+      //Publica um evento / Publish an event (Fire and Forget) no return
+      publisher.sendEvent(input);
+
+      //Executa uma chamada RPC utilizando o broker de menssageria
       //Execute a RPC call through message broker
-       String response = publisher.doPost("domain", "namespace" ,"/doSomething", input, String.class);
+      String response = publisher.doPost("domain", "namespace", "/doSomething", input, String.class);
    }
 
 }

@@ -1,4 +1,4 @@
-package br.com.ccs.dispatcher.messaging.annotations;
+package br.com.ccs.dispatcher.messaging.annotation;
 
 import java.lang.annotation.*;
 

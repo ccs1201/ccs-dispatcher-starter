@@ -1,6 +1,6 @@
 package br.com.ccs.dispatcher.router.impl;
 
-import br.com.ccs.dispatcher.messaging.annotations.EndpointImpl;
+import br.com.ccs.dispatcher.messaging.annotation.EndpointImpl;
 import br.com.ccs.dispatcher.messaging.exceptions.MessageRouterException;
 import br.com.ccs.dispatcher.router.Endpoint;
 import br.com.ccs.dispatcher.router.MessageRouter;

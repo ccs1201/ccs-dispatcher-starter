@@ -17,7 +17,6 @@
 package br.com.ccs.dispatcher.config;
 
 import br.com.ccs.dispatcher.DispatcherMessageHandler;
-import br.com.ccs.dispatcher.config.rabbitmq.RabbitMQConfig;
 import br.com.ccs.dispatcher.router.MessageRouter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;

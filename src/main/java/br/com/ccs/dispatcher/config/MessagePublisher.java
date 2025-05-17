@@ -1,6 +1,5 @@
-package br.com.ccs.dispatcher.config.rabbitmq;
+package br.com.ccs.dispatcher.config;
 
-import br.com.ccs.dispatcher.config.properties.DispatcherConfigurationProperties;
 import br.com.ccs.dispatcher.messaging.MessageTypes;
 import br.com.ccs.dispatcher.messaging.exceptions.MessagePublishException;
 import br.com.ccs.dispatcher.util.httpservlet.RequestContextUtil;
