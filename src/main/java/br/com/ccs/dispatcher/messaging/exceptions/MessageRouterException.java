@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package br.com.ccs.dispatcher.exceptions;
+package br.com.ccs.dispatcher.messaging.exceptions;
 
 /**
  * Exceção lançada quando ocorre um erro no envio de mensagens para a fila RabbitMQ.

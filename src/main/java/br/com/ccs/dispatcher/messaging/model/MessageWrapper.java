@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package br.com.ccs.dispatcher.model;
+package br.com.ccs.dispatcher.messaging.model;
 
 import br.com.ccs.dispatcher.util.httpservlet.RequestContextUtil;
 import br.com.ccs.dispatcher.util.validator.BeanValidatorUtil;

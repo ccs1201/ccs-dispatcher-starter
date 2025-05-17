@@ -1,6 +1,6 @@
-package br.com.ccs.dispatcher.resolver.impl;
+package br.com.ccs.dispatcher.router.impl;
 
-import br.com.ccs.dispatcher.resolver.MessageRouter;
+import br.com.ccs.dispatcher.router.MessageRouter;
 import org.springframework.amqp.core.Message;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;

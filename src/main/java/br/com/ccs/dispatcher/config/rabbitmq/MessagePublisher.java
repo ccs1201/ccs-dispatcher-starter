@@ -1,13 +1,15 @@
 package br.com.ccs.dispatcher.config.rabbitmq;
 
 import br.com.ccs.dispatcher.config.properties.DispatcherConfigurationProperties;
-import br.com.ccs.dispatcher.exceptions.MessagePublishException;
+import br.com.ccs.dispatcher.messaging.MessageTypes;
+import br.com.ccs.dispatcher.messaging.exceptions.MessagePublishException;
 import br.com.ccs.dispatcher.util.httpservlet.RequestContextUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -85,10 +87,50 @@ public class MessagePublisher {
      */
     public void sendEvent(final String exchange, final String routingKey, final Object body) {
         try {
-            rabbitTemplate.convertAndSend(exchange, routingKey, body, this::setMessageHeaders);
+            rabbitTemplate.convertAndSend(exchange, routingKey, body, m -> setMessageHeaders(m, null, "event", MessageTypes.EVENT));
         } catch (AmqpException e) {
             throw new MessagePublishException("Erro ao publicar evento " + e.getMessage(), e);
         }
+    }
+
+    public <T> T doGet(final String routingKey, final String path, final Object body, Class<T> responseClass) {
+        return fetch(HttpMethod.GET, routingKey, path, body, responseClass);
+    }
+
+    public <T> T doGet(final String exchange, final String routingKey, final String path, final Object body, Class<T> responseClass) {
+        return fetch(HttpMethod.GET, exchange, routingKey, path, body, responseClass);
+    }
+
+    public <T> T doPost(final String routingKey, final String path, final Object body, Class<T> responseClass) {
+        return fetch(HttpMethod.POST, routingKey, path, body, responseClass);
+    }
+
+    public <T> T doPost(final String exchange, final String routingKey, final String path, final Object body, Class<T> responseClass) {
+        return fetch(HttpMethod.POST, exchange, routingKey, path, body, responseClass);
+    }
+
+    public <T> T doPut(final String routingKey, final String path, final Object body, Class<T> responseClass) {
+        return fetch(HttpMethod.PUT, routingKey, path, body, responseClass);
+    }
+
+    public <T> T doPut(final String exchange, final String routingKey, final String path, final Object body, Class<T> responseClass) {
+        return fetch(HttpMethod.PUT, exchange, path, routingKey, body, responseClass);
+    }
+
+    public <T> T doPatch(final String routingKey, final String path, final Object body, Class<T> responseClass) {
+        return fetch(HttpMethod.PATCH, routingKey, path, body, responseClass);
+    }
+
+    public <T> T doPatch(final String exchange, final String routingKey, final String path, final Object body, Class<T> responseClass) {
+        return fetch(HttpMethod.PATCH, exchange, path, routingKey, body, responseClass);
+    }
+
+    public <T> T doDelete(final String routingKey, final String path, final Object body, Class<T> responseClass) {
+        return fetch(HttpMethod.DELETE, routingKey, path, body, responseClass);
+    }
+
+    public <T> T doDelete(final String exchange, final String routingKey, final String path, final Object body, Class<T> responseClass) {
+        return fetch(HttpMethod.DELETE, exchange, path, routingKey, body, responseClass);
     }
 
     /**
@@ -101,8 +143,8 @@ public class MessagePublisher {
      * @param <T>           tipo de retorno esperado / type of expected return
      * @return (responseClass) object
      */
-    public <T> T fetch(final Object body, final @NonNull Class<T> responseClass) {
-        return this.fetch(properties.getExchangeName(), properties.getRoutingKey(), body, responseClass);
+    public <T> T fetch(final HttpMethod method, final Object body, final String path, final @NonNull Class<T> responseClass) {
+        return this.fetch(method, properties.getExchangeName(), properties.getRoutingKey(), path, body, responseClass);
     }
 
 
@@ -117,8 +159,8 @@ public class MessagePublisher {
      * @param <T>           tipo de retorno esperado / type of expected return
      * @return
      */
-    public <T> T fetch(final String routingKey, final Object body, final @NonNull Class<T> responseClass) {
-        return this.fetch(properties.getExchangeName(), routingKey, body, responseClass);
+    public <T> T fetch(final HttpMethod method, final String routingKey, final String path, final Object body, final @NonNull Class<T> responseClass) {
+        return this.fetch(method, properties.getExchangeName(), routingKey, path, body, responseClass);
     }
 
     /**
@@ -133,9 +175,9 @@ public class MessagePublisher {
      * @param <T>           tipo de retorno esperado / type of expected return
      * @return (responseClass) object
      */
-    public <T> T fetch(final String exchange, final String routingKey, final Object body, final Class<T> responseClass) {
+    public <T> T fetch(final HttpMethod method, final String exchange, final String routingKey, String path, final Object body, final Class<T> responseClass) {
         try {
-            var response = rabbitTemplate.convertSendAndReceive(exchange, routingKey, body, this::setMessageHeaders);
+            var response = rabbitTemplate.convertSendAndReceive(exchange, routingKey, body, m -> setMessageHeaders(m, method, path, MessageTypes.RPC));
 
             if (response != null) {
                 return objectMapper.convertValue(response, responseClass);
@@ -147,11 +189,17 @@ public class MessagePublisher {
         }
     }
 
-    private Message setMessageHeaders(Message message) {
+    private Message setMessageHeaders(Message message, HttpMethod method, String path, MessageTypes type) {
 
         var messageProperties = message.getMessageProperties();
 
-        messageProperties.setHeader("x-dispatcher-origin", this.applicationName);
+        if (type != MessageTypes.EVENT) {
+            messageProperties.setHeader("x-message-dispatcher-method", method.name());
+        }
+
+        messageProperties.setHeader("x-message-dispatcher-type", type);
+        messageProperties.setHeader("x-message-dispatcher-path", path);
+        messageProperties.setHeader("x-message-dispatcher-origin", this.applicationName);
 
         Arrays.stream(properties
                         .getMappedHeaders())

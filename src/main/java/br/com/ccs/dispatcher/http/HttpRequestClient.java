@@ -1,6 +1,6 @@
 package br.com.ccs.dispatcher.http;
 
-import br.com.ccs.dispatcher.model.MessageWrapper;
+import br.com.ccs.dispatcher.messaging.model.MessageWrapper;
 
 public interface HttpRequestClient {
 

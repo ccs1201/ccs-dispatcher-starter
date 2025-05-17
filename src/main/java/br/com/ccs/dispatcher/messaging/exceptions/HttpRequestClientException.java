@@ -1,4 +1,4 @@
-package br.com.ccs.dispatcher.exceptions;
+package br.com.ccs.dispatcher.messaging.exceptions;
 
 public class HttpRequestClientException extends DispatcherException {
     public HttpRequestClientException(String msg, Exception e) {

@@ -17,7 +17,7 @@
 
 package br.com.ccs.dispatcher;
 
-import br.com.ccs.dispatcher.resolver.MessageRouter;
+import br.com.ccs.dispatcher.router.MessageRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -32,13 +32,13 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
  * @version 1.0
  * @since 09/05/2025
  */
-public class MessageHandler {
+public class DispatcherMessageHandler {
 
-    private final Logger log = LoggerFactory.getLogger(MessageHandler.class);
+    private final Logger log = LoggerFactory.getLogger(DispatcherMessageHandler.class);
 
     private final MessageRouter messageRouter;
 
-    public MessageHandler(MessageRouter messageRouter) {
+    public DispatcherMessageHandler(MessageRouter messageRouter) {
         this.messageRouter = messageRouter;
         log.info("MessageHandler inicializado.");
     }

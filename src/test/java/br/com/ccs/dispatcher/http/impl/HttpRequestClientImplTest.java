@@ -1,7 +1,7 @@
 package br.com.ccs.dispatcher.http.impl;
 
-import br.com.ccs.dispatcher.exceptions.HttpRequestClientException;
-import br.com.ccs.dispatcher.model.MessageWrapper;
+import br.com.ccs.dispatcher.messaging.exceptions.HttpRequestClientException;
+import br.com.ccs.dispatcher.messaging.model.MessageWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
