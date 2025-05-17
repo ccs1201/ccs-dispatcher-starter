@@ -113,7 +113,7 @@ public class ExampleController {
 ### Exemplo de MessagePublisher
 
 ```java
-import br.com.ccs.dispatcher.config.MessagePublisher;
+import br.com.ccs.dispatcher.messaging.MessagePublisher;
 
 @Service
 public class ExampleService {

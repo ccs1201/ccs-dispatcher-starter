@@ -1,7 +1,7 @@
 package br.com.ccs.dispatcher.config.rabbitmq;
 
 import br.com.ccs.dispatcher.config.DispatcherConfigurationProperties;
-import br.com.ccs.dispatcher.config.MessagePublisher;
+import br.com.ccs.dispatcher.messaging.MessagePublisher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
