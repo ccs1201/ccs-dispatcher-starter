@@ -13,6 +13,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 
 /**
@@ -31,8 +32,16 @@ import java.util.Arrays;
  * @version 1.0
  * @since 16/05/2025
  */
+
 @Component
 public class MessagePublisher {
+
+    private final String HEADER_PREFIX = "x-message-dispatcher-";
+    private final String HEADER_MESSAGE_TYPE = HEADER_PREFIX + "message-type";
+    private final String HEADER_MESSAGE_TIMESTAMP = HEADER_PREFIX + "message-timestamp";
+    private final String HEADER_MESSAGE_SOURCE = HEADER_PREFIX + "message-source";
+    private final String HEADER_MESSAGE_PATH = HEADER_PREFIX + "message-path";
+    private final String HEADER_MESSAGE_METHOD = HEADER_PREFIX + "message-method";
 
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
@@ -192,14 +201,15 @@ public class MessagePublisher {
     private Message setMessageHeaders(Message message, HttpMethod method, String path, MessageTypes type) {
 
         var messageProperties = message.getMessageProperties();
+        messageProperties.setHeader(HEADER_MESSAGE_TIMESTAMP, OffsetDateTime.now());
 
         if (type != MessageTypes.EVENT) {
-            messageProperties.setHeader("x-message-dispatcher-method", method.name());
+            messageProperties.setHeader(HEADER_MESSAGE_METHOD, method.name());
         }
 
-        messageProperties.setHeader("x-message-dispatcher-type", type);
-        messageProperties.setHeader("x-message-dispatcher-path", path);
-        messageProperties.setHeader("x-message-dispatcher-origin", this.applicationName);
+        messageProperties.setHeader(HEADER_MESSAGE_TYPE, type);
+        messageProperties.setHeader(HEADER_MESSAGE_PATH, path);
+        messageProperties.setHeader(HEADER_MESSAGE_SOURCE, this.applicationName);
 
         Arrays.stream(properties
                         .getMappedHeaders())
