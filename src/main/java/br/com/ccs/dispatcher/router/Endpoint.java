@@ -1,6 +1,6 @@
 package br.com.ccs.dispatcher.router;
 
-public interface Endpoint<I, R> {
+public interface Endpoint {
 
-    R handle(I input);
+    <I, R> R handle(I input);
 }
