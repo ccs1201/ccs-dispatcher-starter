@@ -70,8 +70,8 @@ public class AnnotateddMessageRouter implements MessageRouter {
             }
 
             var parameterType = endpoint.getClass().getAnnotation(MessageListener.class).forClass();
-            final Object payload;
-            payload = objectMapper.readValue(message.getBody(), parameterType);
+           
+            var payload = objectMapper.readValue(message.getBody(), parameterType);
 
             return endpoint.get().handle(payload);
 
