@@ -1,5 +1,6 @@
 package br.com.ccs.dispatcher.router.impl;
 
+import br.com.ccs.dispatcher.messaging.annotation.MessageHandler;
 import br.com.ccs.dispatcher.messaging.annotation.MessageListener;
 import br.com.ccs.dispatcher.messaging.exceptions.MessageRouterException;
 import br.com.ccs.dispatcher.router.Endpoint;
@@ -23,7 +24,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 @Primary
 public class AnnotateddMessageRouter implements MessageRouter {
 
-    private final Logger log = LoggerFactory.getLogger(AnnotateddMessageRouter.class);
+    private static final Logger log = LoggerFactory.getLogger(AnnotateddMessageRouter.class);
 
     private final ObjectMapper objectMapper;
     private final Map<String, Endpoint> handlersMap;
@@ -42,10 +43,12 @@ public class AnnotateddMessageRouter implements MessageRouter {
     private static String getDeclaredForClass(final Endpoint endpoint) {
 
         if (endpoint.getClass().isAnnotationPresent(MessageListener.class)) {
-            return endpoint.getClass()
-                    .getDeclaredAnnotation(MessageListener.class)
-                    .forClass()
-                    .getSimpleName();
+            log.info("Found handler for type: {}", endpoint.getClass().getName());
+            return "";
+//                    endpoint.getClass()
+//                    .getDeclaredAnnotation(MessageListener.class)
+//                    .forClass()
+//                    .getSimpleName();
         }
         throw new MessageRouterException(endpoint.getClass().getName() + " is not annotated with @MessageListener", null);
     }
@@ -66,11 +69,11 @@ public class AnnotateddMessageRouter implements MessageRouter {
         try {
             if (endpoint.isEmpty()) {
                 log.warn("No handler found for type: {}", typeId);
-                return null;
+                throw new MessageRouterException("No handler found for type: " + typeId, null);
             }
 
-            var parameterType = endpoint.getClass().getAnnotation(MessageListener.class).forClass();
-           
+            var parameterType = endpoint.getClass().getAnnotation(MessageHandler.class).forClass();
+
             var payload = objectMapper.readValue(message.getBody(), parameterType);
 
             return endpoint.get().handle(payload);

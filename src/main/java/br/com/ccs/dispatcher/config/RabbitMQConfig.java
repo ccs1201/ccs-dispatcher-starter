@@ -16,6 +16,7 @@
 
 package br.com.ccs.dispatcher.config;
 
+import br.com.ccs.dispatcher.config.properties.DispatcherProperties;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

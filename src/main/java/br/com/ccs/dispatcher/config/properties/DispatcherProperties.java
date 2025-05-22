@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package br.com.ccs.dispatcher.config;
+package br.com.ccs.dispatcher.config.properties;
 
+import br.com.ccs.dispatcher.config.DispatcherAutoConfig;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

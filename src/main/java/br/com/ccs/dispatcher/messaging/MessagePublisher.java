@@ -1,6 +1,6 @@
 package br.com.ccs.dispatcher.messaging;
 
-import br.com.ccs.dispatcher.config.DispatcherProperties;
+import br.com.ccs.dispatcher.config.properties.DispatcherProperties;
 import br.com.ccs.dispatcher.messaging.exceptions.MessagePublishException;
 import br.com.ccs.dispatcher.util.httpservlet.RequestContextUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;

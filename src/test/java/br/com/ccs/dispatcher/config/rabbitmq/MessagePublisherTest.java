@@ -1,6 +1,6 @@
 package br.com.ccs.dispatcher.config.rabbitmq;
 
-import br.com.ccs.dispatcher.config.DispatcherProperties;
+import br.com.ccs.dispatcher.config.properties.DispatcherProperties;
 import br.com.ccs.dispatcher.messaging.MessagePublisher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.extension.ExtendWith;
