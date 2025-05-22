@@ -66,7 +66,7 @@ public class AnnotateddMessageRouter implements MessageRouter {
         try {
             if (endpoint.isEmpty()) {
                 log.warn("No handler found for type: {}", typeId);
-                return null;
+                throw new MessageRouterException("No handler found for type: " + typeId, null);
             }
 
             var parameterType = endpoint.getClass().getAnnotation(MessageListener.class).forClass();

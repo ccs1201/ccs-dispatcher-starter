@@ -226,7 +226,8 @@ public class ExampleService {
 5. Abra um Pull Request
 
 ---
-
+![diagrama.png](diagrama.png)
+---
 ## Licença
 
 Copyright 2024 Cleber Souza
