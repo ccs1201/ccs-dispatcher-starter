@@ -16,6 +16,7 @@
 
 package br.com.ccs.dispatcher.config;
 
+import br.com.ccs.dispatcher.config.builder.RabbitMQConfigBuilder;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -50,9 +52,11 @@ public class RabbitMQConfig {
 
     private final Logger log = LoggerFactory.getLogger(RabbitMQConfig.class);
     private final DispatcherProperties properties;
+    private final RabbitMQConfigBuilder configBuilder;
 
     public RabbitMQConfig(@Qualifier("DispatcherProperties") DispatcherProperties properties) {
         this.properties = properties;
+        this.configBuilder = RabbitMQConfigBuilder.builder(properties);
     }
 
     @PostConstruct
@@ -69,134 +73,58 @@ public class RabbitMQConfig {
     @Bean
     @Primary
     public ConnectionFactory connectionFactory() {
-        log.debug("Configurando ConnectionFactory");
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-        connectionFactory.setHost(properties.getHost());
-        connectionFactory.setPort(properties.getPort());
-        connectionFactory.setUsername(properties.getUsername());
-        connectionFactory.setPassword(properties.getPassword());
-        connectionFactory.setVirtualHost(properties.getVirtualHost());
-        connectionFactory.setPublisherConfirmType(CachingConnectionFactory.ConfirmType.CORRELATED);
-        connectionFactory.setPublisherReturns(true);
-
-        log.debug("ConnectionFactory configurada");
-        return connectionFactory;
+        return configBuilder.buildConnectionFactory();
     }
 
     @Bean
     @Primary
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
-        log.debug("Configurando RabbitAdmin");
+
         return new RabbitAdmin(connectionFactory);
     }
 
     @Bean
     @Primary
     public Exchange dispatcherExchange() {
-        log.debug("Configurando exchange: " + properties.getExchangeName());
-        var ex = ExchangeBuilder
-                .topicExchange(properties.getExchangeName())
-                .durable(properties.isExchangeDurable())
-                .build();
-
-        log.info("Exchange criada: " + ex);
-        return ex;
+        return configBuilder.buildDispatcherExchange();
     }
 
     @Bean
     @Qualifier("deadLetterExchange")
     public Exchange deadLetterExchange() {
-        log.debug("Configurando Dead Letter Exchange: " + properties.getDeadLetterExchangeName());
-        var dlqEx = ExchangeBuilder
-                .topicExchange(properties.getDeadLetterExchangeName())
-                .durable(true)
-                .build();
-
-        log.info("Dead Letter Exchange criada: " + dlqEx);
-        return dlqEx;
+        return configBuilder.buildDeadLetterExchange();
     }
 
     @Bean
     @Primary
     public Queue dispatcherQueue() {
-        log.debug("Configurando queue: " + properties.getQueueName());
-
-        var q = QueueBuilder
-                .durable(properties.getQueueName())
-                .deadLetterRoutingKey(properties.getDeadLetterRoutingKey())
-                .deadLetterExchange(properties.getDeadLetterExchangeName())
-                .build();
-
-        log.info("Default Queue criada: " + q);
-        return q;
+        return configBuilder.buildDispatcherQueue();
     }
 
     @Bean
     @Primary
     public Binding dispatcherQueueBinding(Queue ccsDispatcherQueue,
                                           Exchange ccsDispatcherExchange) {
-        log.debug("Configurando binding: " + properties.getRoutingKey());
-        return BindingBuilder
-                .bind(ccsDispatcherQueue)
-                .to(ccsDispatcherExchange)
-                .with(properties.getRoutingKey())
-                .noargs();
+        return configBuilder.buildDispatcherBinding(ccsDispatcherQueue, ccsDispatcherExchange);
     }
 
     @Bean
     @Qualifier("deadLetterQueue")
     public Queue deadLetterQueue() {
-        log.debug("Configurando Dead Letter Queue: " + properties.getDeadLetterQueueName());
-
-        var dlqQueue = QueueBuilder
-                .durable(properties.getDeadLetterQueueName())
-                .build();
-        log.info("Dead Letter Queue criada: " + dlqQueue);
-        return dlqQueue;
+        return configBuilder.buildDeadLetterQueue();
     }
 
     @Bean
     @Qualifier("deadLetterQueueBinding")
     public Binding deadLetterQueueBinding(@Qualifier("deadLetterQueue") Queue deadLetterQueue,
                                           @Qualifier("deadLetterExchange") Exchange deadLetterExchange) {
-        log.debug("Configurando binding da Dead Letter Queue: " + properties.getDeadLetterRoutingKey());
-        return BindingBuilder
-                .bind(deadLetterQueue)
-                .to(deadLetterExchange)
-                .with(properties.getDeadLetterRoutingKey())
-                .noargs();
+        return configBuilder.buildDeadLetterBinding(deadLetterQueue, deadLetterExchange);
     }
 
     @Bean
     @Primary
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
-        log.debug("Configurando RabbitTemplate");
-        RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setMessageConverter(messageConverter);
-
-        // Configurando exchange e routing key padrão
-        template.setExchange(properties.getExchangeName());
-        template.setRoutingKey(properties.getRoutingKey());
-
-        // Configurando confirmação de publicação
-        template.setMandatory(true);
-        template.setConfirmCallback((correlationData, ack, cause) -> {
-            if (ack) {
-                log.info("Mensagem confirmada: " + correlationData);
-            } else {
-                log.error("Mensagem não confirmada: " + cause);
-            }
-        });
-
-        // Configurando retorno de mensagem
-        template.setReturnsCallback(returned -> log.info("Mensagem retornada: " + returned.getMessage() +
-                " code: " + returned.getReplyCode() +
-                " reason: " + returned.getReplyText()));
-
-        log.info("RabbitTemplate configurado com exchange: " + properties.getExchangeName() +
-                " e routing key: " + properties.getRoutingKey());
-
-        return template;
+    public RabbitTemplate rabbitTemplate(MessageConverter messageConverter) {
+        return configBuilder.buildRabbitTemplate(messageConverter);
     }
 
     //    @Bean

@@ -44,7 +44,7 @@ public class AnnotateddMessageRouter implements MessageRouter {
         if (endpoint.getClass().isAnnotationPresent(MessageListener.class)) {
             return endpoint.getClass()
                     .getDeclaredAnnotation(MessageListener.class)
-                    .forClass()
+                    .getClass()
                     .getSimpleName();
         }
         throw new MessageRouterException(endpoint.getClass().getName() + " is not annotated with @MessageListener", null);

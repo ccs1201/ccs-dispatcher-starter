@@ -78,7 +78,6 @@ import java.util.Arrays;
 @AutoConfigureBefore(DispatcherAutoConfig.class)
 @Component("DispatcherProperties")
 @ConfigurationProperties(prefix = "ccs.dispatcher")
-@Validated
 public class DispatcherProperties {
 
     @PostConstruct
