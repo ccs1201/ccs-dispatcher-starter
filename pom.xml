@@ -4,14 +4,14 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>br.com.ccs</groupId>
-    <artifactId>ccs-dispatcher-starter</artifactId>
+    <artifactId>message-dispatcher-starter</artifactId>
     <version>0.0.1-ALPHA</version>
     <packaging>jar</packaging>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>https://github.com/ccs1201/ccs-dispatcher-starter</distribution>
+            <distribution>https://github.com/ccs1201/message-dispatcher-starter</distribution>
         </license>
     </licenses>
 
