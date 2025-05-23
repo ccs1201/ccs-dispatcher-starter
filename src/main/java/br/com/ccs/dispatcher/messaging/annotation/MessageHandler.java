@@ -1,5 +1,7 @@
 package br.com.ccs.dispatcher.messaging.annotation;
 
+import br.com.ccs.dispatcher.messaging.MessageType;
+
 import java.lang.annotation.*;
 
 /**
@@ -16,7 +18,7 @@ public @interface MessageHandler {
      * Ação que o método processa (command, query or event).
      * Action that's handler process (command, query or event).
      */
-    String action() default "";
+    MessageType action();
 
     /**
      * Tipo de mensagem que este handler processa
@@ -24,5 +26,9 @@ public @interface MessageHandler {
      */
     String type() default "";
 
+    /**
+     * Classe que o handler processa.
+     * Class that's handler process.
+     */
     Class<?> forClass() default Void.class;
 }

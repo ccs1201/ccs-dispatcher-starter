@@ -97,7 +97,7 @@ public class MessagePublisher {
      */
     public void sendEvent(final String exchange, final String routingKey, final Object body) {
         try {
-            rabbitTemplate.convertAndSend(exchange, routingKey, body, m -> setMessageHeaders(m, null, "event", MessageTypes.EVENT));
+            rabbitTemplate.convertAndSend(exchange, routingKey, body, m -> setMessageHeaders(m, null, "event", MessageType.EVENT));
         } catch (AmqpException e) {
             throw new MessagePublishException("Erro ao publicar evento " + e.getMessage(), e);
         }
@@ -187,7 +187,7 @@ public class MessagePublisher {
      */
     public <T> T fetch(final HttpMethod method, final String exchange, final String routingKey, String path, final Object body, final Class<T> responseClass) {
         try {
-            var response = rabbitTemplate.convertSendAndReceive(exchange, routingKey, body, m -> setMessageHeaders(m, method, path, MessageTypes.RPC));
+            var response = rabbitTemplate.convertSendAndReceive(exchange, routingKey, body, m -> setMessageHeaders(m, method, path, MessageType.RPC));
 
             if (response != null) {
                 return objectMapper.convertValue(response, responseClass);
@@ -199,12 +199,12 @@ public class MessagePublisher {
         }
     }
 
-    private Message setMessageHeaders(Message message, HttpMethod method, String path, MessageTypes type) {
+    private Message setMessageHeaders(Message message, HttpMethod method, String path, MessageType type) {
 
         var messageProperties = message.getMessageProperties();
         messageProperties.setHeader(HEADER_MESSAGE_TIMESTAMP, OffsetDateTime.now());
 
-        if (type != MessageTypes.EVENT) {
+        if (type != MessageType.EVENT) {
             messageProperties.setHeader(HEADER_MESSAGE_METHOD, method.name());
         }
 

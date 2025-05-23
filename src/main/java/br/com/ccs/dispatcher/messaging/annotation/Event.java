@@ -1,18 +1,25 @@
 package br.com.ccs.dispatcher.messaging.annotation;
 
+import br.com.ccs.dispatcher.messaging.MessageType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
 
 
 /**
- * Eventos não possuem retorno, recebem um notifição e executam alguma ação.
+ * Eventos não possuem retorno, recebem uma notificação e executam alguma ação.
  * <p>
- * Eventos são publicados e consumidos por todos os contextos.
+ * Representam fatos que já aconteceram no sistema
  * <p>
- *
+ * São imutáveis
+ * <p>
+ * São o resultado da execução de commands
+ * <p>
+ * Exemplo: ProductCreated, OrderUpdated, CustomerDeleted
+ * <p>
+ * Podem ser usados para sincronizar diferentes modelos de dados
  */
-@MessageHandler(action = "Event")
+@MessageHandler(action = MessageType.EVENT)
 @Documented
 public @interface Event {
 
