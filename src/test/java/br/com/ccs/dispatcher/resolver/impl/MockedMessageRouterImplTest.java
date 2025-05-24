@@ -1,8 +1,8 @@
 package br.com.ccs.dispatcher.resolver.impl;
 
-import br.com.ccs.dispatcher.messaging.exceptions.MessageRouterException;
-import br.com.ccs.dispatcher.messaging.model.MessageWrapper;
-import br.com.ccs.dispatcher.router.impl.MockedMessageRouterImpl;
+import br.com.ccs.messagedispatcher.messaging.exceptions.MessageRouterMessageProcessException;
+import br.com.ccs.messagedispatcher.messaging.model.MessageWrapper;
+import br.com.ccs.messagedispatcher.router.impl.MockedMessageRouterImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,7 +64,7 @@ public class MockedMessageRouterImplTest {
      * - The exception message should indicate that no handler was found for the given path
      */
     @Test
-    public void testHandleMessageWithNullBodyAndNoHandler() throws Exception {
+    public void testRouteMessageWithNullBodyAndNoHandler() throws Exception {
 
         MessageWrapper messageWrapper = MessageWrapper.builder()
                 .path("/xxx")
@@ -79,7 +79,7 @@ public class MockedMessageRouterImplTest {
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
         // Act & Assert
-        var exception = assertThrows(MessageRouterException.class, () -> router.handleMessage(message));
+        var exception = assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
 
         assertEquals("Nenhum handler encontrado para path: /xxx", exception.getMessage());
     }
@@ -98,7 +98,7 @@ public class MockedMessageRouterImplTest {
      * This scenario is explicitly handled in the focal method by throwing an IllegalArgumentException.
      */
     @Test
-    public void test_handleMessage_noHandlerFound() throws Exception {
+    public void test_routeMessage_noHandlerFound() throws Exception {
         MessageWrapper messageWrapper = MessageWrapper.builder()
                 .path("/invalid-path")
                 .method("GET")
@@ -109,7 +109,7 @@ public class MockedMessageRouterImplTest {
         when(objectMapper.readValue(any(byte[].class), any(Class.class))).thenReturn(messageWrapper);
         when(handlerMapping.getHandler(any())).thenReturn(null);
 
-        assertThrows(MessageRouterException.class, () -> router.handleMessage(message));
+        assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
 
     }
 
@@ -121,7 +121,7 @@ public class MockedMessageRouterImplTest {
      * and throws an IllegalArgumentException with an appropriate error message.
      */
     @Test
-    public void test_handleMessage_noHandlerFoundEmptyResponse() throws Exception {
+    public void test_routeMessage_noHandlerFoundEmptyResponse() throws Exception {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
 
@@ -141,7 +141,7 @@ public class MockedMessageRouterImplTest {
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
         // Act & Assert
-        var exception = assertThrows(MessageRouterException.class, () -> router.handleMessage(message));
+        var exception = assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
         assertEquals("Nenhum handler encontrado para path: /test", exception.getMessage());
     }
 
@@ -161,7 +161,7 @@ public class MockedMessageRouterImplTest {
      * which is then wrapped in a MessageDispatcherException.
      */
     @Test
-    public void test_handleMessage_noHandlerFoundNonJsonResponse() {
+    public void test_routeMessage_noHandlerFoundNonJsonResponse() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "text/plain");
 
@@ -183,7 +183,7 @@ public class MockedMessageRouterImplTest {
             when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
             // Execute method and assert
-            assertThrows(MessageRouterException.class, () -> router.handleMessage(message));
+            assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
 
             // Verify interactions
             verify(handlerMapping).getHandler(any(MockHttpServletRequest.class));
@@ -205,7 +205,7 @@ public class MockedMessageRouterImplTest {
      * Expected: IllegalArgumentException is thrown
      */
     @Test
-    public void test_handleMessage_noHandlerFound_2() throws Exception {
+    public void test_routeMessage_noHandlerFound_2() throws Exception {
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("param", "value");
 
@@ -223,7 +223,7 @@ public class MockedMessageRouterImplTest {
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
         // Act & Assert
-        assertThrows(MessageRouterException.class, () -> router.handleMessage(message));
+        assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
     }
 
     /**
@@ -236,7 +236,7 @@ public class MockedMessageRouterImplTest {
      * 3. The response body is processed correctly when it's JSON.
      */
     @Test
-    public void test_handleMessage_whenNoHandlerFoundAndJsonResponse() throws Exception {
+    public void test_routeMessage_whenNoHandlerFoundAndJsonResponse() throws Exception {
         MessageWrapper messageWrapper = MessageWrapper.builder()
                 .method("GET")
                 .path("/test")
@@ -251,7 +251,7 @@ public class MockedMessageRouterImplTest {
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
         // Executing the method and asserting the exception
-        assertThrows(MessageRouterException.class, () -> router.handleMessage(message));
+        assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
 
         // Verifying interactions
         verify(objectMapper).readValue(any(byte[].class), eq(MessageWrapper.class));
@@ -269,7 +269,7 @@ public class MockedMessageRouterImplTest {
      * Expected: The method should process the message and return the parsed JSON response
      */
     @Test
-    public void test_handleMessage_withValidJsonResponse() throws Exception {
+    public void test_routeMessage_withValidJsonResponse() throws Exception {
          Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         Map<String, String> queryParams = new HashMap<>();
@@ -303,7 +303,7 @@ public class MockedMessageRouterImplTest {
         when(objectMapper.readValue(any(byte[].class), eq(Object.class))).thenReturn(expectedResult);
 
         // Executing the method
-        Object result = router.handleMessage(message);
+        Object result = router.routeMessage(message);
 
         // Verifying the result
         assertNotNull(result);

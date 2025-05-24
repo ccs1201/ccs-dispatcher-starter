@@ -1,5 +1,6 @@
 package br.com.ccs.dispatcher.util.httpservlet;
 
+import br.com.ccs.messagedispatcher.util.httpservlet.RequestContextUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

@@ -1,7 +1,7 @@
 package br.com.ccs.dispatcher.config.rabbitmq;
 
-import br.com.ccs.dispatcher.config.properties.DispatcherProperties;
-import br.com.ccs.dispatcher.messaging.MessagePublisher;
+import br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties;
+import br.com.ccs.messagedispatcher.messaging.publisher.MessagePublisher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,7 +19,7 @@ public class MessagePublisherTest {
     private ObjectMapper objectMapper;
 
     @Mock
-    private DispatcherProperties properties;
+    private MessageDispatcherProperties properties;
 
     @Mock
     private RabbitTemplate rabbitTemplate;
