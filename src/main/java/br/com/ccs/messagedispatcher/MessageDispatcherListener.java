@@ -26,9 +26,9 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 /**
- * Classe responsável por receber as mensagens do RabbitMQ e despachá-las para o handler correto.
+ * Classe responsável por receber as mensagens do RabbitMQ e despachá-las para a implementação do {@code MessageRouter}.
  * <p>
- * Class responsible for receiving RabbitMQ messages and dispatching them to the correct handler.
+ * Class responsible for receiving messages from RabbitMQ and dispatching them to the {@code MessageRouter} implementation.
  *
  * @author Cleber Souza
  * @version 1.0
@@ -45,7 +45,7 @@ public class MessageDispatcherListener {
 
     public MessageDispatcherListener(MessageRouter messageRouter) {
         this.messageRouter = messageRouter;
-        log.info("DispatcherMessageHandler inicializado.");
+        log.info("DispatcherMessageListener inicializado com o MessageRouter: " + messageRouter.getClass().getSimpleName());
     }
 
     @RabbitListener(queues = "#{@messageDispatcherProperties.queueName}",

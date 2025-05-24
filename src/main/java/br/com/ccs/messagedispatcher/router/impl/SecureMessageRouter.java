@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(value = "dispatcher.security.enabled", havingValue = "true")
-public class SecureMessageRouterImpl implements MessageRouter {
+@ConditionalOnProperty(value = "message.dispatcher.router", havingValue = "secure")
+public class SecureMessageRouter implements MessageRouter {
     @Override
     public String routeMessage(Message message) {
         throw new UnsupportedOperationException("Not implemented yet");

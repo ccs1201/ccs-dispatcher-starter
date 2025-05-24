@@ -37,13 +37,13 @@ public class MessageDispatcherAnnotatedMethodDiscover {
         var start = System.currentTimeMillis();
         final var listeners = MessageListenerBeanDiscover.getMessageListeners(applicationContext);
         listeners.forEach(listener -> mapMethods(listener));
-        log.debug("Listeners found: {}", listeners.size());
-        log.debug("Commands handler found: {}", commands.size());
-        log.debug("Queries handler found: {}", queries.size());
-        log.debug("Notifications handler found: {}", notifications.size());
-        log.debug("Events handler found: {}", events.size());
-        log.debug("MessageHandlers found: {}", messageHandlers.size());
-        log.debug("MessageHandlerMethodDiscover toke {} ms to discover all methods handlers", System.currentTimeMillis() - start);
+        log.debug("Listeners descobertos: {}", listeners.size());
+        log.debug("Commands handlers descobertos: {}", commands.size());
+        log.debug("Queries handlers descobertos: {}", queries.size());
+        log.debug("Notifications handlers descobertos: {}", notifications.size());
+        log.debug("Events handlers descobertos: {}", events.size());
+        log.debug("MessageHandlers descobertos: {}", messageHandlers.size());
+        log.debug("MessageHandlerMethodDiscover levou {} ms para descobrir todos o métodos handler.", System.currentTimeMillis() - start);
     }
 
     private void mapMethods(Object listener) {

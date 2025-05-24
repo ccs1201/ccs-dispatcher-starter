@@ -96,7 +96,7 @@ public class MessageDispatcherProperties {
             deadLetterQueueName = queueName.concat(".dlq");
         }
         if (deadLetterExchangeName == null) {
-            deadLetterExchangeName = exchangeName.concat(".dlx");
+            deadLetterExchangeName = exchangeName.replace(".ex", ".dlx");
         }
 
         if (deadLetterRoutingKey == null) {

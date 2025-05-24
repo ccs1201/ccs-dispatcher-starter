@@ -53,6 +53,9 @@ import java.util.Map;
  * @version 1.0
  * @since 10/05/2025
  */
+
+//todo verificar se ainda será necessário
+
 @Component
 public class HttpRequestClientImpl implements HttpRequestClient, ApplicationListener<WebServerInitializedEvent> {
 
@@ -68,6 +71,7 @@ public class HttpRequestClientImpl implements HttpRequestClient, ApplicationList
 
     @Override
     public void onApplicationEvent(WebServerInitializedEvent event) {
+        log.warn("!!!!!Talvez não seja mais necessário.............");
         this.BASE_URL = URI.create("http://localhost:" + event.getWebServer().getPort());
         log.info("HttpRequestClient inicializado com URL Base: " + BASE_URL);
     }

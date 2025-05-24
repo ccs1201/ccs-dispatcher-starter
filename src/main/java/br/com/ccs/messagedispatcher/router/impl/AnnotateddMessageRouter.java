@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,7 @@ import static br.com.ccs.messagedispatcher.messaging.publisher.MessageHeaders.HE
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Component
-@Primary
+@ConditionalOnProperty(value = "message.dispatcher.router", havingValue = "annotated", matchIfMissing = true)
 public class AnnotateddMessageRouter implements MessageRouter {
 
     private static final Logger log = LoggerFactory.getLogger(AnnotateddMessageRouter.class);

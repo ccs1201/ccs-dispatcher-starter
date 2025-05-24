@@ -148,9 +148,42 @@
     {
       "name": "message.dispatcher.mapped.headers ",
       "type": "java.lang.Iterable<java.lang.String>",
-      "description": "Um array dos Headers presentes na request que serão injetados como headers das mensagens publicadas pelo MessagePublisher",
+      "description": "Um array com os nomes dos Headers presentes na Request e que serão injetados como Headers das mensagens publicadas pelo MessagePublisher",
       "sourceType": "br.com.ccs.messagedispatcher.config.MessageDispatcherProperties"
+    },
+    {
+      "name": "message.dispatcher.router ",
+      "type": "java.lang.String",
+      "description": "Implementação de MessageRouter que deve ser usada no MessageDispatcherListener.",
+      "sourceType": "br.com.ccs.messagedispatcher.router.MessageRouter",
+      "defaultValue": "annotated"
     }
   ],
-  "hints": []
+  "hints": [
+    {
+      "name": "message.dispatcher.router",
+      "providers": [
+        {
+          "name": "any"
+        }
+      ],
+      "values": [
+        {
+          "value": "annotated",
+          "description": "Usa o AnnotatedMessageRouter",
+          "sourceType": "br.com.ccs.messagedispatcher.router.impl.AnnotatedMessageRouter"
+        },
+        {
+          "value": "mocked",
+          "description": "Usa o MockedMessageRouter",
+          "sourceType": "br.com.ccs.messagedispatcher.router.impl.MockedMessageRouter"
+        },
+        {
+          "value": "secure",
+          "description": "Usa o SecureMessageRouter",
+          "sourceType": "br.com.ccs.messagedispatcher.router.impl.SecureMessageRouter"
+        }
+      ]
+    }
+  ]
 }

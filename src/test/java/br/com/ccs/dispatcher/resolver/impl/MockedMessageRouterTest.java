@@ -2,7 +2,7 @@ package br.com.ccs.dispatcher.resolver.impl;
 
 import br.com.ccs.messagedispatcher.messaging.exceptions.MessageRouterMessageProcessException;
 import br.com.ccs.messagedispatcher.messaging.model.MessageWrapper;
-import br.com.ccs.messagedispatcher.router.impl.MockedMessageRouterImpl;
+import br.com.ccs.messagedispatcher.router.impl.MockedMessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,10 +26,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class MockedMessageRouterImplTest {
+public class MockedMessageRouterTest {
 
     @InjectMocks
-    private MockedMessageRouterImpl router;
+    private MockedMessageRouter router;
 
     @Mock
     private HandlerExecutionChain handler;

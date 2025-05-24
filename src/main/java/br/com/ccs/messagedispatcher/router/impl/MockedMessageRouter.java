@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.stereotype.Component;
@@ -20,15 +21,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 @Component
-public class MockedMessageRouterImpl implements MessageRouter {
+@ConditionalOnProperty(value = "message.dispatcher.router", havingValue = "mocked")
+public class MockedMessageRouter implements MessageRouter {
 
-    private final Logger log = LoggerFactory.getLogger(MockedMessageRouterImpl.class);
+    private final Logger log = LoggerFactory.getLogger(MockedMessageRouter.class);
     private final ObjectMapper objectMapper;
     private final RequestMappingHandlerMapping handlerMapping;
     private final RequestMappingHandlerAdapter handlerAdapter;
 
-    public MockedMessageRouterImpl(ObjectMapper objectMapper, RequestMappingHandlerMapping handlerMapping,
-                                   RequestMappingHandlerAdapter handlerAdapter) {
+    public MockedMessageRouter(ObjectMapper objectMapper, RequestMappingHandlerMapping handlerMapping,
+                               RequestMappingHandlerAdapter handlerAdapter) {
         this.objectMapper = objectMapper;
         this.handlerMapping = handlerMapping;
         this.handlerAdapter = handlerAdapter;
