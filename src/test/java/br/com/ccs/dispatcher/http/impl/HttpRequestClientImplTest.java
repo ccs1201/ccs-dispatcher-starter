@@ -1,7 +1,7 @@
 package br.com.ccs.dispatcher.http.impl;
 
 import br.com.ccs.messagedispatcher.http.impl.HttpRequestClientImpl;
-import br.com.ccs.messagedispatcher.messaging.exceptions.HttpRequestClientExceptionMessage;
+import br.com.ccs.messagedispatcher.exceptions.HttpRequestClientException;
 import br.com.ccs.messagedispatcher.messaging.model.MessageWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -74,7 +74,7 @@ class HttpRequestClientImplTest {
             when(mockBuilder.build()).thenReturn(mockHttpClient);
 
             // Act & Assert
-            assertThrows(HttpRequestClientExceptionMessage.class, () -> httpRequestClient.doRequest(messageWrapper));
+            assertThrows(HttpRequestClientException.class, () -> httpRequestClient.doRequest(messageWrapper));
         }
 
         // Verify
@@ -106,7 +106,7 @@ class HttpRequestClientImplTest {
             when(mockBuilder.version(any(HttpClient.Version.class))).thenReturn(mockBuilder);
             when(mockBuilder.build()).thenReturn(mockHttpClient);
 
-            assertThrows(HttpRequestClientExceptionMessage.class, () -> httpRequestClient.doRequest(messageWrapper));
+            assertThrows(HttpRequestClientException.class, () -> httpRequestClient.doRequest(messageWrapper));
         }
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package br.com.ccs.messagedispatcher.messaging.exceptions;
+package br.com.ccs.messagedispatcher.exceptions;
 
 /**
  * Exceção lançada quando ocorre um erro no envio de mensagens para a fila RabbitMQ.
@@ -26,7 +26,7 @@ package br.com.ccs.messagedispatcher.messaging.exceptions;
  * @since 09/05/2025
  */
 
-public class MessageRouterMessageProcessException extends MessageDispatcherException {
+public class MessageRouterMessageProcessException extends MessageDispatcherRuntimeException {
     public MessageRouterMessageProcessException(String msg, Exception e) {
         super(msg, e);
     }

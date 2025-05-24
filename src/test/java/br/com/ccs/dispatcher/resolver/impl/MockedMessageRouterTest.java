@@ -1,6 +1,6 @@
 package br.com.ccs.dispatcher.resolver.impl;
 
-import br.com.ccs.messagedispatcher.messaging.exceptions.MessageRouterMessageProcessException;
+import br.com.ccs.messagedispatcher.exceptions.MessageRouterMessageProcessException;
 import br.com.ccs.messagedispatcher.messaging.model.MessageWrapper;
 import br.com.ccs.messagedispatcher.router.impl.MockedMessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;

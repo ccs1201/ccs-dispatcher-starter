@@ -2,7 +2,7 @@ package br.com.ccs.messagedispatcher.messaging.publisher;
 
 import br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties;
 import br.com.ccs.messagedispatcher.messaging.MessageType;
-import br.com.ccs.messagedispatcher.messaging.exceptions.MessagePublishExceptionMessage;
+import br.com.ccs.messagedispatcher.exceptions.MessagePublishException;
 import br.com.ccs.messagedispatcher.util.httpservlet.RequestContextUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.AmqpException;
@@ -92,7 +92,7 @@ public class MessagePublisher {
         try {
             rabbitTemplate.convertAndSend(exchange, routingKey, body, m -> setMessageHeaders(body, m, null, "event", MessageType.EVENT));
         } catch (AmqpException e) {
-            throw new MessagePublishExceptionMessage("Erro ao publicar evento " + e.getMessage(), e);
+            throw new MessagePublishException("Erro ao publicar evento " + e.getMessage(), e);
         }
     }
 
@@ -190,9 +190,9 @@ public class MessagePublisher {
                 return objectMapper.convertValue(response, responseClass);
             }
 
-            throw new MessagePublishExceptionMessage("Nenhum retorno recebido: ", null);
+            throw new MessagePublishException("Nenhum retorno recebido: ", null);
         } catch (AmqpException e) {
-            throw new MessagePublishExceptionMessage("Erro ao chamar procedimento remoto " + e.getMessage(), e);
+            throw new MessagePublishException("Erro ao chamar procedimento remoto " + e.getMessage(), e);
         }
     }
 

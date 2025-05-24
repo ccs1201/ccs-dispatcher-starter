@@ -17,7 +17,7 @@
 package br.com.ccs.messagedispatcher.http.impl;
 
 import br.com.ccs.messagedispatcher.MessageDispatcherListener;
-import br.com.ccs.messagedispatcher.messaging.exceptions.HttpRequestClientExceptionMessage;
+import br.com.ccs.messagedispatcher.exceptions.HttpRequestClientException;
 import br.com.ccs.messagedispatcher.http.HttpRequestClient;
 import br.com.ccs.messagedispatcher.messaging.model.MessageWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -99,7 +99,7 @@ public class HttpRequestClientImpl implements HttpRequestClient, ApplicationList
 
             return response.body();
         } catch (InterruptedException | IOException e) {
-            throw new HttpRequestClientExceptionMessage("Erro ao encaminhar a mensagem recebida no message dispatcher para " +
+            throw new HttpRequestClientException("Erro ao encaminhar a mensagem recebida no message dispatcher para " +
                     "o Controller: " + messageWrapper.getPath(), e);
         }
     }

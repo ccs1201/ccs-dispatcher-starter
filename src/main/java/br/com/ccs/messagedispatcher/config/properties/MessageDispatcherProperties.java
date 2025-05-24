@@ -107,19 +107,10 @@ public class MessageDispatcherProperties {
             routingKey = queueName;
         }
 
-        if (mappedHeaders != null) {
-            mappedHeadersArray = Arrays.stream(mappedHeaders.split(","))
-                    .filter(s -> !s.isEmpty())
-                    .map(String::trim)
-                    .toArray(String[]::new);
-        }
+        getMappedHeaders();
 
         log.debug("MessageDispatcherProperties inicializado com os seguintes valores:" + this);
     }
-
-    @Value("${message.dispatcher.mapped.headers}")
-    private String mappedHeaders;
-    private String[] mappedHeadersArray;
 
     /**
      * Ip ou Nome do Host do RabbitMQ
@@ -233,6 +224,8 @@ public class MessageDispatcherProperties {
      * Tempo máximo de espera por uma resposta. Padrão é 10 segundos
      */
     private long replyTimeOut = 10_000;
+
+    private Mapped mapped = new Mapped();
 
     public long getReplyTimeOut() {
         return replyTimeOut;
@@ -411,8 +404,9 @@ public class MessageDispatcherProperties {
     }
 
     public String[] getMappedHeaders() {
-        return mappedHeadersArray;
+        return mapped.getMappedHeadersArray();
     }
+
 
     @Override
     public String toString() {
@@ -437,7 +431,62 @@ public class MessageDispatcherProperties {
                 ", maxInterval=" + maxInterval +
                 ", prefetchCount=" + prefetchCount +
                 ", replyTimeOut= " + replyTimeOut +
-                ", mappedHeaders=" + mappedHeaders +
+                ", mappedHeaders=" + mapped +
                 '}';
+    }
+
+    public Mapped getMapped() {
+        return mapped;
+    }
+
+    public void setMapped(Mapped mapped) {
+        this.mapped = mapped;
+    }
+
+    /**
+     * Mapeia os headers que serão mapeados para o objeto MessageProperties do RabbitMQ.
+     * <p>
+     * Maps the headers that will be mapped to the MessageProperties of the RabbitMQ.
+     * <p>
+     * Os headers mapeados serão injetados em todas as mensagens enviadas ao broker pelo produtor
+     * e no consumidor serão automaticamente injetadas em um {@link ThreadLocal} para serem utilizadas
+     * em qualquer ponto da aplicação.
+     * <p>
+     * The mapped headers will be injected into all messages sent to the broker by the producer
+     * and will be automatically injected into a {@link ThreadLocal} for use in any part of the application.
+     */
+    public static class Mapped {
+
+        private String headers;
+
+        private String[] mappedHeadersArray;
+
+        public String getHeaders() {
+            return headers;
+        }
+
+        public void setHeaders(String headers) {
+            this.headers = headers;
+        }
+
+        public String[] getMappedHeadersArray() {
+            if (mappedHeadersArray == null && headers != null) {
+                mappedHeadersArray = Arrays.stream(headers.split(","))
+                        .filter(s -> !s.isEmpty())
+                        .map(String::trim)
+                        .toArray(String[]::new);
+            }
+            return mappedHeadersArray;
+        }
+
+        public void setMappedHeadersArray(String[] mappedHeadersArray) {
+            this.mappedHeadersArray = mappedHeadersArray;
+        }
+
+        @Override
+        public String toString() {
+            return "Mapped{" +
+                    "headers=" + Arrays.toString(mappedHeadersArray) + '}';
+        }
     }
 }

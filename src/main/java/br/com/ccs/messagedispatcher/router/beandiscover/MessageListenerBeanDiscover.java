@@ -1,9 +1,10 @@
-package br.com.ccs.messagedispatcher.pocs;
+package br.com.ccs.messagedispatcher.router.beandiscover;
 
 import br.com.ccs.messagedispatcher.messaging.annotation.MessageListener;
 import org.springframework.context.ApplicationContext;
 
 import java.util.List;
+import java.util.Objects;
 
 public final class MessageListenerBeanDiscover {
 
@@ -13,7 +14,7 @@ public final class MessageListenerBeanDiscover {
     }
 
 
-    private static List<Object> discover(ApplicationContext applicationContext) {
+    private static List<Object> discoverListener(ApplicationContext applicationContext) {
         return applicationContext.getBeansWithAnnotation(MessageListener.class)
                 .values()
                 .stream()
@@ -21,6 +22,9 @@ public final class MessageListenerBeanDiscover {
     }
 
     public static List<Object> getMessageListeners(ApplicationContext applicationContext) {
-        return discover(applicationContext);
+        if (Objects.isNull(listeners)) {
+            listeners = discoverListener(applicationContext);
+        }
+        return listeners;
     }
 }
