@@ -168,7 +168,6 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    @Primary
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
         log.debug("Configurando RabbitTemplate");
         RabbitTemplate template = new RabbitTemplate(connectionFactory);

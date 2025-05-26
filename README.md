@@ -210,7 +210,7 @@ public class ExampleService {
 
 - Java 17+
 - Spring Boot 3.x ou superior
-- RabbitMQ 3.x ou superior
+- RabbitMQ 3.4.x ou superior
 
 ---
 

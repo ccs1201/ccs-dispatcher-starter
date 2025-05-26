@@ -17,6 +17,7 @@
 package br.com.ccs.messagedispatcher.config;
 
 import br.com.ccs.messagedispatcher.MessageDispatcherListener;
+import br.com.ccs.messagedispatcher.listener.RabbitMqMessageDispatcherListener;
 import br.com.ccs.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -26,9 +27,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Auto Configuração do {@link MessageDispatcherListener}
+ * Auto Configuração do {@link RabbitMqMessageDispatcherListener}
  * <p>
- * Auto Configuration of {@link MessageDispatcherListener}
+ * Auto Configuration of {@link RabbitMqMessageDispatcherListener}
  *
  * @author Cleber Souza
  * @version 1.0
@@ -40,7 +41,8 @@ import org.springframework.context.annotation.Configuration;
 public class MessageDispatcherAutoConfig {
 
     @Bean
-    public MessageDispatcherListener messageHandler(MessageRouter messageRouter, ObjectMapper objectMapper) {
-        return new MessageDispatcherListener(messageRouter, objectMapper);
+    public MessageDispatcherListener messageDispatcherListener(MessageRouter messageRouter, ObjectMapper objectMapper) {
+        return new RabbitMqMessageDispatcherListener(messageRouter, objectMapper);
     }
+
 }

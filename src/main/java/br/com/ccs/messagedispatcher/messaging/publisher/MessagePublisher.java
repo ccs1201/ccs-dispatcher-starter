@@ -1,20 +1,27 @@
 package br.com.ccs.messagedispatcher.messaging.publisher;
 
 import br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties;
-import br.com.ccs.messagedispatcher.messaging.MessageType;
+import br.com.ccs.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException;
 import br.com.ccs.messagedispatcher.exceptions.MessagePublishException;
+import br.com.ccs.messagedispatcher.messaging.MessageType;
 import br.com.ccs.messagedispatcher.util.httpservlet.RequestContextUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.AmqpReplyTimeoutException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.RemoteInvocationResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.*;
 
@@ -37,6 +44,7 @@ import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcher
 @Component
 public class MessagePublisher {
 
+    private static final Logger log = LoggerFactory.getLogger(MessagePublisher.class);
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
     private final MessageDispatcherProperties properties;
@@ -182,21 +190,34 @@ public class MessagePublisher {
      * @param <T>           tipo de retorno esperado / type of expected return
      * @return (responseClass) object
      */
-    public <T> T fetch(final HttpMethod method, final String exchange, final String routingKey, String path, final Object body, final Class<T> responseClass) {
+    private <T> T fetch(final HttpMethod method, final String exchange, final String routingKey, String path, final Object body, final Class<T> responseClass) {
         try {
-            var response = rabbitTemplate.convertSendAndReceive(exchange, routingKey, body, m -> setMessageHeaders(body, m, method, path, MessageType.RPC));
+            var response = Optional.ofNullable(
+                    rabbitTemplate.convertSendAndReceive(exchange,
+                            routingKey,
+                            body,
+                            m ->
+                                    setMessageHeaders(body, m, method, path, MessageType.RPC)));
 
-            if (response != null) {
-                return objectMapper.convertValue(response, responseClass);
+            if (response.isPresent() && response.get() instanceof RemoteInvocationResult result && result.hasException()) {
+                throw new MessageDispatcherRemoteProcessException(result.getException().getMessage());
             }
-            throw new MessagePublishException("Nenhum retorno recebido: ", null);
-        } catch (AmqpException e) {
-            throw new MessagePublishException("Erro ao chamar procedimento remoto " + e.getMessage(), e);
+
+            if (log.isDebugEnabled()) {
+                log.debug("Resposta recebida: {}", response);
+            }
+
+            return responseClass.cast(response.orElseThrow(() ->
+                    new MessageDispatcherRemoteProcessException("Nenhuma resposta recebida do consumidor")));
+
+        } catch (AmqpReplyTimeoutException e) {
+            throw new MessageDispatcherRemoteProcessException("Tempo de espera pela reposta excedido.", e, HttpStatus.REQUEST_TIMEOUT);
+        } catch (Exception e) {
+            throw new MessageDispatcherRemoteProcessException(e);
         }
     }
 
     private Message setMessageHeaders(Object body, Message message, HttpMethod method, String path, MessageType type) {
-
         var messageProperties = message.getMessageProperties();
         messageProperties.setHeader(HEADER_MESSAGE_TIMESTAMP, OffsetDateTime.now());
 

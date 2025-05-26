@@ -16,7 +16,7 @@
 
 package br.com.ccs.messagedispatcher.http.impl;
 
-import br.com.ccs.messagedispatcher.MessageDispatcherListener;
+import br.com.ccs.messagedispatcher.listener.RabbitMqMessageDispatcherListener;
 import br.com.ccs.messagedispatcher.exceptions.HttpRequestClientException;
 import br.com.ccs.messagedispatcher.http.HttpRequestClient;
 import br.com.ccs.messagedispatcher.messaging.model.MessageWrapper;
@@ -41,12 +41,12 @@ import java.util.Map;
 /**
  * Implementação do {@link HttpRequestClient} que utiliza a API de
  * {@link HttpClient} para fazer as requisições HTTP.
- * Primariamente utilizada para encaminhar as mensagens recebidas no {@link MessageDispatcherListener}
+ * Primariamente utilizada para encaminhar as mensagens recebidas no {@link RabbitMqMessageDispatcherListener}
  * para servidor web da aplicação.
  * <p>
  * Implementation of {@link HttpRequestClient} that uses the
  * {@link HttpClient} API to make HTTP requests.
- * Primarily used to forward the messages received in {@link MessageDispatcherListener}
+ * Primarily used to forward the messages received in {@link RabbitMqMessageDispatcherListener}
  * to the web server of the application.
  *
  * @author Cleber Souza

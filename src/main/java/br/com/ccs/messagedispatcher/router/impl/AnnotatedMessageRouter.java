@@ -1,10 +1,10 @@
 package br.com.ccs.messagedispatcher.router.impl;
 
-import br.com.ccs.messagedispatcher.messaging.annotation.MessageHandler;
-import br.com.ccs.messagedispatcher.messaging.annotation.MessageListener;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerNotFoundException;
 import br.com.ccs.messagedispatcher.exceptions.MessageRouterMessageProcessException;
 import br.com.ccs.messagedispatcher.exceptions.MessageRouterMissingHeaderException;
+import br.com.ccs.messagedispatcher.messaging.annotation.MessageHandler;
+import br.com.ccs.messagedispatcher.messaging.annotation.MessageListener;
 import br.com.ccs.messagedispatcher.router.Endpoint;
 import br.com.ccs.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,13 +47,11 @@ public class AnnotatedMessageRouter implements MessageRouter {
     private static String getDeclaredForClass(final Endpoint endpoint) {
 
         if (endpoint.getClass().isAnnotationPresent(MessageListener.class)) {
-            log.info("Found handler for type: {}", endpoint.getClass().getName());
+            log.error("Found handler for type: {}", endpoint.getClass().getName());
             return "";
-//                    endpoint.getClass()
-//                    .getDeclaredAnnotation(MessageListener.class)
-//                    .forClass()
-//                    .getSimpleName();
         }
+
+        log.error("Found handler for type: {}", endpoint.getClass().getName());
         throw new MessageHandlerNotFoundException(endpoint.getClass().getName() + " is not annotated with @MessageListener");
     }
 
