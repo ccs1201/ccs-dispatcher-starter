@@ -21,19 +21,19 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageHeaders.HEADER_TYPE_ID;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HEADER_TYPE_ID;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Component
 @ConditionalOnProperty(value = "message.dispatcher.router", havingValue = "annotated", matchIfMissing = true)
-public class AnnotateddMessageRouter implements MessageRouter {
+public class AnnotatedMessageRouter implements MessageRouter {
 
-    private static final Logger log = LoggerFactory.getLogger(AnnotateddMessageRouter.class);
+    private static final Logger log = LoggerFactory.getLogger(AnnotatedMessageRouter.class);
 
     private final ObjectMapper objectMapper;
     private final Map<String, Endpoint> handlersMap;
 
-    public AnnotateddMessageRouter(ObjectMapper objectMapper, List<Endpoint> endpoints) {
+    public AnnotatedMessageRouter(ObjectMapper objectMapper, List<Endpoint> endpoints) {
         this.objectMapper = objectMapper;
         this.handlersMap = getHandlersMap(endpoints);
     }
@@ -41,7 +41,7 @@ public class AnnotateddMessageRouter implements MessageRouter {
     private static Map<String, Endpoint> getHandlersMap(final List<Endpoint> endpoints) {
         return endpoints.stream()
                 .collect(Collectors
-                        .toMap(AnnotateddMessageRouter::getDeclaredForClass, Function.identity()));
+                        .toMap(AnnotatedMessageRouter::getDeclaredForClass, Function.identity()));
     }
 
     private static String getDeclaredForClass(final Endpoint endpoint) {
@@ -58,7 +58,8 @@ public class AnnotateddMessageRouter implements MessageRouter {
     }
 
     @Override
-    public Object routeMessage(Message message) {
+    public Object routeMessage(Object objectMessage) {
+        var message = (Message) objectMessage;
         var typeId = message.getMessageProperties().getHeaders().get(HEADER_TYPE_ID).toString();
 
         if (isEmpty(typeId)) {
@@ -68,7 +69,7 @@ public class AnnotateddMessageRouter implements MessageRouter {
         var endpoint = Optional.ofNullable(handlersMap.get(typeId));
 
         if (endpoint.isEmpty()) {
-            log.debug("No handler found for type: {}", typeId);
+            log.error("No handler found for type: {}", typeId);
             throw new MessageHandlerNotFoundException("No handler found for type: " + typeId);
         }
 
@@ -78,7 +79,7 @@ public class AnnotateddMessageRouter implements MessageRouter {
             var payload = objectMapper.readValue(message.getBody(), parameterType);
             return endpoint.get().handle(payload);
         } catch (IOException | RuntimeException e) {
-            log.debug("Error processing message {}", e.getMessage());
+            log.error("Error processing message {}", e.getMessage());
             throw new MessageRouterMessageProcessException("Error processing message", e);
         }
     }

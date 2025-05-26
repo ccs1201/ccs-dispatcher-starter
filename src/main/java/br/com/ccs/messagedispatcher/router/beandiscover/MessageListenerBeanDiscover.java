@@ -14,7 +14,7 @@ public final class MessageListenerBeanDiscover {
     }
 
 
-    private static List<Object> discoverListener(ApplicationContext applicationContext) {
+    private static List<Object> discoverMessageListener(ApplicationContext applicationContext) {
         return applicationContext.getBeansWithAnnotation(MessageListener.class)
                 .values()
                 .stream()
@@ -23,7 +23,7 @@ public final class MessageListenerBeanDiscover {
 
     public static List<Object> getMessageListeners(ApplicationContext applicationContext) {
         if (Objects.isNull(listeners)) {
-            listeners = discoverListener(applicationContext);
+            listeners = discoverMessageListener(applicationContext);
         }
         return listeners;
     }

@@ -121,7 +121,6 @@ public class RabbitMQConfig {
     @Primary
     public Queue dispatcherQueue() {
         log.debug("Configurando queue: " + properties.getQueueName());
-
         var q = QueueBuilder
                 .durable(properties.getQueueName())
                 .deadLetterRoutingKey(properties.getDeadLetterRoutingKey())
@@ -182,18 +181,18 @@ public class RabbitMQConfig {
         // Configurando confirmação de publicação
         template.setMandatory(true);
         template.setReplyTimeout(properties.getReplyTimeOut());
-        template.setConfirmCallback((correlationData, ack, cause) -> {
-            if (ack) {
-                log.info("Mensagem confirmada: " + correlationData);
-            } else {
-                log.error("Mensagem não confirmada: " + cause);
-            }
-        });
-
-        // Configurando retorno de mensagem
-        template.setReturnsCallback(returned -> log.info("Mensagem retornada: " + returned.getMessage() +
-                " code: " + returned.getReplyCode() +
-                " reason: " + returned.getReplyText()));
+//        template.setConfirmCallback((correlationData, ack, cause) -> {
+//            if (ack) {
+//                log.info("Mensagem confirmada: " + correlationData);
+//            } else {
+//                log.error("Mensagem não confirmada: " + cause);
+//            }
+//        });
+//
+//        // Configurando retorno de mensagem
+//        template.setReturnsCallback(returned -> log.info("Mensagem retornada: " + returned.getMessage() +
+//                " code: " + returned.getReplyCode() +
+//                " reason: " + returned.getReplyText()));
 
         log.info("RabbitTemplate configurado com exchange: " + properties.getExchangeName() +
                 " e routing key: " + properties.getRoutingKey());

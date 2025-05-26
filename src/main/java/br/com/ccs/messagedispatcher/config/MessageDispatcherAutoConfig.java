@@ -40,7 +40,7 @@ import org.springframework.context.annotation.Configuration;
 public class MessageDispatcherAutoConfig {
 
     @Bean
-    public MessageDispatcherListener messageHandler(MessageRouter messageRouter) {
-        return new MessageDispatcherListener(messageRouter);
+    public MessageDispatcherListener messageHandler(MessageRouter messageRouter, ObjectMapper objectMapper) {
+        return new MessageDispatcherListener(messageRouter, objectMapper);
     }
 }

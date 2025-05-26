@@ -227,6 +227,11 @@ public class MessageDispatcherProperties {
 
     private Mapped mapped = new Mapped();
 
+    /**
+     * Indica se exceções ocorridas durante o processamento das mensagens dem ser retornadas ao cliente publicador.
+     */
+    private boolean returnExceptions = true;
+
     public long getReplyTimeOut() {
         return replyTimeOut;
     }
@@ -407,6 +412,13 @@ public class MessageDispatcherProperties {
         return mapped.getMappedHeadersArray();
     }
 
+    public boolean isReturnExceptions() {
+        return returnExceptions;
+    }
+
+    public void setReturnExceptions(boolean returnExceptions) {
+        this.returnExceptions = returnExceptions;
+    }
 
     @Override
     public String toString() {

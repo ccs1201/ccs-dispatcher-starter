@@ -5,27 +5,28 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import java.util.logging.Logger;
 
 @Configuration
 public class ObjectMapperConfig {
-    private final Logger log = Logger.getLogger(ObjectMapperConfig.class.getName());
+    private final Logger log = LoggerFactory.getLogger(ObjectMapperConfig.class);
 
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
-        log.info("Initializing Jackson ObjectMapper...");
+        log.debug("Initializing Jackson ObjectMapper...");
         final ObjectMapper objectMapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                .configure(SerializationFeature.INDENT_OUTPUT, true) // Habilita pretty-printing
+                .configure(SerializationFeature.INDENT_OUTPUT, true)
                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 .registerModule(new JavaTimeModule());
-        log.info("Jackson ObjectMapper initialized");
+        log.debug("Jackson ObjectMapper initialized");
 
         return objectMapper;
     }

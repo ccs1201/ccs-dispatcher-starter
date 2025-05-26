@@ -73,7 +73,7 @@ public class HttpRequestClientImpl implements HttpRequestClient, ApplicationList
     public void onApplicationEvent(WebServerInitializedEvent event) {
         log.warn("!!!!!Talvez não seja mais necessário.............");
         this.BASE_URL = URI.create("http://localhost:" + event.getWebServer().getPort());
-        log.info("HttpRequestClient inicializado com URL Base: " + BASE_URL);
+        log.debug("HttpRequestClient inicializado com URL Base: " + BASE_URL);
     }
 
     /**

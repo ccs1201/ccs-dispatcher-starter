@@ -145,6 +145,14 @@
       "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": 10000
     },
+
+    {
+      "name": "message.dispatcher.returnExceptions",
+      "type": "java.lang.boolean",
+      "description": "Indica se exceções ocorridas durante o processamento das mensagens dem ser retornadas ao cliente publicador.",
+      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": true
+    },
     {
       "name": "message.dispatcher.mapped.headers ",
       "type": "java.lang.String",

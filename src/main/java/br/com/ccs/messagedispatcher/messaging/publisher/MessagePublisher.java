@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageHeaders.*;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.*;
 
 /**
  * Classe de proxy para o {@link RabbitTemplate} com métodos prontos
@@ -189,7 +189,6 @@ public class MessagePublisher {
             if (response != null) {
                 return objectMapper.convertValue(response, responseClass);
             }
-
             throw new MessagePublishException("Nenhum retorno recebido: ", null);
         } catch (AmqpException e) {
             throw new MessagePublishException("Erro ao chamar procedimento remoto " + e.getMessage(), e);
@@ -207,7 +206,7 @@ public class MessagePublisher {
 
         messageProperties.setHeader(HEADER_TYPE_ID, body.getClass().getSimpleName());
 
-        messageProperties.setHeader(HEADER_MESSAGE_TYPE, type);
+        messageProperties.setHeader(HEADER_MESSAGE_ACTION, type);
         messageProperties.setHeader(HEADER_MESSAGE_PATH, path);
         messageProperties.setHeader(HEADER_MESSAGE_SOURCE, this.applicationName);
 

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(value = "message.dispatcher.router", havingValue = "secure")
 public class SecureMessageRouter implements MessageRouter {
     @Override
-    public String routeMessage(Message message) {
+    public String routeMessage(Object objectMessage) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

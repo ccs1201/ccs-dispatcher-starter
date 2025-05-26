@@ -39,7 +39,7 @@ import jakarta.validation.Validator;
  * @version 1.0
  * @since 10/05/2025
  */
-public class BeanValidatorUtil {
+public final class BeanValidatorUtil {
 
     private BeanValidatorUtil() {
         throw new IllegalStateException("Utility class");

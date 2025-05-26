@@ -36,7 +36,7 @@ public class MockedMessageRouter implements MessageRouter {
         this.handlerAdapter = handlerAdapter;
     }
 
-    public Object routeMessage(Message message) {
+    public Object routeMessage(Object message) {
         var messageWrapper = getMessageWrapper(message);
         try {
             // Cria request com método e path
@@ -94,12 +94,13 @@ public class MockedMessageRouter implements MessageRouter {
         }
     }
 
-    private MessageWrapper getMessageWrapper(Message message) {
+    private MessageWrapper getMessageWrapper(Object objectMessage) {
+        var message = (Message) objectMessage;
         try {
             var messageWrapper = objectMapper.readValue(message.getBody(), MessageWrapper.class);
             log.info("Mensagem recebida: " + messageWrapper);
             return messageWrapper;
-        } catch (IOException e) {
+        } catch (IOException | ClassCastException e) {
             throw new MessageRouterMessageProcessException("Erro ao ler mensagem: " + Arrays.toString(message.getBody()), e);
         }
     }

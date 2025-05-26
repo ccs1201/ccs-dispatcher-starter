@@ -16,7 +16,9 @@ public class MessageConverterConfig {
     @Bean
     @Primary
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter(ObjectMapper objectMapper) {
-        log.debug("Configurando Jackson2JsonMessageConverter");
+        if (log.isDebugEnabled()) {
+            log.debug("Configurando Jackson2JsonMessageConverter");
+        }
         return new Jackson2JsonMessageConverter(objectMapper);
     }
 }
