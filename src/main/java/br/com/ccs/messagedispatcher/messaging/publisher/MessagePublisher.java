@@ -116,15 +116,15 @@ public final class MessagePublisher {
     }
 
     public void sendCommand(final Object body) {
-        this.send(properties.getExchangeName(), properties.getRoutingKey(), body, MessageAction.COMMAND);
+        this.convertAndSend(properties.getExchangeName(), properties.getRoutingKey(), body, MessageAction.COMMAND);
     }
 
     public void sendCommand(final String routingKey, final Object body) {
-        this.send(properties.getExchangeName(), routingKey, body, MessageAction.COMMAND);
+        this.convertAndSend(properties.getExchangeName(), routingKey, body, MessageAction.COMMAND);
     }
 
     public void sendCommand(final String exchange, final String routingKey, final Object body) {
-        this.send(exchange, routingKey, body, MessageAction.COMMAND);
+        this.convertAndSend(exchange, routingKey, body, MessageAction.COMMAND);
     }
 
     public <T> T doQuery(final Object body, final @NonNull Class<T> responseClass) {
@@ -144,7 +144,7 @@ public final class MessagePublisher {
     }
 
     public void sendNotification(final String routingKey, final Object body) {
-        this.send(properties.getExchangeName(), routingKey, body, MessageAction.NOTIFICATION);
+        this.convertAndSend(properties.getExchangeName(), routingKey, body, MessageAction.NOTIFICATION);
     }
 
     /**
@@ -187,7 +187,7 @@ public final class MessagePublisher {
         }
     }
 
-    private void send(final String exchange, final String routingKey, final Object body, MessageAction messageAction) {
+    private void convertAndSend(final String exchange, final String routingKey, final Object body, MessageAction messageAction) {
         rabbitTemplate.convertAndSend(exchange,
                 routingKey,
                 body,
