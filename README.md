@@ -2,7 +2,9 @@
 
 ## Visão Geral
 
-O **CCS Message Dispatcher** é um Spring Boot Starter desenvolvido para simplificar a implementação de microsserviços com mensageria, eliminando a necessidade de criar múltiplos listeners ou handlers para diferentes tipos de mensagens. O projeto atua como uma camada de abstração inteligente entre o RabbitMQ e os controllers Spring.
+O **CCS Message Dispatcher** é um Spring Boot Starter desenvolvido para simplificar a implementação de microsserviços com mensageria,
+eliminando a necessidade de criar múltiplos listeners ou handlers para diferentes tipos de mensagens.
+O projeto atua como uma camada de abstração inteligente entre o RabbitMQ e os controllers Spring.
 
 ---
 
@@ -108,14 +110,30 @@ public class ExampleController {
 }
 ```
 
-### Exemplo de Publisher
+### Exemplo de MessagePublisher
 
 ```java
+import br.com.ccs.messagedispatcher.messaging.publisher.MessagePublisher;
+
 @Service
 public class ExampleService {
-    
-    //todo
-    
+
+   private final MessagePublisher publisher;
+
+   public ExampleService(MessagePublisher publisher) {
+      this.publisher = publisher;
+   }
+
+   @PostMapping("Publish")
+   public void publica(@RequestBody MessageInput input) {
+      //Publica um evento / Publish an event (Fire and Forget) no return
+      publisher.sendEvent(input);
+
+      //Executa uma chamada RPC utilizando o broker de menssageria
+      //Execute a RPC call through message broker
+      String response = publisher.doPost("domain", "namespace", "/doSomething", input, String.class);
+   }
+
 }
 ```
 
@@ -192,7 +210,7 @@ public class ExampleService {
 
 - Java 17+
 - Spring Boot 3.x ou superior
-- RabbitMQ 3.x ou superior
+- RabbitMQ 3.4.x ou superior
 
 ---
 
@@ -208,7 +226,8 @@ public class ExampleService {
 5. Abra um Pull Request
 
 ---
-
+![diagrama.png](diagrama.png)
+---
 ## Licença
 
 Copyright 2024 Cleber Souza
