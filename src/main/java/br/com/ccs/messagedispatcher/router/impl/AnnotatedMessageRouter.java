@@ -1,26 +1,21 @@
 package br.com.ccs.messagedispatcher.router.impl;
 
-import br.com.ccs.messagedispatcher.exceptions.MessageHandlerNotFoundException;
+import br.com.ccs.messagedispatcher.beandiscover.MessageDispatcherAnnotatedMethodDiscover;
 import br.com.ccs.messagedispatcher.exceptions.MessageRouterMessageProcessException;
 import br.com.ccs.messagedispatcher.exceptions.MessageRouterMissingHeaderException;
-import br.com.ccs.messagedispatcher.messaging.annotation.MessageHandler;
-import br.com.ccs.messagedispatcher.messaging.annotation.MessageListener;
-import br.com.ccs.messagedispatcher.router.Endpoint;
+import br.com.ccs.messagedispatcher.messaging.MessageAction;
 import br.com.ccs.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.test.util.ApplicationContextTestUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ReflectionUtils;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HEADER_MESSAGE_ACTION;
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HEADER_TYPE_ID;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -31,28 +26,11 @@ public class AnnotatedMessageRouter implements MessageRouter {
     private static final Logger log = LoggerFactory.getLogger(AnnotatedMessageRouter.class);
 
     private final ObjectMapper objectMapper;
-    private final Map<String, Endpoint> handlersMap;
+    private final MessageDispatcherAnnotatedMethodDiscover annotatedMethodDiscover;
 
-    public AnnotatedMessageRouter(ObjectMapper objectMapper, List<Endpoint> endpoints) {
+    public AnnotatedMessageRouter(ObjectMapper objectMapper, MessageDispatcherAnnotatedMethodDiscover annotatedMethodDiscover) {
         this.objectMapper = objectMapper;
-        this.handlersMap = getHandlersMap(endpoints);
-    }
-
-    private static Map<String, Endpoint> getHandlersMap(final List<Endpoint> endpoints) {
-        return endpoints.stream()
-                .collect(Collectors
-                        .toMap(AnnotatedMessageRouter::getDeclaredForClass, Function.identity()));
-    }
-
-    private static String getDeclaredForClass(final Endpoint endpoint) {
-
-        if (endpoint.getClass().isAnnotationPresent(MessageListener.class)) {
-            log.error("Found handler for type: {}", endpoint.getClass().getName());
-            return "";
-        }
-
-        log.error("Found handler for type: {}", endpoint.getClass().getName());
-        throw new MessageHandlerNotFoundException(endpoint.getClass().getName() + " is not annotated with @MessageListener");
+        this.annotatedMethodDiscover = annotatedMethodDiscover;
     }
 
     @Override
@@ -64,21 +42,17 @@ public class AnnotatedMessageRouter implements MessageRouter {
             throw new MessageRouterMissingHeaderException("Missing " + HEADER_TYPE_ID + " header in the message");
         }
 
-        var endpoint = Optional.ofNullable(handlersMap.get(typeId));
-
-        if (endpoint.isEmpty()) {
-            log.error("No handler found for type: {}", typeId);
-            throw new MessageHandlerNotFoundException("No handler found for type: " + typeId);
-        }
-
-        var parameterType = endpoint.getClass().getAnnotation(MessageHandler.class).forClass();
-
         try {
-            var payload = objectMapper.readValue(message.getBody(), parameterType);
-            return endpoint.get().handle(payload);
-        } catch (IOException | RuntimeException e) {
-            log.error("Error processing message {}", e.getMessage());
-            throw new MessageRouterMessageProcessException("Error processing message", e);
+
+            var handler = annotatedMethodDiscover.getHandler(MessageAction
+                            .valueOf(message.getMessageProperties().getHeader(HEADER_MESSAGE_ACTION)),
+                    typeId);
+
+            var payload = objectMapper.readValue(message.getBody(), handler.getParameterTypes()[0]);
+            return handler.invoke(annotatedMethodDiscover.getApplicationContext().getBean(handler.getDeclaringClass()), payload);
+        } catch (Exception e) {
+            log.error("Error processando mensagem: {}", e.getMessage(), e);
+            throw new MessageRouterMessageProcessException("Erro ao processar mensagem. Detail: " + e.getMessage(), e);
         }
     }
 }

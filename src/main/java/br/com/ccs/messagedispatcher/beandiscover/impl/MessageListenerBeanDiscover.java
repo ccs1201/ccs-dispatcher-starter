@@ -1,4 +1,4 @@
-package br.com.ccs.messagedispatcher.router.beandiscover;
+package br.com.ccs.messagedispatcher.beandiscover.impl;
 
 import br.com.ccs.messagedispatcher.messaging.annotation.MessageListener;
 import org.springframework.context.ApplicationContext;

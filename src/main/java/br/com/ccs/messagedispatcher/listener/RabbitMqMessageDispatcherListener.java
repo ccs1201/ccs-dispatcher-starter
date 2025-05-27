@@ -58,16 +58,16 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
             concurrency = "#{@messageDispatcherProperties.concurrency}",
             returnExceptions = returnExceptions)
     @Override
-    public void onMessage(Message message) {
+    public Object onMessage(Message message) {
         if (log.isDebugEnabled()) {
             log(message);
         }
-        messageRouter.routeMessage(message);
+        return messageRouter.routeMessage(message);
     }
 
     private void log(Message message) {
         try {
-            log.debug("Mensagem recebida Action:{} TypeId:{} Body:{}",
+            log.debug("Mensagem recebida Action: {} TypeId: {} Body: {}",
                     message.getMessageProperties()
                             .getHeaders().get(MessageDispatcherHeaders.HEADER_MESSAGE_ACTION),
                     message.getMessageProperties()

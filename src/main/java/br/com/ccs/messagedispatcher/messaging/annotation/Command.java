@@ -1,6 +1,6 @@
 package br.com.ccs.messagedispatcher.messaging.annotation;
 
-import br.com.ccs.messagedispatcher.messaging.MessageType;
+import br.com.ccs.messagedispatcher.messaging.MessageAction;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
  * Podem ser rejeitados, gerar erro ou produzir eventos
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(action = MessageType.COMMAND)
+@MessageHandler(action = MessageAction.COMMAND)
 @Documented
 public @interface Command {
 

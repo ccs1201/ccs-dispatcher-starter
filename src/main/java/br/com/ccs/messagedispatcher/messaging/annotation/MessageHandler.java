@@ -1,6 +1,6 @@
 package br.com.ccs.messagedispatcher.messaging.annotation;
 
-import br.com.ccs.messagedispatcher.messaging.MessageType;
+import br.com.ccs.messagedispatcher.messaging.MessageAction;
 
 import java.lang.annotation.*;
 
@@ -18,7 +18,7 @@ public @interface MessageHandler {
      * Ação que o método processa (command, query or event).
      * Action that's handler process (command, query or event).
      */
-    MessageType action();
+    MessageAction action();
 
     /**
      * Tipo de mensagem que este handler processa

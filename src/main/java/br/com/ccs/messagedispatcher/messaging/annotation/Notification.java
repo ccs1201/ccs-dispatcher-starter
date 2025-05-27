@@ -1,6 +1,6 @@
 package br.com.ccs.messagedispatcher.messaging.annotation;
 
-import br.com.ccs.messagedispatcher.messaging.MessageType;
+import br.com.ccs.messagedispatcher.messaging.MessageAction;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
  * Exemplo: OrderShipped, PaymentReceived
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(action = MessageType.NOTIFICATION)
+@MessageHandler(action = MessageAction.NOTIFICATION)
 @Documented
 public @interface Notification {
 

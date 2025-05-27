@@ -1,9 +1,8 @@
 package br.com.ccs.messagedispatcher.messaging;
 
-public enum MessageType {
+public enum MessageAction {
     COMMAND,
     EVENT,
     NOTIFICATION,
-    QUERY,
-    RPC
+    QUERY
 }

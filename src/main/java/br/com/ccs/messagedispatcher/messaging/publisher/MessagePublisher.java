@@ -3,7 +3,7 @@ package br.com.ccs.messagedispatcher.messaging.publisher;
 import br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties;
 import br.com.ccs.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException;
 import br.com.ccs.messagedispatcher.exceptions.MessagePublishException;
-import br.com.ccs.messagedispatcher.messaging.MessageType;
+import br.com.ccs.messagedispatcher.messaging.MessageAction;
 import br.com.ccs.messagedispatcher.util.httpservlet.RequestContextUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -14,7 +14,6 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.RemoteInvocationResult;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -42,7 +41,7 @@ import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcher
  */
 
 @Component
-public class MessagePublisher {
+public final class MessagePublisher {
 
     private static final Logger log = LoggerFactory.getLogger(MessagePublisher.class);
     private final RabbitTemplate rabbitTemplate;
@@ -98,84 +97,54 @@ public class MessagePublisher {
      */
     public void sendEvent(final String exchange, final String routingKey, final Object body) {
         try {
-            rabbitTemplate.convertAndSend(exchange, routingKey, body, m -> setMessageHeaders(body, m, null, "event", MessageType.EVENT));
+            rabbitTemplate.convertAndSend(exchange, routingKey, body, m -> setMessageHeaders(body, m, MessageAction.EVENT));
         } catch (AmqpException e) {
             throw new MessagePublishException("Erro ao publicar evento " + e.getMessage(), e);
         }
     }
 
-    public <T> T doGet(final Object body, Class<T> responseClass) {
-        return fetch(HttpMethod.GET, properties.getRoutingKey(), "", body, responseClass);
+    public <T> T doCommand(final Object body, final @NonNull Class<T> responseClass) {
+        return this.sendAndReceive(properties.getExchangeName(), properties.getRoutingKey(), body, responseClass, MessageAction.COMMAND);
     }
 
-    public <T> T doGet(final String routingKey, final String path, final Object body, Class<T> responseClass) {
-        return fetch(HttpMethod.GET, routingKey, path, body, responseClass);
+    public <T> T doCommand(final String routingKey, final Object body, final @NonNull Class<T> responseClass) {
+        return this.sendAndReceive(properties.getExchangeName(), routingKey, body, responseClass, MessageAction.COMMAND);
     }
 
-    public <T> T doGet(final String exchange, final String routingKey, final String path, final Object body, Class<T> responseClass) {
-        return fetch(HttpMethod.GET, exchange, routingKey, path, body, responseClass);
+    public <T> T doCommand(final String exchange, final String routingKey, final Object body, final @NonNull Class<T> responseClass) {
+        return this.sendAndReceive(exchange, routingKey, body, responseClass, MessageAction.COMMAND);
     }
 
-    public <T> T doPost(final String routingKey, final String path, final Object body, Class<T> responseClass) {
-        return fetch(HttpMethod.POST, routingKey, path, body, responseClass);
+    public void sendCommand(final Object body) {
+        this.send(properties.getExchangeName(), properties.getRoutingKey(), body, MessageAction.COMMAND);
     }
 
-    public <T> T doPost(final String exchange, final String routingKey, final String path, final Object body, Class<T> responseClass) {
-        return fetch(HttpMethod.POST, exchange, routingKey, path, body, responseClass);
+    public void sendCommand(final String routingKey, final Object body) {
+        this.send(properties.getExchangeName(), routingKey, body, MessageAction.COMMAND);
     }
 
-    public <T> T doPut(final String routingKey, final String path, final Object body, Class<T> responseClass) {
-        return fetch(HttpMethod.PUT, routingKey, path, body, responseClass);
+    public void sendCommand(final String exchange, final String routingKey, final Object body) {
+        this.send(exchange, routingKey, body, MessageAction.COMMAND);
     }
 
-    public <T> T doPut(final String exchange, final String routingKey, final String path, final Object body, Class<T> responseClass) {
-        return fetch(HttpMethod.PUT, exchange, path, routingKey, body, responseClass);
+    public <T> T doQuery(final Object body, final @NonNull Class<T> responseClass) {
+        return this.sendAndReceive(properties.getExchangeName(), properties.getRoutingKey(), body, responseClass, MessageAction.QUERY);
     }
 
-    public <T> T doPatch(final String routingKey, final String path, final Object body, Class<T> responseClass) {
-        return fetch(HttpMethod.PATCH, routingKey, path, body, responseClass);
+    public <T> T doQuery(final String routingKey, final Object body, final @NonNull Class<T> responseClass) {
+        return this.sendAndReceive(properties.getExchangeName(), routingKey, body, responseClass, MessageAction.QUERY);
     }
 
-    public <T> T doPatch(final String exchange, final String routingKey, final String path, final Object body, Class<T> responseClass) {
-        return fetch(HttpMethod.PATCH, exchange, path, routingKey, body, responseClass);
+    public <T> T doQuery(final String exchange, final String routingKey, final Object body, final @NonNull Class<T> responseClass) {
+        return this.sendAndReceive(exchange, routingKey, body, responseClass, MessageAction.QUERY);
     }
 
-    public <T> T doDelete(final String routingKey, final String path, final Object body, Class<T> responseClass) {
-        return fetch(HttpMethod.DELETE, routingKey, path, body, responseClass);
+    public void sendNotification(final Object body) {
+        this.sendNotification(properties.getRoutingKey(), body);
     }
 
-    public <T> T doDelete(final String exchange, final String routingKey, final String path, final Object body, Class<T> responseClass) {
-        return fetch(HttpMethod.DELETE, exchange, path, routingKey, body, responseClass);
-    }
-
-    /**
-     * Publica uma mensagem para a aplicação local através da exchange global e espera por uma resposta.
-     * <p>
-     * Publishes a message to local application through the global exchange and waits for a response.
-     *
-     * @param body
-     * @param responseClass
-     * @param <T>           tipo de retorno esperado / type of expected return
-     * @return (responseClass) object
-     */
-    public <T> T fetch(final HttpMethod method, final Object body, final String path, final @NonNull Class<T> responseClass) {
-        return this.fetch(method, properties.getExchangeName(), properties.getRoutingKey(), path, body, responseClass);
-    }
-
-
-    /**
-     * Publica uma mensagem para uma aplicação através da exchange global e espera por uma resposta.
-     * <p>
-     * Publishes a message to an application through the global exchange and waits for a response.
-     *
-     * @param routingKey
-     * @param body
-     * @param responseClass
-     * @param <T>           tipo de retorno esperado / type of expected return
-     * @return
-     */
-    public <T> T fetch(final HttpMethod method, final String routingKey, final String path, final Object body, final @NonNull Class<T> responseClass) {
-        return this.fetch(method, properties.getExchangeName(), routingKey, path, body, responseClass);
+    public void sendNotification(final String routingKey, final Object body) {
+        this.send(properties.getExchangeName(), routingKey, body, MessageAction.NOTIFICATION);
     }
 
     /**
@@ -190,14 +159,15 @@ public class MessagePublisher {
      * @param <T>           tipo de retorno esperado / type of expected return
      * @return (responseClass) object
      */
-    private <T> T fetch(final HttpMethod method, final String exchange, final String routingKey, String path, final Object body, final Class<T> responseClass) {
+    private <T> T sendAndReceive(final String exchange, final String routingKey, final Object body, final Class<T> responseClass,
+                                 MessageAction messageAction) {
         try {
             var response = Optional.ofNullable(
                     rabbitTemplate.convertSendAndReceive(exchange,
                             routingKey,
                             body,
                             m ->
-                                    setMessageHeaders(body, m, method, path, MessageType.RPC)));
+                                    setMessageHeaders(body, m, messageAction)));
 
             if (response.isPresent() && response.get() instanceof RemoteInvocationResult result && result.hasException()) {
                 throw new MessageDispatcherRemoteProcessException(result.getException().getMessage());
@@ -207,8 +177,8 @@ public class MessagePublisher {
                 log.debug("Resposta recebida: {}", response);
             }
 
-            return responseClass.cast(response.orElseThrow(() ->
-                    new MessageDispatcherRemoteProcessException("Nenhuma resposta recebida do consumidor")));
+            return objectMapper.convertValue(response.orElseThrow(() ->
+                    new MessageDispatcherRemoteProcessException("Nenhuma resposta recebida do consumidor")), responseClass);
 
         } catch (AmqpReplyTimeoutException e) {
             throw new MessageDispatcherRemoteProcessException("Tempo de espera pela reposta excedido.", e, HttpStatus.REQUEST_TIMEOUT);
@@ -217,18 +187,20 @@ public class MessagePublisher {
         }
     }
 
-    private Message setMessageHeaders(Object body, Message message, HttpMethod method, String path, MessageType type) {
+    private void send(final String exchange, final String routingKey, final Object body, MessageAction messageAction) {
+        rabbitTemplate.convertAndSend(exchange,
+                routingKey,
+                body,
+                m ->
+                        setMessageHeaders(body, m, messageAction));
+
+    }
+
+    private Message setMessageHeaders(Object body, Message message, MessageAction action) {
         var messageProperties = message.getMessageProperties();
         messageProperties.setHeader(HEADER_MESSAGE_TIMESTAMP, OffsetDateTime.now());
-
-        if (type != MessageType.EVENT) {
-            messageProperties.setHeader(HEADER_MESSAGE_METHOD, method.name());
-        }
-
         messageProperties.setHeader(HEADER_TYPE_ID, body.getClass().getSimpleName());
-
-        messageProperties.setHeader(HEADER_MESSAGE_ACTION, type);
-        messageProperties.setHeader(HEADER_MESSAGE_PATH, path);
+        messageProperties.setHeader(HEADER_MESSAGE_ACTION, action);
         messageProperties.setHeader(HEADER_MESSAGE_SOURCE, this.applicationName);
 
         Arrays.stream(properties.getMappedHeaders())
