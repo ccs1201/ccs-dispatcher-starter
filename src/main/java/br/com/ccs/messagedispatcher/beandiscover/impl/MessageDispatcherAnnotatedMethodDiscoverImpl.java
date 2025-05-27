@@ -39,11 +39,6 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
         resolveAnnotatedMethods(applicationContext);
     }
 
-    @Override
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
     private void resolveAnnotatedMethods(ApplicationContext applicationContext) {
         var start = System.currentTimeMillis();
         final var listeners = MessageListenerBeanDiscover.getMessageListeners(applicationContext);

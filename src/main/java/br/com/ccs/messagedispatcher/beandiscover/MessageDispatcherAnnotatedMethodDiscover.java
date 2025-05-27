@@ -7,6 +7,4 @@ import java.lang.reflect.Method;
 
 public interface MessageDispatcherAnnotatedMethodDiscover {
     Method getHandler(MessageAction actionType,String parameterType);
-
-    ApplicationContext getApplicationContext();
 }

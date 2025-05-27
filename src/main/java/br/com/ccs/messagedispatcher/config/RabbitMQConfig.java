@@ -18,13 +18,18 @@ package br.com.ccs.messagedispatcher.config;
 
 import br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties;
 import jakarta.annotation.PostConstruct;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.retry.MessageRecoverer;
+import org.springframework.amqp.rabbit.retry.RepublishMessageRecoverer;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -32,6 +37,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+
+import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -180,18 +189,19 @@ public class RabbitMQConfig {
         // Configurando confirmação de publicação
         template.setMandatory(true);
         template.setReplyTimeout(properties.getReplyTimeOut());
-//        template.setConfirmCallback((correlationData, ack, cause) -> {
-//            if (ack) {
-//                log.info("Mensagem confirmada: " + correlationData);
-//            } else {
-//                log.error("Mensagem não confirmada: " + cause);
-//            }
-//        });
-//
-//        // Configurando retorno de mensagem
-//        template.setReturnsCallback(returned -> log.info("Mensagem retornada: " + returned.getMessage() +
-//                " code: " + returned.getReplyCode() +
-//                " reason: " + returned.getReplyText()));
+
+        template.setConfirmCallback((correlationData, ack, cause) -> {
+            if (ack) {
+                log.info("Mensagem confirmada: " + correlationData);
+            } else {
+                log.error("Mensagem não confirmada: " + cause);
+            }
+        });
+
+        // Configurando retorno de mensagem
+        template.setReturnsCallback(returned -> log.info("Mensagem retornada: " + returned.getMessage() +
+                " code: " + returned.getReplyCode() +
+                " reason: " + returned.getReplyText()));
 
         log.info("RabbitTemplate configurado com exchange: " + properties.getExchangeName() +
                 " e routing key: " + properties.getRoutingKey());
@@ -199,32 +209,57 @@ public class RabbitMQConfig {
         return template;
     }
 
-//    @Bean
-//    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory,
-//                                                                               MessageConverter messageConverter) {
-//
-//        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-//        factory.setConnectionFactory(connectionFactory);
-//        factory.setMessageConverter(messageConverter);
-//        factory.setPrefetchCount(properties.getPrefetchCount());
-//
-//        // Configuração de retry
-//        var retryInterceptorBuilder = RetryInterceptorBuilder.stateless()
-//                .maxAttempts(properties.getMaxRetryAttempts())
-//                .backOffOptions(
-//                        properties.getInitialInterval(),
-//                        properties.getMultiplier(),
-//                        properties.getMaxInterval()
-//                );
-//
-//        factory.setAdviceChain(retryInterceptorBuilder.build());
-//
-//        // Configurações adicionais
-//        factory.setConcurrentConsumers(
-//                Integer.parseInt(properties.getConcurrency().split("-")[0]));
-//        factory.setMaxConcurrentConsumers(
-//                Integer.parseInt(properties.getConcurrency().split("-")[1]));
-//
-//        return factory;
-//    }
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory,
+                                                                               MessageConverter messageConverter,
+                                                                               MessageRecoverer messageRecoverer) {
+
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(messageConverter);
+        factory.setPrefetchCount(properties.getPrefetchCount());
+        factory.setDefaultRequeueRejected(false);
+
+        // Configuração de retry
+        var retryInterceptorBuilder = RetryInterceptorBuilder.stateless()
+                .maxAttempts(properties.getMaxRetryAttempts())
+                .backOffOptions(
+                        properties.getInitialInterval(),
+                        properties.getMultiplier(),
+                        properties.getMaxInterval()
+                )
+                .recoverer(messageRecoverer);
+//                .recoverer(new RejectAndDontRequeueRecoverer());
+
+        factory.setAdviceChain(retryInterceptorBuilder.build());
+
+        factory.setConcurrentConsumers(
+                Integer.parseInt(properties.getConcurrency().split("-")[0]));
+        factory.setMaxConcurrentConsumers(
+                Integer.parseInt(properties.getConcurrency().split("-")[1]));
+
+        return factory;
+    }
+
+    @Bean
+    public MessageRecoverer messageRecoverer(RabbitTemplate rabbitTemplate) {
+        return new RepublishMessageRecoverer(rabbitTemplate,
+                properties.getDeadLetterExchangeName(),
+                properties.getDeadLetterRoutingKey()) {
+            @Override
+            protected Map<String, Object> additionalHeaders(Message message, Throwable cause) {
+
+                var rootCause = ExceptionUtils.getRootCause(cause);
+
+                log.error("Enviando mensagem para dead letter queue.", rootCause);
+
+                Map<String, Object> headers = new HashMap<>();
+                headers.put("x-exception-message", rootCause.getLocalizedMessage());
+                headers.put("x-exception-type", rootCause.getClass().getName());
+                headers.put("x-original-exchange", message.getMessageProperties().getReceivedExchange());
+                headers.put("x-failed-at", OffsetDateTime.now());
+                return headers;
+            }
+        };
+    }
 }

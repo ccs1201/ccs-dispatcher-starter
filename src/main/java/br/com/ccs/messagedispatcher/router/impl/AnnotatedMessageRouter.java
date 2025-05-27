@@ -10,7 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import java.lang.reflect.InvocationTargetException;
 
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HEADER_MESSAGE_ACTION;
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HEADER_TYPE_ID;
@@ -24,10 +27,13 @@ public class AnnotatedMessageRouter implements MessageRouter {
 
     private final ObjectMapper objectMapper;
     private final MessageDispatcherAnnotatedMethodDiscover annotatedMethodDiscover;
+    private final ApplicationContext applicationContext;
 
-    public AnnotatedMessageRouter(ObjectMapper objectMapper, MessageDispatcherAnnotatedMethodDiscover annotatedMethodDiscover) {
+    public AnnotatedMessageRouter(ObjectMapper objectMapper, MessageDispatcherAnnotatedMethodDiscover annotatedMethodDiscover,
+                                  ApplicationContext applicationContext) {
         this.objectMapper = objectMapper;
         this.annotatedMethodDiscover = annotatedMethodDiscover;
+        this.applicationContext = applicationContext;
     }
 
     @Override
@@ -40,15 +46,16 @@ public class AnnotatedMessageRouter implements MessageRouter {
         }
 
         try {
-
             var handler = annotatedMethodDiscover.getHandler(MessageAction
-                            .valueOf(message.getMessageProperties().getHeader(HEADER_MESSAGE_ACTION)),
-                    typeId);
+                    .valueOf(message.getMessageProperties().getHeader(HEADER_MESSAGE_ACTION)), typeId);
 
             var payload = objectMapper.readValue(message.getBody(), handler.getParameterTypes()[0]);
-            return handler.invoke(annotatedMethodDiscover.getApplicationContext().getBean(handler.getDeclaringClass()), payload);
+
+            return handler.invoke(applicationContext.getBean(handler.getDeclaringClass()), payload);
+
+        } catch (InvocationTargetException e) {
+            throw new MessageRouterMessageProcessException("Erro ao processar mensagem. Detail: " + e.getTargetException().getMessage(), e.getTargetException());
         } catch (Exception e) {
-            log.error("Error processando mensagem: {}", e.getMessage(), e);
             throw new MessageRouterMessageProcessException("Erro ao processar mensagem. Detail: " + e.getMessage(), e);
         }
     }
