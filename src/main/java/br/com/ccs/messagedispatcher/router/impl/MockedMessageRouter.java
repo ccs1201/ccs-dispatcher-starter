@@ -98,7 +98,7 @@ public class MockedMessageRouter implements MessageRouter {
         var message = (Message) objectMessage;
         try {
             var messageWrapper = objectMapper.readValue(message.getBody(), MessageWrapper.class);
-            log.info("Mensagem recebida: " + messageWrapper);
+            log.info("Mensagem recebida: {}", messageWrapper);
             return messageWrapper;
         } catch (IOException | ClassCastException e) {
             throw new MessageRouterMessageProcessException("Erro ao ler mensagem: " + Arrays.toString(message.getBody()), e);

@@ -13,10 +13,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HEADER_MESSAGE_ACTION;
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HEADER_TYPE_ID;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_ACTION;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.TYPE_ID;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Component
@@ -39,24 +40,24 @@ public class AnnotatedMessageRouter implements MessageRouter {
     @Override
     public Object routeMessage(Object objectMessage) {
         var message = (Message) objectMessage;
-        var typeId = message.getMessageProperties().getHeaders().get(HEADER_TYPE_ID).toString();
+        var typeId = message.getMessageProperties().getHeaders().get(TYPE_ID).toString();
 
         if (isEmpty(typeId)) {
-            throw new MessageRouterMissingHeaderException("Missing " + HEADER_TYPE_ID + " header in the message");
+            throw new MessageRouterMissingHeaderException("Missing " + TYPE_ID + " header in the message");
         }
 
         try {
             var handler = annotatedMethodDiscover.getHandler(MessageAction
-                    .valueOf(message.getMessageProperties().getHeader(HEADER_MESSAGE_ACTION)), typeId);
+                    .valueOf(message.getMessageProperties().getHeader(MESSAGE_ACTION)), typeId);
 
             var payload = objectMapper.readValue(message.getBody(), handler.getParameterTypes()[0]);
 
             return handler.invoke(applicationContext.getBean(handler.getDeclaringClass()), payload);
 
         } catch (InvocationTargetException e) {
-            throw new MessageRouterMessageProcessException("Erro ao processar mensagem. Detail: " + e.getTargetException().getMessage(), e.getTargetException());
-        } catch (Exception e) {
-            throw new MessageRouterMessageProcessException("Erro ao processar mensagem. Detail: " + e.getMessage(), e);
+            throw new MessageRouterMessageProcessException("Erro ao processar mensagem. " + e.getTargetException().getMessage(), e);
+        } catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+            throw new MessageRouterMessageProcessException("Erro ao processar mensagem. " + e.getMessage(), e);
         }
     }
 }

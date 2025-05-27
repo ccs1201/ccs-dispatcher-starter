@@ -198,10 +198,10 @@ public final class MessagePublisher {
 
     private Message setMessageHeaders(Object body, Message message, MessageAction action) {
         var messageProperties = message.getMessageProperties();
-        messageProperties.setHeader(HEADER_MESSAGE_TIMESTAMP, OffsetDateTime.now());
-        messageProperties.setHeader(HEADER_TYPE_ID, body.getClass().getSimpleName());
-        messageProperties.setHeader(HEADER_MESSAGE_ACTION, action);
-        messageProperties.setHeader(HEADER_MESSAGE_SOURCE, this.applicationName);
+        messageProperties.setHeader(MESSAGE_TIMESTAMP, OffsetDateTime.now());
+        messageProperties.setHeader(TYPE_ID, body.getClass().getSimpleName());
+        messageProperties.setHeader(MESSAGE_ACTION, action);
+        messageProperties.setHeader(MESSAGE_SOURCE, this.applicationName);
 
         Arrays.stream(properties.getMappedHeaders())
                 .forEach(mappedHeader ->

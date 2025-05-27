@@ -14,7 +14,7 @@ public class MessageDispatcherExceptionHandler {
 
     @ExceptionHandler(MessageDispatcherRemoteProcessException.class)
     public ProblemDetail handle(MessageDispatcherRemoteProcessException e) {
-        log.error(e.getMessage());
+        log.error("MessageDispatcherRemoteProcessException occurred: {}", e.getMessage());
         return ProblemDetail.forStatusAndDetail(e.getStatus(),
                 e.getMessage().replaceAll("br.com.ccs.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException: ", ""));
     }

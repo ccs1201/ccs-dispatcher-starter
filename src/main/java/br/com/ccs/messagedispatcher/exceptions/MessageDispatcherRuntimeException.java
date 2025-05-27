@@ -13,8 +13,4 @@ public class MessageDispatcherRuntimeException extends RuntimeException {
     public MessageDispatcherRuntimeException(String message) {
         super(appName + ": " + message);
     }
-
-    public MessageDispatcherRuntimeException(Throwable cause) {
-        super(appName + ": " + cause);
-    }
 }

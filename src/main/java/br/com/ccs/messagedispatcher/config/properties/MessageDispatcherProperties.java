@@ -199,9 +199,9 @@ public class MessageDispatcherProperties {
     private int maxRetryAttempts = 3;
 
     /**
-     * Intervalo inicial entre as tentativas. Padrão é 1000ms
+     * Intervalo inicial entre as tentativas. Padrão é 5000ms
      */
-    private int initialInterval = 1000;
+    private int initialInterval = 5000;
 
     /**
      * Multiplicador do intervalo entre as tentativas. Padrão é 2
