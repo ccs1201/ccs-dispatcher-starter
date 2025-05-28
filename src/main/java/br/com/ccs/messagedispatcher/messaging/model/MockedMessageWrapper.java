@@ -38,7 +38,7 @@ import java.util.Map;
  */
 
 @SuppressWarnings("unused")
-public class MessageWrapper {
+public class MockedMessageWrapper {
     @NotBlank(message = "must not be null or empty")
     private String path;
     @NotBlank(message = "method must not be null or empty")
@@ -48,14 +48,14 @@ public class MessageWrapper {
     private Map<String, String> queryParams;
     private String body;
 
-    public MessageWrapper() {
+    public MockedMessageWrapper() {
     }
 
-    public MessageWrapper(String path,
-                          String method,
-                          Map<String, String> headers,
-                          Map<String, String> queryParams,
-                          String body) {
+    public MockedMessageWrapper(String path,
+                                String method,
+                                Map<String, String> headers,
+                                Map<String, String> queryParams,
+                                String body) {
         this.path = path;
         this.method = method;
         this.headers = headers;
@@ -153,8 +153,8 @@ public class MessageWrapper {
             return this;
         }
 
-        public MessageWrapper build() {
-            var messageWrapper = new MessageWrapper(path, method, headers, queryParams, body);
+        public MockedMessageWrapper build() {
+            var messageWrapper = new MockedMessageWrapper(path, method, headers, queryParams, body);
             BeanValidatorUtil.validate(messageWrapper);
             return messageWrapper;
         }

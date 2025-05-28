@@ -19,6 +19,8 @@ package br.com.ccs.messagedispatcher.listener;
 
 import br.com.ccs.messagedispatcher.MessageDispatcherListener;
 import br.com.ccs.messagedispatcher.exceptions.MessageDispatcherLoggerException;
+import br.com.ccs.messagedispatcher.messaging.model.MessageDispatcherErrorResponse;
+import br.com.ccs.messagedispatcher.messaging.model.MessageWrapperResponse;
 import br.com.ccs.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +34,10 @@ import org.springframework.beans.factory.annotation.Value;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.*;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_ACTION;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.RESPONSE_FROM;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.RESPONSE_TIME_STAMP;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.TYPE_ID;
 
 /**
  * Classe responsável por receber as mensagens do RabbitMQ e despachá-las para a implementação de {@code MessageRouter}.
@@ -53,9 +58,9 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
     private final ObjectMapper objectMapper;
 
     @Value("${spring.application.name}")
-    private static String applicationName;
+    private String applicationName;
 
-    private static final String returnExceptions = "true";
+    private static final String returnExceptions = "false";
 
     public RabbitMqMessageDispatcherListener(MessageRouter messageRouter, ObjectMapper objectMapper) {
         this.messageRouter = messageRouter;
@@ -67,7 +72,7 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
             concurrency = "#{@messageDispatcherProperties.concurrency}",
             returnExceptions = returnExceptions)
     @Override
-    public Object onMessage(Message message) {
+    public MessageWrapperResponse onMessage(Message message) {
         if (log.isDebugEnabled()) {
 //            sleep();
             log(message);
@@ -75,14 +80,28 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
 
         var resultProcess = messageRouter.routeMessage(message);
 
+        if (resultProcess == null) {
+            return null;
+        }
+
         if (requiresReplyTo(message)) {
             setResponseHeaders(message);
-            return resultProcess;
+            return buildResponse(resultProcess);
         }
 
         return null;
     }
 
+    private MessageWrapperResponse buildResponse(Object resultProcess) {
+
+        if (resultProcess instanceof MessageDispatcherErrorResponse) {
+            return new MessageWrapperResponse(true, resultProcess);
+        }
+
+        return new MessageWrapperResponse(false, resultProcess);
+    }
+
+    @SuppressWarnings("unussed")
     private static void sleep() {
         try {
             Thread.sleep(5000);
@@ -102,7 +121,7 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
 
     private void log(Message message) {
         try {
-            log.debug("Mensagem recebida Action: {} TypeId: {} Body: {}",
+            log.debug("Mensagem recebida Action:{} | TypeId:{} | Body:{}",
                     message.getMessageProperties()
                             .getHeaders().get(MESSAGE_ACTION),
                     message.getMessageProperties()

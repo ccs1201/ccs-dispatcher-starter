@@ -21,7 +21,13 @@ import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Exchange;
+import org.springframework.amqp.core.ExchangeBuilder;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -43,7 +49,10 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.*;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.EXCEPTION_MESSAGE;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.EXCEPTION_TYPE;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.FAILED_AT;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HAS_ERROR;
 
 
 /**
@@ -81,6 +90,7 @@ public class RabbitMQConfig {
 
     @Bean
     @Primary
+    @SuppressWarnings("unused")
     protected ConnectionFactory connectionFactory() {
         log.debug("Configurando ConnectionFactory");
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
@@ -146,7 +156,7 @@ public class RabbitMQConfig {
     @Bean
     @Primary
     protected Binding dispatcherQueueBinding(Queue ccsDispatcherQueue,
-                                          Exchange ccsDispatcherExchange) {
+                                             Exchange ccsDispatcherExchange) {
         log.debug("Configurando binding: {}", properties.getRoutingKey());
         return BindingBuilder
                 .bind(ccsDispatcherQueue)
@@ -170,7 +180,7 @@ public class RabbitMQConfig {
     @Bean
     @Qualifier("deadLetterQueueBinding")
     protected Binding deadLetterQueueBinding(@Qualifier("deadLetterQueue") Queue deadLetterQueue,
-                                          @Qualifier("deadLetterExchange") Exchange deadLetterExchange) {
+                                             @Qualifier("deadLetterExchange") Exchange deadLetterExchange) {
         log.debug("Configurando binding da Dead Letter Queue: {}", properties.getDeadLetterRoutingKey());
         return BindingBuilder
                 .bind(deadLetterQueue)
@@ -189,9 +199,11 @@ public class RabbitMQConfig {
         template.setExchange(properties.getExchangeName());
         template.setRoutingKey(properties.getRoutingKey());
 
-        // Configurando confirmação de protectedação
+        // Configurando confirmação
         template.setMandatory(true);
         template.setReplyTimeout(properties.getReplyTimeOut());
+
+        //
 
         template.setConfirmCallback((correlationData, ack, cause) -> {
             if (ack) {
@@ -214,18 +226,18 @@ public class RabbitMQConfig {
 
     @Bean
     protected SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory,
-                                                                               MessageConverter messageConverter,
-                                                                               MessageRecoverer messageRecoverer,
-                                                                               RetryOperationsInterceptor retryOperationsInterceptor) {
+                                                                                  MessageConverter messageConverter,
+                                                                                  RetryOperationsInterceptor retryOperationsInterceptor) {
 
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(messageConverter);
-        factory.setPrefetchCount(properties.getPrefetchCount());
         factory.setDefaultRequeueRejected(false);
-
         factory.setAdviceChain(retryOperationsInterceptor);
 
+        //configura o número de mensagens que serão consumidas de uma vez
+        factory.setPrefetchCount(properties.getPrefetchCount());
+        //configura a concorrência de consumidores
         factory.setConcurrentConsumers(
                 Integer.parseInt(properties.getConcurrency().split("-")[0]));
         factory.setMaxConcurrentConsumers(

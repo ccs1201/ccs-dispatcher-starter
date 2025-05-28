@@ -6,7 +6,11 @@ import br.com.ccs.messagedispatcher.exceptions.MessageHandlerMultipleInputParame
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerNotFoundException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerWithoutInputParameterException;
 import br.com.ccs.messagedispatcher.messaging.MessageAction;
-import br.com.ccs.messagedispatcher.messaging.annotation.*;
+import br.com.ccs.messagedispatcher.messaging.annotation.Command;
+import br.com.ccs.messagedispatcher.messaging.annotation.Event;
+import br.com.ccs.messagedispatcher.messaging.annotation.MessageHandler;
+import br.com.ccs.messagedispatcher.messaging.annotation.Notification;
+import br.com.ccs.messagedispatcher.messaging.annotation.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
@@ -18,7 +22,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
+@SuppressWarnings("unused")
 @Component
 public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDispatcherAnnotatedMethodDiscover {
 
@@ -121,7 +125,7 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
         var method = handlers.get(actionType).get(parameterType);
 
         if (method == null) {
-            throw new MessageHandlerNotFoundException("Não foi encontrado nenhum handler para o tipo: " + parameterType);
+            throw new MessageHandlerNotFoundException("Nenhum handler encontrado capaz de processar o tipo: " + parameterType);
         }
 
         return method;

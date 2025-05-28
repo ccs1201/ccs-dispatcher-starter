@@ -3,18 +3,20 @@ package br.com.ccs.messagedispatcher.messaging.publisher;
 import br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties;
 import br.com.ccs.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException;
 import br.com.ccs.messagedispatcher.exceptions.MessagePublishException;
+import br.com.ccs.messagedispatcher.exceptions.MessagePublisherTimeOutException;
 import br.com.ccs.messagedispatcher.messaging.MessageAction;
+import br.com.ccs.messagedispatcher.messaging.model.MessageDispatcherErrorResponse;
+import br.com.ccs.messagedispatcher.messaging.model.MessageWrapperResponse;
 import br.com.ccs.messagedispatcher.util.httpservlet.RequestContextUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.AmqpRemoteException;
 import org.springframework.amqp.core.AmqpReplyTimeoutException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.RemoteInvocationResult;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -67,7 +69,7 @@ public final class MessagePublisher {
      * Publishes an event to local application through the global exchange.
      * Acts as a fire and forget, not waiting for a response.
      *
-     * @param body
+     * @param body - corpo da mensagem
      */
     public void sendEvent(final Object body) {
         this.sendEvent(properties.getExchangeName(), properties.getRoutingKey(), body);
@@ -80,8 +82,8 @@ public final class MessagePublisher {
      * Publishes an event to am application through the global exchange.
      * Acts as a fire and forget, not waiting for a response.
      *
-     * @param routingKey
-     * @param body
+     * @param routingKey - chave de roteamento
+     * @param body       - corpo da mensagem
      */
     public void sendEvent(final String routingKey, final Object body) {
         this.sendEvent(properties.getExchangeName(), routingKey, body);
@@ -94,9 +96,9 @@ public final class MessagePublisher {
      * Publishes an event to an application through the defined exchange.
      * Acts as a fire and forget, not waiting for a response.
      *
-     * @param exchange
-     * @param routingKey
-     * @param body
+     * @param exchange   - nome da exchange
+     * @param routingKey - chave de roteamento
+     * @param body       - corpo da mensagem
      */
     public void sendEvent(final String exchange, final String routingKey, final Object body) {
         try {
@@ -107,15 +109,15 @@ public final class MessagePublisher {
     }
 
     public <T> T doCommand(final Object body, final @NonNull Class<T> responseClass) {
-        return this.sendAndReceive(properties.getExchangeName(), properties.getRoutingKey(), body, responseClass, MessageAction.COMMAND);
+        return this.convertSendAndReceive(properties.getExchangeName(), properties.getRoutingKey(), body, responseClass, MessageAction.COMMAND);
     }
 
     public <T> T doCommand(final String routingKey, final Object body, final @NonNull Class<T> responseClass) {
-        return this.sendAndReceive(properties.getExchangeName(), routingKey, body, responseClass, MessageAction.COMMAND);
+        return this.convertSendAndReceive(properties.getExchangeName(), routingKey, body, responseClass, MessageAction.COMMAND);
     }
 
     public <T> T doCommand(final String exchange, final String routingKey, final Object body, final @NonNull Class<T> responseClass) {
-        return this.sendAndReceive(exchange, routingKey, body, responseClass, MessageAction.COMMAND);
+        return this.convertSendAndReceive(exchange, routingKey, body, responseClass, MessageAction.COMMAND);
     }
 
     public void sendCommand(final Object body) {
@@ -131,15 +133,15 @@ public final class MessagePublisher {
     }
 
     public <T> T doQuery(final Object body, final @NonNull Class<T> responseClass) {
-        return this.sendAndReceive(properties.getExchangeName(), properties.getRoutingKey(), body, responseClass, MessageAction.QUERY);
+        return this.convertSendAndReceive(properties.getExchangeName(), properties.getRoutingKey(), body, responseClass, MessageAction.QUERY);
     }
 
     public <T> T doQuery(final String routingKey, final Object body, final @NonNull Class<T> responseClass) {
-        return this.sendAndReceive(properties.getExchangeName(), routingKey, body, responseClass, MessageAction.QUERY);
+        return this.convertSendAndReceive(properties.getExchangeName(), routingKey, body, responseClass, MessageAction.QUERY);
     }
 
     public <T> T doQuery(final String exchange, final String routingKey, final Object body, final @NonNull Class<T> responseClass) {
-        return this.sendAndReceive(exchange, routingKey, body, responseClass, MessageAction.QUERY);
+        return this.convertSendAndReceive(exchange, routingKey, body, responseClass, MessageAction.QUERY);
     }
 
     public void sendNotification(final Object body) {
@@ -155,40 +157,41 @@ public final class MessagePublisher {
      * <p>
      * Publishes a body to an application through the defined exchange and waits for a response.
      *
-     * @param exchange
-     * @param routingKey
-     * @param body
-     * @param responseClass
-     * @param <T>           tipo de retorno esperado / type of expected return
+     * @param exchange      - nome da exchange
+     * @param routingKey    - chave de roteamento
+     * @param body          - corpo da mensagem
+     * @param responseClass - classe de retorno esperado
+     * @param <T>           tipo de retorno esperado
      * @return (responseClass) object
      */
-    private <T> T sendAndReceive(final String exchange, final String routingKey, final Object body, final Class<T> responseClass,
-                                 MessageAction messageAction) {
+    private <T> T convertSendAndReceive(final String exchange, final String routingKey, final Object body, final Class<T> responseClass,
+                                        MessageAction messageAction) {
         try {
+
             var response = Optional.ofNullable(
-                    rabbitTemplate.convertSendAndReceive(exchange,
+                    (MessageWrapperResponse) rabbitTemplate.convertSendAndReceive(exchange,
                             routingKey,
                             body,
                             m ->
                                     setMessageHeaders(body, m, messageAction)));
 
-            if (response.isPresent() && response.get() instanceof RemoteInvocationResult result && result.hasException()) {
-                throw new MessageDispatcherRemoteProcessException(result.getException().getMessage());
-            }
-
-
-            var responseBody = objectMapper.convertValue(response.orElseThrow(() ->
-                    new MessageDispatcherRemoteProcessException("Nenhuma resposta recebida do consumidor")), responseClass);
+            var messageWrapperResponse = objectMapper
+                    .convertValue(response.orElseThrow(() ->
+                            new MessageDispatcherRemoteProcessException("Nenhuma resposta recebida do consumidor")), MessageWrapperResponse.class);
 
             if (log.isDebugEnabled()) {
                 log.debug("Resposta recebida: {}", response.get());
             }
+            if (messageWrapperResponse.hasError()) {
+                var errorData = objectMapper.convertValue(messageWrapperResponse.data(), MessageDispatcherErrorResponse.class);
+                throw new MessageDispatcherRemoteProcessException(errorData);
+            }
 
-            return responseBody;
+            return responseClass.cast(messageWrapperResponse.data());
         } catch (AmqpReplyTimeoutException e) {
-            throw new MessageDispatcherRemoteProcessException("Tempo de espera pela reposta excedido.", e, HttpStatus.REQUEST_TIMEOUT);
-        } catch (Exception e) {
-            throw new MessageDispatcherRemoteProcessException(e);
+            throw new MessagePublisherTimeOutException("Tempo de espera pela reposta excedido.", e);
+        } catch (AmqpRemoteException e) {
+            throw new MessageDispatcherRemoteProcessException(e.getCause());
         }
     }
 
@@ -198,7 +201,6 @@ public final class MessagePublisher {
                 body,
                 m ->
                         setMessageHeaders(body, m, messageAction));
-
     }
 
     private Message setMessageHeaders(Object body, Message message, MessageAction action) {

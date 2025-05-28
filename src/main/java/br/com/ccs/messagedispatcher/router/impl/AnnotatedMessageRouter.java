@@ -1,11 +1,14 @@
 package br.com.ccs.messagedispatcher.router.impl;
 
 import br.com.ccs.messagedispatcher.beandiscover.MessageDispatcherAnnotatedMethodDiscover;
+import br.com.ccs.messagedispatcher.exceptions.MessageDispatcherRuntimeException;
 import br.com.ccs.messagedispatcher.exceptions.MessageRouterMessageProcessException;
 import br.com.ccs.messagedispatcher.exceptions.MessageRouterMissingHeaderException;
+import br.com.ccs.messagedispatcher.messaging.model.MessageDispatcherErrorResponse;
 import br.com.ccs.messagedispatcher.messaging.MessageAction;
 import br.com.ccs.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -20,6 +23,7 @@ import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcher
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.TYPE_ID;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+@SuppressWarnings("unused")
 @Component
 @ConditionalOnProperty(value = "message.dispatcher.router", havingValue = "annotated", matchIfMissing = true)
 public class AnnotatedMessageRouter implements MessageRouter {
@@ -54,11 +58,16 @@ public class AnnotatedMessageRouter implements MessageRouter {
 
             return handler.invoke(applicationContext.getBean(handler.getDeclaringClass()), payload);
 
-        } catch (InvocationTargetException e) {
-            throw new MessageRouterMessageProcessException("Erro ao processar mensagem. " + e.getTargetException().getMessage(), e);
-        } catch (IllegalArgumentException | IllegalAccessException | IOException e) {
-            throw new MessageRouterMessageProcessException("Erro ao processar mensagem. " + e.getMessage(), e);
+        } catch (MessageDispatcherRuntimeException | IllegalAccessException | InvocationTargetException e) {
+            return handleMappingError(e);
+        } catch (IOException e) {
+            throw new MessageRouterMessageProcessException("Erro ao processar mensagem: " + ExceptionUtils.getRootCauseMessage(e), e);
         }
+    }
+
+    private Object handleMappingError(Exception e) {
+        log.error("Erro ao processar mensagem: {}", e.getMessage(), e);
+        return MessageDispatcherErrorResponse.of(e);
     }
 }
 
