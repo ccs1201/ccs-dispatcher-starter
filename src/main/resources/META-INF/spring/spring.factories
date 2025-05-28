@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-br.com.ccs.dispatcher.config.CcsDispatcherAutoConfig
+br.com.ccs.messagedispatcher.config.MessageDispatcherAutoConfig
