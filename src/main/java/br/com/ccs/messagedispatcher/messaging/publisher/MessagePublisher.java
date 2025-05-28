@@ -187,7 +187,7 @@ public final class MessagePublisher {
                 throw new MessageDispatcherRemoteProcessException(errorData);
             }
 
-            return responseClass.cast(messageWrapperResponse.data());
+            return objectMapper.convertValue(messageWrapperResponse.data(), responseClass);
         } catch (AmqpReplyTimeoutException e) {
             throw new MessagePublisherTimeOutException("Tempo de espera pela reposta excedido.", e);
         } catch (AmqpRemoteException e) {
