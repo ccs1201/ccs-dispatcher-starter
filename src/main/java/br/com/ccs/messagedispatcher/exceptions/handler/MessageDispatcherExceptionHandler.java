@@ -2,6 +2,7 @@ package br.com.ccs.messagedispatcher.exceptions.handler;
 
 import br.com.ccs.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException;
 import br.com.ccs.messagedispatcher.exceptions.MessagePublisherTimeOutException;
+import br.com.ccs.messagedispatcher.util.EnvironmentUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,16 +18,20 @@ public class MessageDispatcherExceptionHandler {
 
     @ExceptionHandler(MessageDispatcherRemoteProcessException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public ProblemDetailExceptionResponse handle(MessageDispatcherRemoteProcessException e) {
+    public MessageDispatcherProblemDetailExceptionResponse handle(MessageDispatcherRemoteProcessException e) {
         log.error("Ocorreu um erro no processamento remoto Message: {} Cause: {}", e.getMessage(), e.getRemoteCause());
-        return ProblemDetailExceptionResponse.of(e.getStatus().name(), e.getStatus().value(), "Serviço: " + e.getMessage());
+        return buildProblemDetailExceptionResponse(e.getStatus(), e.getMessage(), e.getOriginService());
     }
 
     @ExceptionHandler(MessagePublisherTimeOutException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public ProblemDetailExceptionResponse handle(MessagePublisherTimeOutException e) {
+    public MessageDispatcherProblemDetailExceptionResponse handle(MessagePublisherTimeOutException e) {
         log.error("\"Ocorreu um erro no processamento remoto Message: {}", e.getMessage());
-        return ProblemDetailExceptionResponse.of(e.getStatus().name(), e.getStatus().value(), "Serviço: " + e.getMessage());
+        return buildProblemDetailExceptionResponse(e.getStatus(), e.getMessage(), EnvironmentUtils.getAppName());
+    }
+
+    private static MessageDispatcherProblemDetailExceptionResponse buildProblemDetailExceptionResponse(HttpStatus e, String message, String orinService) {
+        return MessageDispatcherProblemDetailExceptionResponse.of(e.name(), e.value(), message, orinService);
     }
 
 }

@@ -7,10 +7,12 @@ public class MessageDispatcherRemoteProcessException extends RuntimeException {
 
     private final HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
     private String remoteCause;
+    private String originService;
 
     public MessageDispatcherRemoteProcessException(MessageDispatcherErrorResponse errorData) {
         super(errorData.message());
         this.remoteCause = errorData.cause();
+        this.originService = errorData.originService();
     }
 
     public MessageDispatcherRemoteProcessException(String message) {
@@ -27,5 +29,9 @@ public class MessageDispatcherRemoteProcessException extends RuntimeException {
 
     public String getRemoteCause() {
         return remoteCause;
+    }
+
+    public String getOriginService() {
+        return originService;
     }
 }

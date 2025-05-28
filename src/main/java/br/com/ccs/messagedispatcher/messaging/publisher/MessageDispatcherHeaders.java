@@ -8,7 +8,7 @@ public final class MessageDispatcherHeaders {
     private static final String HEADER_PREFIX = "x-message-dispatcher-";
     public static final String MESSAGE_ACTION = HEADER_PREFIX + "message-action";
     public static final String MESSAGE_TIMESTAMP = HEADER_PREFIX + "message-timestamp";
-    public static final String MESSAGE_SOURCE = HEADER_PREFIX + "message-source";
+    public static final String MESSAGE_SOURCE = HEADER_PREFIX + "message-originService";
     public static final String TYPE_ID = HEADER_PREFIX + "typeid";
     public static final String RESPONSE_FROM = HEADER_PREFIX + "response-from";
     public static final String RESPONSE_TIME_STAMP = HEADER_PREFIX + "response-timestamp";
