@@ -6,11 +6,7 @@ import br.com.ccs.messagedispatcher.exceptions.MessageHandlerMultipleInputParame
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerNotFoundException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerWithoutInputParameterException;
 import br.com.ccs.messagedispatcher.messaging.MessageAction;
-import br.com.ccs.messagedispatcher.messaging.annotation.Command;
-import br.com.ccs.messagedispatcher.messaging.annotation.Event;
-import br.com.ccs.messagedispatcher.messaging.annotation.MessageHandler;
-import br.com.ccs.messagedispatcher.messaging.annotation.Notification;
-import br.com.ccs.messagedispatcher.messaging.annotation.Query;
+import br.com.ccs.messagedispatcher.messaging.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
@@ -22,6 +18,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
 @SuppressWarnings("unused")
 @Component
 public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDispatcherAnnotatedMethodDiscover {
@@ -106,8 +103,12 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
         }
 
         if (handlers.get(actionType).containsKey(parameterType)) {
-            throw new MessageHandlerDuplicatedInputParameterException("Tipo handler: " + actionType + " parâmetro de entrada duplicado no método: " + method
-                    + " não é permitido utilizar o mesmo parâmetro de entrada para handlers do mesmo tipo.");
+            throw new MessageHandlerDuplicatedInputParameterException(" O handler: @" + actionType + " - " + handlers.get(actionType).get(parameterType).getName()
+                    + " na Classe: " + handlers.get(actionType).get(parameterType).getDeclaringClass().getName()
+                    + " já declara o mesmo tipo de entrada que a Classe: " + method.getDeclaringClass().getName()
+                    + " está declarando no método: " + method.getName() + " para o PayLoad: " + parameterType
+                    + " não são permitidos Handlers duplicados para o mesmo tipo de entrada.");
+
         }
         handlers.get(actionType).put(parameterType, method);
     }
@@ -132,7 +133,7 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
     }
 
     private void handleMappingError(Exception e) {
-        log.error("Erro ao registrar handler : {} ", e.getMessage(), e);
+        log.error("Erro ao registrar handler : ", e);
         ApplicationContextTestUtils.closeAll(applicationContext);
         System.exit(999);
     }
