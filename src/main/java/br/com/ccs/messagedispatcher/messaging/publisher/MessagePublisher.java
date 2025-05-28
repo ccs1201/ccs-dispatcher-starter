@@ -22,7 +22,10 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.*;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_ACTION;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_SOURCE;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_TIMESTAMP;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.TYPE_ID;
 
 /**
  * Classe de proxy para o {@link RabbitTemplate} com métodos prontos
@@ -173,13 +176,15 @@ public final class MessagePublisher {
                 throw new MessageDispatcherRemoteProcessException(result.getException().getMessage());
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug("Resposta recebida: {}", response);
-            }
 
-            return objectMapper.convertValue(response.orElseThrow(() ->
+            var responseBody = objectMapper.convertValue(response.orElseThrow(() ->
                     new MessageDispatcherRemoteProcessException("Nenhuma resposta recebida do consumidor")), responseClass);
 
+            if (log.isDebugEnabled()) {
+                log.debug("Resposta recebida: {}", response.get());
+            }
+
+            return responseBody;
         } catch (AmqpReplyTimeoutException e) {
             throw new MessageDispatcherRemoteProcessException("Tempo de espera pela reposta excedido.", e, HttpStatus.REQUEST_TIMEOUT);
         } catch (Exception e) {
