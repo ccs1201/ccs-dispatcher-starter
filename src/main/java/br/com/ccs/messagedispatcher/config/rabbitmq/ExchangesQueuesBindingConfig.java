@@ -21,15 +21,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Declarables;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+
+import java.util.List;
 
 
 /**
@@ -49,80 +50,61 @@ public class ExchangesQueuesBindingConfig {
     private final Logger log = LoggerFactory.getLogger(ExchangesQueuesBindingConfig.class);
 
     @Bean
-    @Primary
-    protected Exchange dispatcherExchange(MessageDispatcherProperties properties) {
-        log.debug("Configurando exchange: {}", properties.getExchangeName());
-        var ex = ExchangeBuilder
+    @SuppressWarnings("unused")
+    public Declarables defaultExchangeAndQueue(MessageDispatcherProperties properties) {
+        var exchange = ExchangeBuilder
                 .topicExchange(properties.getExchangeName())
                 .durable(properties.isExchangeDurable())
                 .build();
 
-        log.info("Exchange criada: {}", ex);
-        return ex;
-    }
-
-    @Bean
-    @Qualifier("deadLetterExchange")
-    protected Exchange deadLetterExchange(MessageDispatcherProperties properties) {
-        log.debug("Configurando Dead Letter Exchange: {}", properties.getDeadLetterExchangeName());
-        var dlqEx = ExchangeBuilder
-                .topicExchange(properties.getDeadLetterExchangeName())
-                .durable(properties.isDeadLetterExchangeDurable())
-                .build();
-
-        log.info("Dead Letter Exchange criada: {} ", dlqEx);
-        return dlqEx;
-    }
-
-    @Bean
-    @Primary
-    protected Queue dispatcherQueue(MessageDispatcherProperties properties) {
-        log.debug("Configurando queue: {}", properties.getQueueName());
-        var q = QueueBuilder
+        var queue = QueueBuilder
                 .durable(properties.getQueueName())
                 .deadLetterExchange(properties.getDeadLetterExchangeName())
                 .deadLetterRoutingKey(properties.getDeadLetterRoutingKey())
                 .build();
 
-        log.info("Default Queue criada: {}", q);
-        return q;
-    }
-
-    @Bean
-    @Primary
-    protected Binding dispatcherQueueBinding(Queue ccsDispatcherQueue,
-                                             Exchange ccsDispatcherExchange,
-                                             MessageDispatcherProperties properties) {
-        log.debug("Configurando binding: {}", properties.getRoutingKey());
-        return BindingBuilder
-                .bind(ccsDispatcherQueue)
-                .to(ccsDispatcherExchange)
+        var binding = BindingBuilder
+                .bind(queue)
+                .to(exchange)
                 .with(properties.getRoutingKey())
                 .noargs();
+
+        log("Default Exchange and Queue", exchange, queue, binding);
+
+        return new Declarables(
+                List.of(exchange, queue, binding)
+        );
     }
 
     @Bean
-    @Qualifier("deadLetterQueue")
-    protected Queue deadLetterQueue(MessageDispatcherProperties properties) {
-        log.debug("Configurando Dead Letter Queue: {}", properties.getDeadLetterQueueName());
+    @SuppressWarnings("unused")
+    public Declarables deadLetterExchangeAndQueue(MessageDispatcherProperties properties) {
+        var exchange = ExchangeBuilder
+                .topicExchange(properties.getDeadLetterExchangeName())
+                .durable(properties.isDeadLetterExchangeDurable())
+                .build();
 
-        var dlqQueue = QueueBuilder
+        var queue = QueueBuilder
                 .durable(properties.getDeadLetterQueueName())
                 .build();
-        log.info("Dead Letter Queue criada: {}", dlqQueue);
-        return dlqQueue;
-    }
 
-    @Bean
-    @Qualifier("deadLetterQueueBinding")
-    protected Binding deadLetterQueueBinding(@Qualifier("deadLetterQueue") Queue deadLetterQueue,
-                                             @Qualifier("deadLetterExchange") Exchange deadLetterExchange,
-                                             MessageDispatcherProperties properties) {
-        log.debug("Configurando binding da Dead Letter Queue: {}", properties.getDeadLetterRoutingKey());
-        return BindingBuilder
-                .bind(deadLetterQueue)
-                .to(deadLetterExchange)
+        var binding = BindingBuilder
+                .bind(queue)
+                .to(exchange)
                 .with(properties.getDeadLetterRoutingKey())
                 .noargs();
+
+        log("Dead Letter Exchange and Queue", exchange, queue, binding);
+
+        return new Declarables(
+                List.of(exchange, queue, binding)
+        );
+    }
+
+    private void log(String info, Exchange exchange, Queue queue, Binding binding) {
+        log.debug("Criando Exchange, Queue e Binding {}", info);
+        log.debug("Exchange {} criada", exchange.getName());
+        log.debug("Queue {} criada", queue.getName());
+        log.debug("Binding {} criado", binding.getExchange());
     }
 }
