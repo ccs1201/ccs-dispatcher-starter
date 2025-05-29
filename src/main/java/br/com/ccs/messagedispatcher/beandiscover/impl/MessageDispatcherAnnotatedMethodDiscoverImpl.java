@@ -107,7 +107,7 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
                     + " na Classe: " + handlers.get(actionType).get(parameterType).getDeclaringClass().getName()
                     + " já declara o mesmo tipo de entrada que a Classe: " + method.getDeclaringClass().getName()
                     + " está declarando no método: " + method.getName() + " para o PayLoad: " + parameterType
-                    + " não são permitidos Handlers duplicados para o mesmo tipo de entrada.");
+                    + " não são permitidos Handlers duplicados para o mesmo tipo de PayLoad.");
 
         }
         handlers.get(actionType).put(parameterType, method);
@@ -134,7 +134,7 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
 
     private void handleMappingError(Exception e) {
         log.error("Erro ao registrar handler : ", e);
-        ApplicationContextTestUtils.closeAll(applicationContext);
+//        ApplicationContextTestUtils.closeAll(applicationContext);
         System.exit(999);
     }
 }
