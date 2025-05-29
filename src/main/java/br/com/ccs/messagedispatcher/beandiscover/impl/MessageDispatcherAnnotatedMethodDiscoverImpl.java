@@ -6,11 +6,14 @@ import br.com.ccs.messagedispatcher.exceptions.MessageHandlerMultipleInputParame
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerNotFoundException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerWithoutInputParameterException;
 import br.com.ccs.messagedispatcher.messaging.MessageAction;
-import br.com.ccs.messagedispatcher.messaging.annotation.*;
+import br.com.ccs.messagedispatcher.messaging.annotation.Command;
+import br.com.ccs.messagedispatcher.messaging.annotation.Event;
+import br.com.ccs.messagedispatcher.messaging.annotation.MessageHandler;
+import br.com.ccs.messagedispatcher.messaging.annotation.Notification;
+import br.com.ccs.messagedispatcher.messaging.annotation.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.boot.test.util.ApplicationContextTestUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -27,10 +30,7 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
 
     private final Map<MessageAction, HashMap<String, Method>> handlers;
 
-    private final ApplicationContext applicationContext;
-
     public MessageDispatcherAnnotatedMethodDiscoverImpl(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
         this.handlers = Map.of(
                 MessageAction.COMMAND, new HashMap<>(),
                 MessageAction.QUERY, new HashMap<>(),
@@ -88,13 +88,14 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
                     } catch (ArrayIndexOutOfBoundsException e) {
                         var ex = new MessageHandlerWithoutInputParameterException("Handler não possui parâmetros de entrada.");
                         handleMappingError(ex);
-                    } catch (MessageHandlerDuplicatedInputParameterException e) {
+                    } catch (MessageHandlerDuplicatedInputParameterException |
+                             MessageHandlerMultipleInputParametersException e) {
                         handleMappingError(e);
                     }
                 });
     }
 
-    private void registreHandler(MessageAction actionType, Method method, String parameterType) {
+    private void registreHandler(MessageAction actionType, Method method, String parameterType) throws MessageHandlerMultipleInputParametersException, MessageHandlerDuplicatedInputParameterException {
         log.debug("Registrando handler {} para o tipo {}", method.getName(), parameterType);
 
         if (method.getParameterCount() > 1) {

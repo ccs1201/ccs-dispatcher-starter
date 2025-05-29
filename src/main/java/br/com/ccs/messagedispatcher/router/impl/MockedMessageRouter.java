@@ -1,6 +1,6 @@
 package br.com.ccs.messagedispatcher.router.impl;
 
-import br.com.ccs.messagedispatcher.exceptions.MessageRouterMessageProcessException;
+import br.com.ccs.messagedispatcher.exceptions.MessageRouterProcessingException;
 import br.com.ccs.messagedispatcher.messaging.model.MockedMessageWrapper;
 import br.com.ccs.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -90,7 +90,7 @@ public class MockedMessageRouter implements MessageRouter {
 
         } catch (Exception e) {
             log.error("Erro ao processar mensagem: {}", e.getMessage());
-            throw new MessageRouterMessageProcessException("Nenhum handler encontrado para path: ".concat(messageWrapper.getPath()), e);
+            throw new MessageRouterProcessingException("Nenhum handler encontrado para path: ".concat(messageWrapper.getPath()), e);
         }
     }
 
@@ -101,7 +101,7 @@ public class MockedMessageRouter implements MessageRouter {
             log.info("Mensagem recebida: {}", messageWrapper);
             return messageWrapper;
         } catch (IOException | ClassCastException e) {
-            throw new MessageRouterMessageProcessException("Erro ao ler mensagem: " + Arrays.toString(message.getBody()), e);
+            throw new MessageRouterProcessingException("Erro ao ler mensagem: " + Arrays.toString(message.getBody()), e);
         }
     }
 }

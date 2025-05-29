@@ -1,6 +1,6 @@
 package br.com.ccs.dispatcher.resolver.impl;
 
-import br.com.ccs.messagedispatcher.exceptions.MessageRouterMessageProcessException;
+import br.com.ccs.messagedispatcher.exceptions.MessageRouterProcessingException;
 import br.com.ccs.messagedispatcher.messaging.model.MockedMessageWrapper;
 import br.com.ccs.messagedispatcher.router.impl.MockedMessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,7 +79,7 @@ public class MockedMessageRouterTest {
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
         // Act & Assert
-        var exception = assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
+        var exception = assertThrows(MessageRouterProcessingException.class, () -> router.routeMessage(message));
 
         assertEquals("Nenhum handler encontrado para path: /xxx", exception.getMessage());
     }
@@ -109,7 +109,7 @@ public class MockedMessageRouterTest {
         when(objectMapper.readValue(any(byte[].class), any(Class.class))).thenReturn(mockedMessageWrapper);
         when(handlerMapping.getHandler(any())).thenReturn(null);
 
-        assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
+        assertThrows(MessageRouterProcessingException.class, () -> router.routeMessage(message));
 
     }
 
@@ -141,7 +141,7 @@ public class MockedMessageRouterTest {
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
         // Act & Assert
-        var exception = assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
+        var exception = assertThrows(MessageRouterProcessingException.class, () -> router.routeMessage(message));
         assertEquals("Nenhum handler encontrado para path: /test", exception.getMessage());
     }
 
@@ -183,7 +183,7 @@ public class MockedMessageRouterTest {
             when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
             // Execute method and assert
-            assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
+            assertThrows(MessageRouterProcessingException.class, () -> router.routeMessage(message));
 
             // Verify interactions
             verify(handlerMapping).getHandler(any(MockHttpServletRequest.class));
@@ -223,7 +223,7 @@ public class MockedMessageRouterTest {
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
         // Act & Assert
-        assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
+        assertThrows(MessageRouterProcessingException.class, () -> router.routeMessage(message));
     }
 
     /**
@@ -251,7 +251,7 @@ public class MockedMessageRouterTest {
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
         // Executing the method and asserting the exception
-        assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
+        assertThrows(MessageRouterProcessingException.class, () -> router.routeMessage(message));
 
         // Verifying interactions
         verify(objectMapper).readValue(any(byte[].class), eq(MockedMessageWrapper.class));

@@ -71,7 +71,7 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
     @Override
     public MessageWrapperResponse onMessage(Message message) {
         if (log.isDebugEnabled()) {
-            sleep();
+//            sleep();
             log(message);
         }
 
