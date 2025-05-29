@@ -12,15 +12,10 @@ import org.springframework.context.annotation.Configuration;
 public class ConnectionFactoryConfig {
 
     private final Logger log = LoggerFactory.getLogger(ConnectionFactoryConfig.class);
-    private final MessageDispatcherProperties properties;
-
-    public ConnectionFactoryConfig(MessageDispatcherProperties properties) {
-        this.properties = properties;
-    }
 
     @Bean
     @SuppressWarnings("unused")
-    protected ConnectionFactory connectionFactory() {
+    protected ConnectionFactory connectionFactory(final MessageDispatcherProperties properties) {
         log.debug("Configurando ConnectionFactory");
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
         connectionFactory.setHost(properties.getHost());

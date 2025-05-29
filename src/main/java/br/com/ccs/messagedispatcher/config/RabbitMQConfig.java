@@ -17,7 +17,6 @@
 package br.com.ccs.messagedispatcher.config;
 
 import br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties;
-import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,16 +29,13 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.retry.MessageRecoverer;
 import org.springframework.amqp.rabbit.retry.RepublishMessageRecoverer;
 import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,13 +71,6 @@ public class RabbitMQConfig {
 
     protected RabbitMQConfig(MessageDispatcherProperties properties) {
         this.properties = properties;
-    }
-
-    @Bean
-    @Primary
-    protected RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
-        log.debug("Configurando RabbitAdmin");
-        return new RabbitAdmin(connectionFactory);
     }
 
     @Bean
@@ -158,35 +147,6 @@ public class RabbitMQConfig {
                 .to(deadLetterExchange)
                 .with(properties.getDeadLetterRoutingKey())
                 .noargs();
-    }
-
-    @Bean
-    protected RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
-        log.debug("Configurando RabbitTemplate");
-        RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setMessageConverter(messageConverter);
-        template.setExchange(properties.getExchangeName());
-        template.setRoutingKey(properties.getRoutingKey());
-        template.setMandatory(true);
-        template.setReplyTimeout(properties.getReplyTimeOut());
-
-        template.setConfirmCallback((correlationData, ack, cause) -> {
-            if (ack) {
-                log.debug("Mensagem entregue ao broker");
-            } else {
-                log.error("Mensagem não confirmada pelo broker: {}", cause);
-            }
-        });
-
-        // Configurando retorno de mensagem
-        template.setReturnsCallback(returned -> log.info("Mensagem retornada: {}", returned.getMessage() +
-                " code: " + returned.getReplyCode() +
-                " reason: " + returned.getReplyText()));
-
-        log.info("RabbitTemplate configurado com exchange: {}", properties.getExchangeName() +
-                " e routing key: " + properties.getRoutingKey());
-
-        return template;
     }
 
     @Bean
