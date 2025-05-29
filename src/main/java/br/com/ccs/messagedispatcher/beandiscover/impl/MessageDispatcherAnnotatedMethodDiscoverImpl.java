@@ -88,13 +88,14 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
                     } catch (ArrayIndexOutOfBoundsException e) {
                         var ex = new MessageHandlerWithoutInputParameterException("Handler não possui parâmetros de entrada.");
                         handleMappingError(ex);
-                    } catch (MessageHandlerDuplicatedInputParameterException e) {
+                    } catch (MessageHandlerDuplicatedInputParameterException |
+                             MessageHandlerMultipleInputParametersException e) {
                         handleMappingError(e);
                     }
                 });
     }
 
-    private void registreHandler(MessageAction actionType, Method method, String parameterType) {
+    private void registreHandler(MessageAction actionType, Method method, String parameterType) throws MessageHandlerMultipleInputParametersException, MessageHandlerDuplicatedInputParameterException {
         log.debug("Registrando handler {} para o tipo {}", method.getName(), parameterType);
 
         if (method.getParameterCount() > 1) {

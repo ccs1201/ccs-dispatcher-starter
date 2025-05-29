@@ -6,8 +6,8 @@ import br.com.ccs.messagedispatcher.util.EnvironmentUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
@@ -17,21 +17,31 @@ public class MessageDispatcherExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(MessageDispatcherExceptionHandler.class);
 
     @ExceptionHandler(MessageDispatcherRemoteProcessException.class)
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public MessageDispatcherProblemDetailExceptionResponse handle(MessageDispatcherRemoteProcessException e) {
+    public ResponseEntity<MessageDispatcherProblemDetailExceptionResponse> handle(MessageDispatcherRemoteProcessException e) {
         log.error("Ocorreu um erro no processamento remoto Message: {} Cause: {}", e.getMessage(), e.getRemoteCause());
         return buildProblemDetailExceptionResponse(e.getStatus(), e.getMessage(), e.getOriginService());
     }
 
     @ExceptionHandler(MessagePublisherTimeOutException.class)
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public MessageDispatcherProblemDetailExceptionResponse handle(MessagePublisherTimeOutException e) {
+    public ResponseEntity<MessageDispatcherProblemDetailExceptionResponse> handle(MessagePublisherTimeOutException e) {
         log.error("\"Ocorreu um erro no processamento remoto Message: {}", e.getMessage());
         return buildProblemDetailExceptionResponse(e.getStatus(), e.getMessage(), EnvironmentUtils.getAppName());
     }
 
-    private static MessageDispatcherProblemDetailExceptionResponse buildProblemDetailExceptionResponse(HttpStatus e, String message, String orinService) {
-        return MessageDispatcherProblemDetailExceptionResponse.of(e.name(), e.value(), message, orinService);
+    private static ResponseEntity<MessageDispatcherProblemDetailExceptionResponse> buildProblemDetailExceptionResponse(HttpStatus httpStatus, String message, String orinService) {
+        return ResponseEntity
+                .status(httpStatus)
+                .body(MessageDispatcherProblemDetailExceptionResponse.of(httpStatus.name(), httpStatus.value(), message, orinService));
     }
 
+    private record MessageDispatcherProblemDetailExceptionResponse(String type,
+                                                                   String title,
+                                                                   int status,
+                                                                   String detail,
+                                                                   String originService) {
+
+        static MessageDispatcherProblemDetailExceptionResponse of(String title, int status, String detail, String originService) {
+            return new MessageDispatcherProblemDetailExceptionResponse("Error", title, status, detail, originService);
+        }
+    }
 }

@@ -17,6 +17,7 @@ import org.springframework.amqp.AmqpRemoteException;
 import org.springframework.amqp.core.AmqpReplyTimeoutException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -163,7 +164,7 @@ public final class MessagePublisher {
 
             var messageWrapperResponse = objectMapper
                     .convertValue(response.orElseThrow(() ->
-                            new MessageDispatcherRemoteProcessException("Nenhuma resposta recebida do consumidor")), MessageWrapperResponse.class);
+                            new MessageDispatcherRemoteProcessException(HttpStatus.FAILED_DEPENDENCY,"Nenhuma resposta recebida do consumidor")), MessageWrapperResponse.class);
 
             if (log.isDebugEnabled()) {
                 log.debug("Resposta recebida: {}", response.get());
