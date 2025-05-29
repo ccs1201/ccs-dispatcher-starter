@@ -1,7 +1,7 @@
 package br.com.ccs.messagedispatcher.exceptions;
 
-public class MessageHandlerWithoutInputParameterException extends MessageDispatcherRuntimeException {
+public class MessageHandlerWithoutInputParameterException extends MessageDispatcherBeanResolutionException {
     public MessageHandlerWithoutInputParameterException(String message) {
-        super(message, null);
+        super(message);
     }
 }

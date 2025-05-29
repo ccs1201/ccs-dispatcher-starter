@@ -36,6 +36,7 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.retry.MessageRecoverer;
 import org.springframework.amqp.rabbit.retry.RepublishMessageRecoverer;
+import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -46,7 +47,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.EXCEPTION_MESSAGE;
@@ -132,7 +132,7 @@ public class RabbitMQConfig {
         log.debug("Configurando Dead Letter Exchange: {}", properties.getDeadLetterExchangeName());
         var dlqEx = ExchangeBuilder
                 .topicExchange(properties.getDeadLetterExchangeName())
-                .durable(true)
+                .durable(properties.isDeadLetterExchangeDurable())
                 .build();
 
         log.info("Dead Letter Exchange criada: {} ", dlqEx);
@@ -145,8 +145,8 @@ public class RabbitMQConfig {
         log.debug("Configurando queue: {}", properties.getQueueName());
         var q = QueueBuilder
                 .durable(properties.getQueueName())
-                .deadLetterRoutingKey(properties.getDeadLetterRoutingKey())
                 .deadLetterExchange(properties.getDeadLetterExchangeName())
+                .deadLetterRoutingKey(properties.getDeadLetterRoutingKey())
                 .build();
 
         log.info("Default Queue criada: {}", q);
@@ -194,16 +194,10 @@ public class RabbitMQConfig {
         log.debug("Configurando RabbitTemplate");
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter);
-
-        // Configurando exchange e routing key padrão
         template.setExchange(properties.getExchangeName());
         template.setRoutingKey(properties.getRoutingKey());
-
-        // Configurando confirmação
         template.setMandatory(true);
         template.setReplyTimeout(properties.getReplyTimeOut());
-
-        //
 
         template.setConfirmCallback((correlationData, ack, cause) -> {
             if (ack) {
@@ -265,14 +259,17 @@ public class RabbitMQConfig {
                 properties.getDeadLetterRoutingKey()) {
             @Override
             protected Map<String, Object> additionalHeaders(Message message, Throwable cause) {
+                Throwable rootCause = cause;
 
-                var rootCause = ExceptionUtils.getRootCause(cause);
+                if (cause instanceof ListenerExecutionFailedException e) {
+                    rootCause = ExceptionUtils.getRootCause(e);
+                }
 
                 if (log.isDebugEnabled()) {
                     log.debug("Enviando mensagem para dead letter queue.", rootCause);
                 }
 
-                Map<String, Object> headers = new HashMap<>();
+                Map<String, Object> headers = message.getMessageProperties().getHeaders();
                 headers.put(HAS_ERROR, true);
                 headers.put(EXCEPTION_TYPE, rootCause.getClass().getSimpleName());
                 headers.put(EXCEPTION_MESSAGE, rootCause.getMessage());

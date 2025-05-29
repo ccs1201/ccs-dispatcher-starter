@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public class MessageDispatcherRemoteProcessException extends RuntimeException {
 
-    private final HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+    private HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
     private String remoteCause;
     private String originService;
 
@@ -15,12 +15,13 @@ public class MessageDispatcherRemoteProcessException extends RuntimeException {
         this.originService = errorData.originService();
     }
 
-    public MessageDispatcherRemoteProcessException(String message) {
-        super(message);
-    }
-
     public MessageDispatcherRemoteProcessException(Throwable cause) {
         super(cause);
+    }
+
+    public MessageDispatcherRemoteProcessException(HttpStatus status, String message) {
+        super(message);
+        this.status = status;
     }
 
     public HttpStatus getStatus() {
