@@ -1,7 +1,7 @@
 package br.com.ccs.messagedispatcher.router.impl;
 
 import br.com.ccs.messagedispatcher.exceptions.MessageRouterMessageProcessException;
-import br.com.ccs.messagedispatcher.messaging.model.MessageWrapper;
+import br.com.ccs.messagedispatcher.messaging.model.MockedMessageWrapper;
 import br.com.ccs.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -94,11 +94,11 @@ public class MockedMessageRouter implements MessageRouter {
         }
     }
 
-    private MessageWrapper getMessageWrapper(Object objectMessage) {
+    private MockedMessageWrapper getMessageWrapper(Object objectMessage) {
         var message = (Message) objectMessage;
         try {
-            var messageWrapper = objectMapper.readValue(message.getBody(), MessageWrapper.class);
-            log.info("Mensagem recebida: " + messageWrapper);
+            var messageWrapper = objectMapper.readValue(message.getBody(), MockedMessageWrapper.class);
+            log.info("Mensagem recebida: {}", messageWrapper);
             return messageWrapper;
         } catch (IOException | ClassCastException e) {
             throw new MessageRouterMessageProcessException("Erro ao ler mensagem: " + Arrays.toString(message.getBody()), e);

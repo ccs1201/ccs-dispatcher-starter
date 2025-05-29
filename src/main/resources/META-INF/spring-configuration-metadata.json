@@ -94,49 +94,57 @@
       "name": "message.dispatcher.dead-letter-queue-name",
       "type": "java.lang.String",
       "description": "Nome da fila de mensagens de erro.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties"
+      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": "message.dispatcher.dlq"
     },
     {
       "name": "message.dispatcher.dead-letter-exchange-name",
       "type": "java.lang.String",
       "description": "Nome da exchange de mensagens de erro.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties"
+      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": "message.dispatcher.dlx"
     },
     {
       "name": "message.dispatcher.dead-letter-routing-key",
       "type": "java.lang.String",
       "description": "Routing key para mensagens de erro.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties"
+      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": "{app-name}.dlq"
     },
     {
       "name": "message.dispatcher.max-retry-attempts",
       "type": "java.lang.Integer",
       "description": "Número máximo de tentativas de reenvio.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties"
+      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": 3
     },
     {
       "name": "message.dispatcher.initial-interval",
       "type": "java.lang.Integer",
       "description": "Intervalo inicial entre tentativas de reenvio (em milissegundos).",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties"
+      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": 5000
     },
     {
       "name": "message.dispatcher.multiplier",
       "type": "java.lang.Integer",
       "description": "Multiplicador para o intervalo entre tentativas de reenvio.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties"
+      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": 2
     },
     {
       "name": "message.dispatcher.max-interval",
       "type": "java.lang.Integer",
       "description": "Intervalo máximo entre tentativas de reenvio (em milissegundos).",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties"
+      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": 10000
     },
     {
       "name": "message.dispatcher.prefetch-count",
       "type": "java.lang.Integer",
       "description": "Quantidade de mensagens que serão consumidas por vez. Padrão é 10.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties"
+      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": 10
     },
     {
       "name": "message.dispatcher.reply-timeout",

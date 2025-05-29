@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 @Component
 public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDispatcherAnnotatedMethodDiscover {
 
@@ -37,11 +38,6 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
                 MessageAction.EVENT, new HashMap<>());
 
         resolveAnnotatedMethods(applicationContext);
-    }
-
-    @Override
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
     }
 
     private void resolveAnnotatedMethods(ApplicationContext applicationContext) {
@@ -107,8 +103,12 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
         }
 
         if (handlers.get(actionType).containsKey(parameterType)) {
-            throw new MessageHandlerDuplicatedInputParameterException("Tipo handler: " + actionType + " parâmetro de entrada duplicado no método: " + method
-                    + " não é permitido utilizar o mesmo parâmetro de entrada para handlers do mesmo tipo.");
+            throw new MessageHandlerDuplicatedInputParameterException(" O handler: @" + actionType + " - " + handlers.get(actionType).get(parameterType).getName()
+                    + " na Classe: " + handlers.get(actionType).get(parameterType).getDeclaringClass().getName()
+                    + " já declara o mesmo tipo de entrada que a Classe: " + method.getDeclaringClass().getName()
+                    + " está declarando no método: " + method.getName() + " para o PayLoad: " + parameterType
+                    + " não são permitidos Handlers duplicados para o mesmo tipo de entrada.");
+
         }
         handlers.get(actionType).put(parameterType, method);
     }
@@ -126,14 +126,14 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
         var method = handlers.get(actionType).get(parameterType);
 
         if (method == null) {
-            throw new MessageHandlerNotFoundException("Não foi encontrado nenhum handler para o tipo: " + parameterType);
+            throw new MessageHandlerNotFoundException("Nenhum handler encontrado capaz de processar o tipo: " + parameterType);
         }
 
         return method;
     }
 
     private void handleMappingError(Exception e) {
-        log.error("Erro ao registrar handler : {} ", e.getMessage(), e);
+        log.error("Erro ao registrar handler : ", e);
         ApplicationContextTestUtils.closeAll(applicationContext);
         System.exit(999);
     }

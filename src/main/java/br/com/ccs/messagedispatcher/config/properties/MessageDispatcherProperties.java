@@ -199,9 +199,9 @@ public class MessageDispatcherProperties {
     private int maxRetryAttempts = 3;
 
     /**
-     * Intervalo inicial entre as tentativas. Padrão é 1000ms
+     * Intervalo inicial entre as tentativas. Padrão é 5000ms
      */
-    private int initialInterval = 1000;
+    private int initialInterval = 5000;
 
     /**
      * Multiplicador do intervalo entre as tentativas. Padrão é 2
@@ -245,7 +245,7 @@ public class MessageDispatcherProperties {
     }
 
     public void setQueueName(String queueName) {
-        this.queueName = queueName;
+        this.queueName = queueName.trim();
     }
 
     public String getExchangeName() {
@@ -253,7 +253,7 @@ public class MessageDispatcherProperties {
     }
 
     public void setExchangeName(String exchangeName) {
-        this.exchangeName = exchangeName;
+        this.exchangeName = exchangeName.trim();
     }
 
     public String getExchangeType() {
@@ -261,7 +261,7 @@ public class MessageDispatcherProperties {
     }
 
     public void setExchangeType(String exchangeType) {
-        this.exchangeType = exchangeType;
+        this.exchangeType = exchangeType.trim();
     }
 
     public String getRoutingKey() {
@@ -269,7 +269,7 @@ public class MessageDispatcherProperties {
     }
 
     public void setRoutingKey(String routingKey) {
-        this.routingKey = routingKey;
+        this.routingKey = routingKey.trim();
     }
 
     public String getConcurrency() {
@@ -277,7 +277,7 @@ public class MessageDispatcherProperties {
     }
 
     public void setConcurrency(String concurrency) {
-        this.concurrency = concurrency;
+        this.concurrency = concurrency.trim();
     }
 
     public boolean isQueueDurable() {
@@ -301,7 +301,7 @@ public class MessageDispatcherProperties {
     }
 
     public void setHost(String host) {
-        this.host = host;
+        this.host = host.trim();
     }
 
     public int getPort() {
@@ -317,7 +317,7 @@ public class MessageDispatcherProperties {
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.username = username.trim();
     }
 
     public String getPassword() {
@@ -325,7 +325,7 @@ public class MessageDispatcherProperties {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = password.trim();
     }
 
     public String getVirtualHost() {
@@ -333,7 +333,7 @@ public class MessageDispatcherProperties {
     }
 
     public void setVirtualHost(String virtualHost) {
-        this.virtualHost = virtualHost;
+        this.virtualHost = virtualHost.trim();
     }
 
     public String getDeadLetterQueueName() {
@@ -341,7 +341,7 @@ public class MessageDispatcherProperties {
     }
 
     public void setDeadLetterQueueName(String deadLetterQueueName) {
-        this.deadLetterQueueName = deadLetterQueueName;
+        this.deadLetterQueueName = deadLetterQueueName.trim();
     }
 
     public String getDeadLetterExchangeName() {
@@ -349,7 +349,7 @@ public class MessageDispatcherProperties {
     }
 
     public void setDeadLetterExchangeName(String deadLetterExchangeName) {
-        this.deadLetterExchangeName = deadLetterExchangeName;
+        this.deadLetterExchangeName = deadLetterExchangeName.trim();
     }
 
     public String getDeadLetterRoutingKey() {
@@ -357,7 +357,7 @@ public class MessageDispatcherProperties {
     }
 
     public void setDeadLetterRoutingKey(String deadLetterRoutingKey) {
-        this.deadLetterRoutingKey = deadLetterRoutingKey;
+        this.deadLetterRoutingKey = deadLetterRoutingKey.trim();
     }
 
     public boolean isDeadLetterExchangeDurable() {

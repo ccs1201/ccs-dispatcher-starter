@@ -1,21 +1,25 @@
 package br.com.ccs.messagedispatcher.router.impl;
 
 import br.com.ccs.messagedispatcher.beandiscover.MessageDispatcherAnnotatedMethodDiscover;
-import br.com.ccs.messagedispatcher.exceptions.MessageRouterMessageProcessException;
 import br.com.ccs.messagedispatcher.exceptions.MessageRouterMissingHeaderException;
 import br.com.ccs.messagedispatcher.messaging.MessageAction;
+import br.com.ccs.messagedispatcher.messaging.model.MessageDispatcherErrorResponse;
 import br.com.ccs.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HEADER_MESSAGE_ACTION;
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HEADER_TYPE_ID;
+import java.lang.reflect.InvocationTargetException;
+
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_ACTION;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.TYPE_ID;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+@SuppressWarnings("unused")
 @Component
 @ConditionalOnProperty(value = "message.dispatcher.router", havingValue = "annotated", matchIfMissing = true)
 public class AnnotatedMessageRouter implements MessageRouter {
@@ -24,33 +28,43 @@ public class AnnotatedMessageRouter implements MessageRouter {
 
     private final ObjectMapper objectMapper;
     private final MessageDispatcherAnnotatedMethodDiscover annotatedMethodDiscover;
+    private final ApplicationContext applicationContext;
 
-    public AnnotatedMessageRouter(ObjectMapper objectMapper, MessageDispatcherAnnotatedMethodDiscover annotatedMethodDiscover) {
+    public AnnotatedMessageRouter(ObjectMapper objectMapper, MessageDispatcherAnnotatedMethodDiscover annotatedMethodDiscover,
+                                  ApplicationContext applicationContext) {
         this.objectMapper = objectMapper;
         this.annotatedMethodDiscover = annotatedMethodDiscover;
+        this.applicationContext = applicationContext;
     }
 
     @Override
     public Object routeMessage(Object objectMessage) {
         var message = (Message) objectMessage;
-        var typeId = message.getMessageProperties().getHeaders().get(HEADER_TYPE_ID).toString();
+        var typeId = message.getMessageProperties().getHeaders().get(TYPE_ID).toString();
 
         if (isEmpty(typeId)) {
-            throw new MessageRouterMissingHeaderException("Missing " + HEADER_TYPE_ID + " header in the message");
+            throw new MessageRouterMissingHeaderException("Missing " + TYPE_ID + " header in the message");
         }
 
         try {
-
             var handler = annotatedMethodDiscover.getHandler(MessageAction
-                            .valueOf(message.getMessageProperties().getHeader(HEADER_MESSAGE_ACTION)),
-                    typeId);
+                    .valueOf(message.getMessageProperties().getHeader(MESSAGE_ACTION)), typeId);
 
             var payload = objectMapper.readValue(message.getBody(), handler.getParameterTypes()[0]);
-            return handler.invoke(annotatedMethodDiscover.getApplicationContext().getBean(handler.getDeclaringClass()), payload);
-        } catch (Exception e) {
-            log.error("Error processando mensagem: {}", e.getMessage(), e);
-            throw new MessageRouterMessageProcessException("Erro ao processar mensagem. Detail: " + e.getMessage(), e);
+
+            return handler.invoke(applicationContext.getBean(handler.getDeclaringClass()), payload);
+
+        } catch (InvocationTargetException e) {
+            return handleMappingError(e.getTargetException());
         }
+        catch (Exception e) {
+            return handleMappingError(e);
+        }
+    }
+
+    private Object handleMappingError(Throwable e) {
+        log.error("Erro ao processar mensagem: {}", e.getMessage(), e);
+        return MessageDispatcherErrorResponse.of(e);
     }
 }
 

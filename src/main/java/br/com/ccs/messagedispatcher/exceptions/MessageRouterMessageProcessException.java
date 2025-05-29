@@ -27,7 +27,7 @@ package br.com.ccs.messagedispatcher.exceptions;
  */
 
 public class MessageRouterMessageProcessException extends MessageDispatcherRuntimeException {
-    public MessageRouterMessageProcessException(String msg, Exception e) {
+    public MessageRouterMessageProcessException(String msg, Throwable e) {
         super(msg, e);
     }
 }
