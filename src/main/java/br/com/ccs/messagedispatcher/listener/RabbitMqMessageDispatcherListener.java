@@ -71,11 +71,18 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
     @Override
     public MessageWrapperResponse onMessage(Message message) {
         if (log.isDebugEnabled()) {
-//            sleep();
+            sleep();
             log(message);
         }
 
         var resultProcess = messageRouter.routeMessage(message);
+
+        //se não tiver replyTo, mas ocorrer uma exception
+        //então devemos fazer o retry, se a exception persistir
+        //então devemos enviar a mensagem para o DLQ
+        if (resultProcess instanceof MessageDispatcherErrorResponse) {
+
+        }
 
         if (resultProcess == null) {
             return null;
@@ -92,10 +99,10 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
     private MessageWrapperResponse buildResponse(Object resultProcess) {
 
         if (resultProcess instanceof MessageDispatcherErrorResponse) {
-            return new MessageWrapperResponse(true, resultProcess);
+            return MessageWrapperResponse.withError(resultProcess);
         }
 
-        return new MessageWrapperResponse(false, resultProcess);
+        return MessageWrapperResponse.withSuccess(resultProcess);
     }
 
     @SuppressWarnings("unussed")
