@@ -17,7 +17,6 @@ import org.springframework.amqp.AmqpRemoteException;
 import org.springframework.amqp.core.AmqpReplyTimeoutException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +24,7 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_ACTION;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_KINDA;
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_SOURCE;
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_TIMESTAMP;
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.TYPE_ID;
@@ -194,7 +193,7 @@ public final class MessagePublisher {
         var messageProperties = message.getMessageProperties();
         messageProperties.setHeader(MESSAGE_TIMESTAMP, OffsetDateTime.now());
         messageProperties.setHeader(TYPE_ID, body.getClass().getSimpleName());
-        messageProperties.setHeader(MESSAGE_ACTION, action);
+        messageProperties.setHeader(MESSAGE_KINDA, action);
         messageProperties.setHeader(MESSAGE_SOURCE, EnvironmentUtils.getAppName());
 
         Arrays.stream(properties.getMappedHeaders())
