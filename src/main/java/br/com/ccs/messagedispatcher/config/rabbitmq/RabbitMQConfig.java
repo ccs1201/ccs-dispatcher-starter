@@ -155,16 +155,4 @@ public class RabbitMQConfig {
 
         return factory;
     }
-
-    @Bean
-    protected RetryOperationsInterceptor retryOperationsInterceptor(MessageRecoverer messageRecoverer, MessageDispatcherProperties properties) {
-        return RetryInterceptorBuilder.stateless()
-                .maxAttempts(properties.getMaxRetryAttempts())
-                .backOffOptions(
-                        properties.getInitialInterval(),
-                        properties.getMultiplier(),
-                        properties.getMaxInterval()
-                )
-                .recoverer(messageRecoverer).build();
-    }
 }
