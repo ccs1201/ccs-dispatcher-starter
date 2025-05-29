@@ -14,19 +14,20 @@ import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class ObjectMapperConfig {
+
     private final Logger log = LoggerFactory.getLogger(ObjectMapperConfig.class);
 
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
-        log.debug("Initializing Jackson ObjectMapper...");
+        log.debug("Inicializando Jackson ObjectMapper...");
         final ObjectMapper objectMapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                 .configure(SerializationFeature.INDENT_OUTPUT, true)
                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 .registerModule(new JavaTimeModule());
-        log.debug("Jackson ObjectMapper initialized");
+        log.debug("Jackson ObjectMapper inicializado.");
 
         return objectMapper;
     }

@@ -66,44 +66,15 @@ import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcher
  */
 
 @Configuration
-@AutoConfigureAfter(MessageDispatcherAutoConfig.class)
+//@AutoConfigureAfter(MessageDispatcherAutoConfig.class)
 @ConditionalOnProperty(name = "message.dispatcher.enabled", havingValue = "true", matchIfMissing = true)
 public class RabbitMQConfig {
 
     private final Logger log = LoggerFactory.getLogger(RabbitMQConfig.class);
     private final MessageDispatcherProperties properties;
 
-    protected RabbitMQConfig(@Qualifier("messageDispatcherProperties") MessageDispatcherProperties properties) {
+    protected RabbitMQConfig(MessageDispatcherProperties properties) {
         this.properties = properties;
-    }
-
-    @PostConstruct
-    protected void init() {
-        if (properties.getQueueName() == null || properties.getQueueName().trim().isEmpty()) {
-            throw new IllegalStateException("Queue name não pode ser null ou vazio");
-        }
-        log.debug("Propriedades validadas com sucesso");
-        log.debug("Propriedades carregas: {}", properties);
-
-        log.info("RabbitMQConfig inicializado.");
-    }
-
-    @Bean
-    @Primary
-    @SuppressWarnings("unused")
-    protected ConnectionFactory connectionFactory() {
-        log.debug("Configurando ConnectionFactory");
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-        connectionFactory.setHost(properties.getHost());
-        connectionFactory.setPort(properties.getPort());
-        connectionFactory.setUsername(properties.getUsername());
-        connectionFactory.setPassword(properties.getPassword());
-        connectionFactory.setVirtualHost(properties.getVirtualHost());
-        connectionFactory.setPublisherConfirmType(CachingConnectionFactory.ConfirmType.CORRELATED);
-        connectionFactory.setPublisherReturns(true);
-
-        log.debug("ConnectionFactory configurada");
-        return connectionFactory;
     }
 
     @Bean
