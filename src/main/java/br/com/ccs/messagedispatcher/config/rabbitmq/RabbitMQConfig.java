@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-package br.com.ccs.messagedispatcher.config;
+package br.com.ccs.messagedispatcher.config.rabbitmq;
 
 import br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.ExchangeBuilder;
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.retry.MessageRecoverer;
-import org.springframework.amqp.rabbit.retry.RepublishMessageRecoverer;
-import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -41,14 +36,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
-
-import java.time.LocalDateTime;
-import java.util.Map;
-
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.EXCEPTION_MESSAGE;
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.EXCEPTION_TYPE;
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.FAILED_AT;
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HAS_ERROR;
 
 
 /**
@@ -67,15 +54,10 @@ import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcher
 public class RabbitMQConfig {
 
     private final Logger log = LoggerFactory.getLogger(RabbitMQConfig.class);
-    private final MessageDispatcherProperties properties;
-
-    protected RabbitMQConfig(MessageDispatcherProperties properties) {
-        this.properties = properties;
-    }
 
     @Bean
     @Primary
-    protected Exchange dispatcherExchange() {
+    protected Exchange dispatcherExchange(MessageDispatcherProperties properties) {
         log.debug("Configurando exchange: {}", properties.getExchangeName());
         var ex = ExchangeBuilder
                 .topicExchange(properties.getExchangeName())
@@ -88,7 +70,7 @@ public class RabbitMQConfig {
 
     @Bean
     @Qualifier("deadLetterExchange")
-    protected Exchange deadLetterExchange() {
+    protected Exchange deadLetterExchange(MessageDispatcherProperties properties) {
         log.debug("Configurando Dead Letter Exchange: {}", properties.getDeadLetterExchangeName());
         var dlqEx = ExchangeBuilder
                 .topicExchange(properties.getDeadLetterExchangeName())
@@ -101,7 +83,7 @@ public class RabbitMQConfig {
 
     @Bean
     @Primary
-    protected Queue dispatcherQueue() {
+    protected Queue dispatcherQueue(MessageDispatcherProperties properties) {
         log.debug("Configurando queue: {}", properties.getQueueName());
         var q = QueueBuilder
                 .durable(properties.getQueueName())
@@ -116,7 +98,8 @@ public class RabbitMQConfig {
     @Bean
     @Primary
     protected Binding dispatcherQueueBinding(Queue ccsDispatcherQueue,
-                                             Exchange ccsDispatcherExchange) {
+                                             Exchange ccsDispatcherExchange,
+                                             MessageDispatcherProperties properties) {
         log.debug("Configurando binding: {}", properties.getRoutingKey());
         return BindingBuilder
                 .bind(ccsDispatcherQueue)
@@ -127,7 +110,7 @@ public class RabbitMQConfig {
 
     @Bean
     @Qualifier("deadLetterQueue")
-    protected Queue deadLetterQueue() {
+    protected Queue deadLetterQueue(MessageDispatcherProperties properties) {
         log.debug("Configurando Dead Letter Queue: {}", properties.getDeadLetterQueueName());
 
         var dlqQueue = QueueBuilder
@@ -140,7 +123,8 @@ public class RabbitMQConfig {
     @Bean
     @Qualifier("deadLetterQueueBinding")
     protected Binding deadLetterQueueBinding(@Qualifier("deadLetterQueue") Queue deadLetterQueue,
-                                             @Qualifier("deadLetterExchange") Exchange deadLetterExchange) {
+                                             @Qualifier("deadLetterExchange") Exchange deadLetterExchange,
+                                             MessageDispatcherProperties properties) {
         log.debug("Configurando binding da Dead Letter Queue: {}", properties.getDeadLetterRoutingKey());
         return BindingBuilder
                 .bind(deadLetterQueue)
@@ -152,7 +136,8 @@ public class RabbitMQConfig {
     @Bean
     protected SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory,
                                                                                   MessageConverter messageConverter,
-                                                                                  RetryOperationsInterceptor retryOperationsInterceptor) {
+                                                                                  RetryOperationsInterceptor retryOperationsInterceptor,
+                                                                                  MessageDispatcherProperties properties) {
 
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
@@ -172,7 +157,7 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    protected RetryOperationsInterceptor retryOperationsInterceptor(MessageRecoverer messageRecoverer) {
+    protected RetryOperationsInterceptor retryOperationsInterceptor(MessageRecoverer messageRecoverer, MessageDispatcherProperties properties) {
         return RetryInterceptorBuilder.stateless()
                 .maxAttempts(properties.getMaxRetryAttempts())
                 .backOffOptions(
@@ -181,32 +166,5 @@ public class RabbitMQConfig {
                         properties.getMaxInterval()
                 )
                 .recoverer(messageRecoverer).build();
-    }
-
-    @Bean
-    protected MessageRecoverer messageRecoverer(RabbitTemplate rabbitTemplate) {
-        return new RepublishMessageRecoverer(rabbitTemplate,
-                properties.getDeadLetterExchangeName(),
-                properties.getDeadLetterRoutingKey()) {
-            @Override
-            protected Map<String, Object> additionalHeaders(Message message, Throwable cause) {
-                Throwable rootCause = cause;
-
-                if (cause instanceof ListenerExecutionFailedException e) {
-                    rootCause = ExceptionUtils.getRootCause(e);
-                }
-
-                if (log.isDebugEnabled()) {
-                    log.debug("Enviando mensagem para dead letter queue.", rootCause);
-                }
-
-                Map<String, Object> headers = message.getMessageProperties().getHeaders();
-                headers.put(HAS_ERROR, true);
-                headers.put(EXCEPTION_TYPE, rootCause.getClass().getSimpleName());
-                headers.put(EXCEPTION_MESSAGE, rootCause.getMessage());
-                headers.put(FAILED_AT, LocalDateTime.now());
-                return headers;
-            }
-        };
     }
 }

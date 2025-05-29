@@ -1,4 +1,4 @@
-package br.com.ccs.messagedispatcher.config;
+package br.com.ccs.messagedispatcher.config.rabbitmq;
 
 import br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties;
 import org.slf4j.Logger;

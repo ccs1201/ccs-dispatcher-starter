@@ -17,6 +17,7 @@
 package br.com.ccs.messagedispatcher.config;
 
 import br.com.ccs.messagedispatcher.MessageDispatcherListener;
+import br.com.ccs.messagedispatcher.config.rabbitmq.RabbitMQConfig;
 import br.com.ccs.messagedispatcher.listener.RabbitMqMessageDispatcherListener;
 import br.com.ccs.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
