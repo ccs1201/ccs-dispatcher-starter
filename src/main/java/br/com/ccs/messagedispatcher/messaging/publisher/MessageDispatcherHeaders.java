@@ -4,7 +4,6 @@ public final class MessageDispatcherHeaders {
     private MessageDispatcherHeaders() {
     }
 
-
     private static final String HEADER_PREFIX = "x-message-dispatcher-";
     public static final String MESSAGE_KINDA = HEADER_PREFIX + "kinda";
     public static final String MESSAGE_TIMESTAMP = HEADER_PREFIX + "timestamp";
