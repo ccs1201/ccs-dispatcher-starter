@@ -25,17 +25,11 @@ import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
-import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
-import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.retry.MessageRecoverer;
-import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 
 
 /**
@@ -131,28 +125,5 @@ public class RabbitMQConfig {
                 .to(deadLetterExchange)
                 .with(properties.getDeadLetterRoutingKey())
                 .noargs();
-    }
-
-    @Bean
-    protected SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory,
-                                                                                  MessageConverter messageConverter,
-                                                                                  RetryOperationsInterceptor retryOperationsInterceptor,
-                                                                                  MessageDispatcherProperties properties) {
-
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
-        factory.setMessageConverter(messageConverter);
-        factory.setDefaultRequeueRejected(false);
-        factory.setAdviceChain(retryOperationsInterceptor);
-
-        //configura o número de mensagens que serão consumidas de uma vez
-        factory.setPrefetchCount(properties.getPrefetchCount());
-        //configura a concorrência de consumidores
-        factory.setConcurrentConsumers(
-                Integer.parseInt(properties.getConcurrency().split("-")[0]));
-        factory.setMaxConcurrentConsumers(
-                Integer.parseInt(properties.getConcurrency().split("-")[1]));
-
-        return factory;
     }
 }
