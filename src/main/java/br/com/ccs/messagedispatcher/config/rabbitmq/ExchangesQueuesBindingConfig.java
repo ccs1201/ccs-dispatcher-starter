@@ -43,11 +43,10 @@ import org.springframework.context.annotation.Primary;
  */
 
 @Configuration
-//@AutoConfigureAfter(MessageDispatcherAutoConfig.class)
 @ConditionalOnProperty(name = "message.dispatcher.enabled", havingValue = "true", matchIfMissing = true)
-public class RabbitMQConfig {
+public class ExchangesQueuesBindingConfig {
 
-    private final Logger log = LoggerFactory.getLogger(RabbitMQConfig.class);
+    private final Logger log = LoggerFactory.getLogger(ExchangesQueuesBindingConfig.class);
 
     @Bean
     @Primary
