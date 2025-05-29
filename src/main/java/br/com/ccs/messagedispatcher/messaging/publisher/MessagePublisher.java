@@ -7,6 +7,7 @@ import br.com.ccs.messagedispatcher.exceptions.MessagePublisherTimeOutException;
 import br.com.ccs.messagedispatcher.messaging.MessageAction;
 import br.com.ccs.messagedispatcher.messaging.model.MessageDispatcherErrorResponse;
 import br.com.ccs.messagedispatcher.messaging.model.MessageWrapperResponse;
+import br.com.ccs.messagedispatcher.util.EnvironmentUtils;
 import br.com.ccs.messagedispatcher.util.httpservlet.RequestContextUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -52,8 +53,6 @@ public final class MessagePublisher {
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
     private final MessageDispatcherProperties properties;
-    @Value("${spring.application.name}")
-    private String applicationName;
 
 
     public MessagePublisher(RabbitTemplate rabbitTemplate, ObjectMapper objectMapper, MessageDispatcherProperties properties) {
@@ -118,18 +117,6 @@ public final class MessagePublisher {
 
     public <T> T doCommand(final String exchange, final String routingKey, final Object body, final @NonNull Class<T> responseClass) {
         return this.convertSendAndReceive(exchange, routingKey, body, responseClass, MessageAction.COMMAND);
-    }
-
-    public void sendCommand(final Object body) {
-        this.convertAndSend(properties.getExchangeName(), properties.getRoutingKey(), body, MessageAction.COMMAND);
-    }
-
-    public void sendCommand(final String routingKey, final Object body) {
-        this.convertAndSend(properties.getExchangeName(), routingKey, body, MessageAction.COMMAND);
-    }
-
-    public void sendCommand(final String exchange, final String routingKey, final Object body) {
-        this.convertAndSend(exchange, routingKey, body, MessageAction.COMMAND);
     }
 
     public <T> T doQuery(final Object body, final @NonNull Class<T> responseClass) {
@@ -208,7 +195,7 @@ public final class MessagePublisher {
         messageProperties.setHeader(MESSAGE_TIMESTAMP, OffsetDateTime.now());
         messageProperties.setHeader(TYPE_ID, body.getClass().getSimpleName());
         messageProperties.setHeader(MESSAGE_ACTION, action);
-        messageProperties.setHeader(MESSAGE_SOURCE, this.applicationName);
+        messageProperties.setHeader(MESSAGE_SOURCE, EnvironmentUtils.getAppName());
 
         Arrays.stream(properties.getMappedHeaders())
                 .forEach(mappedHeader ->
