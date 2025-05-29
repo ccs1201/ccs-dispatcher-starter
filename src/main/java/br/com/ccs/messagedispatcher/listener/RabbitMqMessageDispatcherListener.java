@@ -84,6 +84,13 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
             return null;
         }
 
+        //se não tiver replyTo, mas ocorrer uma exception
+        //então devemos fazer o retry, se a exception persistir
+        //então devemos enviar a mensagem para o DLQ
+        if (resultProcess instanceof MessageDispatcherErrorResponse) {
+            throw (MessageDispatcherErrorResponse) resultProcess;
+        }
+
         if (requiresReplyTo(message)) {
             setResponseHeaders(message);
             return buildResponse(resultProcess);
