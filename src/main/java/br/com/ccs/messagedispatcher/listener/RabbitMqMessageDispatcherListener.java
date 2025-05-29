@@ -22,6 +22,7 @@ import br.com.ccs.messagedispatcher.exceptions.MessageDispatcherLoggerException;
 import br.com.ccs.messagedispatcher.messaging.model.MessageDispatcherErrorResponse;
 import br.com.ccs.messagedispatcher.messaging.model.MessageWrapperResponse;
 import br.com.ccs.messagedispatcher.router.MessageRouter;
+import br.com.ccs.messagedispatcher.util.EnvironmentUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -29,12 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_ACTION;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_KINDA;
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.RESPONSE_FROM;
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.RESPONSE_TIME_STAMP;
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.TYPE_ID;
@@ -56,9 +56,6 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
     private final MessageRouter messageRouter;
 
     private final ObjectMapper objectMapper;
-
-    @Value("${spring.application.name}")
-    private String applicationName;
 
     private static final String returnExceptions = "false";
 
@@ -116,14 +113,14 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
 
     private void setResponseHeaders(Message message) {
         message.getMessageProperties().setHeader(RESPONSE_TIME_STAMP, LocalDateTime.now());
-        message.getMessageProperties().setHeader(RESPONSE_FROM, applicationName);
+        message.getMessageProperties().setHeader(RESPONSE_FROM, EnvironmentUtils.getAppName());
     }
 
     private void log(Message message) {
         try {
-            log.debug("Mensagem recebida Action:{} | TypeId:{} | Body:{}",
+            log.debug("Mensagem recebida Kinda:{} | TypeId:{} | Body:{}",
                     message.getMessageProperties()
-                            .getHeaders().get(MESSAGE_ACTION),
+                            .getHeaders().get(MESSAGE_KINDA),
                     message.getMessageProperties()
                             .getHeaders().get(TYPE_ID),
                     objectMapper.readValue(message.getBody(), JsonNode.class));

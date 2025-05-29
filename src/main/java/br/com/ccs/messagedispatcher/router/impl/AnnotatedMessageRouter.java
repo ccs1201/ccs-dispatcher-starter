@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_ACTION;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.MESSAGE_KINDA;
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.TYPE_ID;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -48,7 +48,7 @@ public class AnnotatedMessageRouter implements MessageRouter {
 
         try {
             var handler = annotatedMethodDiscover.getHandler(MessageAction
-                    .valueOf(message.getMessageProperties().getHeader(MESSAGE_ACTION)), typeId);
+                    .valueOf(message.getMessageProperties().getHeader(MESSAGE_KINDA)), typeId);
 
             var payload = objectMapper.readValue(message.getBody(), handler.getParameterTypes()[0]);
 
