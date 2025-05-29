@@ -17,6 +17,7 @@
 package br.com.ccs.messagedispatcher.config;
 
 import br.com.ccs.messagedispatcher.MessageDispatcherListener;
+import br.com.ccs.messagedispatcher.config.rabbitmq.ExchangesQueuesBindingConfig;
 import br.com.ccs.messagedispatcher.listener.RabbitMqMessageDispatcherListener;
 import br.com.ccs.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +37,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 09/05/2025
  */
 @Configuration
-@AutoConfigureBefore({RabbitAutoConfiguration.class, RabbitMQConfig.class})
+@AutoConfigureBefore({RabbitAutoConfiguration.class, ExchangesQueuesBindingConfig.class})
 @ComponentScan(basePackages = "br.com.ccs.messagedispatcher")
 public class MessageDispatcherAutoConfig {
 
