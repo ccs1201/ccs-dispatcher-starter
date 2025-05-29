@@ -80,9 +80,6 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
         //se não tiver replyTo, mas ocorrer uma exception
         //então devemos fazer o retry, se a exception persistir
         //então devemos enviar a mensagem para o DLQ
-        if (resultProcess instanceof MessageDispatcherErrorResponse) {
-
-        }
 
         if (resultProcess == null) {
             return null;
@@ -105,7 +102,7 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
         return MessageWrapperResponse.withSuccess(resultProcess);
     }
 
-    @SuppressWarnings("unussed")
+    @SuppressWarnings("unused")
     private static void sleep() {
         try {
             Thread.sleep(5000);
