@@ -4,13 +4,13 @@ import br.com.ccs.messagedispatcher.beandiscover.MessageDispatcherAnnotatedMetho
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerDuplicatedInputParameterException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerMultipleInputParametersException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerNotFoundException;
-import br.com.ccs.messagedispatcher.exceptions.MessageHandlerWithoutInputParameterException;
 import br.com.ccs.messagedispatcher.messaging.MessageKinda;
 import br.com.ccs.messagedispatcher.messaging.annotation.Command;
 import br.com.ccs.messagedispatcher.messaging.annotation.Event;
 import br.com.ccs.messagedispatcher.messaging.annotation.MessageHandler;
 import br.com.ccs.messagedispatcher.messaging.annotation.Notification;
 import br.com.ccs.messagedispatcher.messaging.annotation.Query;
+import br.com.ccs.messagedispatcher.util.validator.HandlerValidatorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
@@ -58,60 +58,39 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
         Arrays.stream(listenerMethods)
                 .filter(MessageDispatcherAnnotatedMethodDiscoverImpl::isAnnotationPresent)
                 .forEach(method -> {
-                    try {
-                        var parameterType = method.getParameterTypes()[0].getSimpleName();
 
-                        if (method.isAnnotationPresent(Command.class)) {
-                            registreHandler(MessageKinda.COMMAND, method, parameterType);
-                            return;
-                        }
 
-                        if (method.isAnnotationPresent(Query.class)) {
-                            registreHandler(MessageKinda.QUERY, method, parameterType);
-                            return;
-                        }
+                    if (method.isAnnotationPresent(Command.class)) {
+                        registreHandler(MessageKinda.COMMAND, method);
+                        return;
+                    }
 
-                        if (method.isAnnotationPresent(Event.class)) {
-                            registreHandler(MessageKinda.EVENT, method, parameterType);
-                            return;
-                        }
+                    if (method.isAnnotationPresent(Query.class)) {
+                        registreHandler(MessageKinda.QUERY, method);
+                        return;
+                    }
 
-                        if (method.isAnnotationPresent(Notification.class)) {
-                            registreHandler(MessageKinda.NOTIFICATION, method, parameterType);
-                            return;
-                        }
+                    if (method.isAnnotationPresent(Event.class)) {
+                        registreHandler(MessageKinda.EVENT, method);
+                        return;
+                    }
 
-                        if (method.isAnnotationPresent(MessageHandler.class)) {
-                            var annotation = method.getAnnotation(MessageHandler.class);
-                            registreHandler(annotation.kinda(), method, parameterType);
-                        }
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        var ex = new MessageHandlerWithoutInputParameterException("Handler não possui parâmetros de entrada.");
-                        handleMappingError(ex);
-                    } catch (MessageHandlerDuplicatedInputParameterException |
-                             MessageHandlerMultipleInputParametersException e) {
-                        handleMappingError(e);
+                    if (method.isAnnotationPresent(Notification.class)) {
+                        registreHandler(MessageKinda.NOTIFICATION, method);
+                        return;
+                    }
+
+                    if (method.isAnnotationPresent(MessageHandler.class)) {
+                        var annotation = method.getAnnotation(MessageHandler.class);
+                        registreHandler(annotation.kinda(), method);
                     }
                 });
     }
 
-    private void registreHandler(MessageKinda actionType, Method method, String parameterType) throws MessageHandlerMultipleInputParametersException, MessageHandlerDuplicatedInputParameterException {
-        log.debug("Registrando handler {} para o tipo {}", method.getName(), parameterType);
-
-        if (method.getParameterCount() > 1) {
-            throw new MessageHandlerMultipleInputParametersException("Tipo handler: " + actionType + " método: " + method
-                    + " handlers devem conter apenas um parâmetro de entrada.");
-        }
-
-        if (handlers.get(actionType).containsKey(parameterType)) {
-            throw new MessageHandlerDuplicatedInputParameterException(" O handler: @" + actionType + " - " + handlers.get(actionType).get(parameterType).getName()
-                    + " na Classe: " + handlers.get(actionType).get(parameterType).getDeclaringClass().getName()
-                    + " já declara o mesmo tipo de entrada que a Classe: " + method.getDeclaringClass().getName()
-                    + " está declarando no método: " + method.getName() + " para o PayLoad: " + parameterType
-                    + " não são permitidos Handlers duplicados para o mesmo tipo de PayLoad.");
-
-        }
-        handlers.get(actionType).put(parameterType, method);
+    private void registreHandler(MessageKinda messageKinda, Method method) throws MessageHandlerMultipleInputParametersException, MessageHandlerDuplicatedInputParameterException {
+        log.debug("Registrando handler {}", method.getName());
+        HandlerValidatorUtil.validate(messageKinda, method, handlers.get(messageKinda));
+        handlers.get(messageKinda).put(method.getParameterTypes()[0].getSimpleName(), method);
     }
 
     private static boolean isAnnotationPresent(Method method) {

@@ -1,6 +1,8 @@
 package br.com.ccs.messagedispatcher.exceptions;
 
-public class MessageDispatcherBeanResolutionException extends MessageDispatcherException {
+import org.springframework.beans.factory.BeanInitializationException;
+
+public class MessageDispatcherBeanResolutionException extends BeanInitializationException {
     public MessageDispatcherBeanResolutionException(String message) {
         super(message);
     }
