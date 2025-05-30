@@ -40,9 +40,9 @@ import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcher
 import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.TYPE_ID;
 
 /**
- * Classe responsável por receber as mensagens do RabbitMQ e despachá-las para a implementação de {@code MessageRouter}.
+ * Classe responsável por receber as mensagens do RabbitMQ e despachá-las para a implementação de {@link MessageRouter}.
  * <p>
- * Class responsible for receiving messages from RabbitMQ and dispatching them to the {@code MessageRouter} implementation.
+ * Class responsible for receiving messages from RabbitMQ and dispatching them to the {@link MessageRouter} implementation.
  *
  * @author Cleber Souza
  * @version 1.0

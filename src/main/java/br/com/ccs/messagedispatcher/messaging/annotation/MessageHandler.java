@@ -1,7 +1,6 @@
 package br.com.ccs.messagedispatcher.messaging.annotation;
 
 import br.com.ccs.messagedispatcher.messaging.MessageKinda;
-import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -29,6 +28,5 @@ public @interface MessageHandler {
      * Tipo de Payload que este handler processa
      * Type of Payload that's handler process.
      */
-    @AliasFor("forClass")
     String type() default "";
 }
