@@ -5,7 +5,7 @@ import br.com.ccs.messagedispatcher.exceptions.MessageHandlerDuplicatedInputPara
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerMultipleInputParametersException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerNotFoundException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerWithoutInputParameterException;
-import br.com.ccs.messagedispatcher.messaging.MessageAction;
+import br.com.ccs.messagedispatcher.messaging.MessageKinda;
 import br.com.ccs.messagedispatcher.messaging.annotation.Command;
 import br.com.ccs.messagedispatcher.messaging.annotation.Event;
 import br.com.ccs.messagedispatcher.messaging.annotation.MessageHandler;
@@ -28,14 +28,14 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
 
     private static final Logger log = LoggerFactory.getLogger(MessageDispatcherAnnotatedMethodDiscoverImpl.class);
 
-    private final Map<MessageAction, HashMap<String, Method>> handlers;
+    private final Map<MessageKinda, HashMap<String, Method>> handlers;
 
     public MessageDispatcherAnnotatedMethodDiscoverImpl(ApplicationContext applicationContext) {
         this.handlers = Map.of(
-                MessageAction.COMMAND, new HashMap<>(),
-                MessageAction.QUERY, new HashMap<>(),
-                MessageAction.NOTIFICATION, new HashMap<>(),
-                MessageAction.EVENT, new HashMap<>());
+                MessageKinda.COMMAND, new HashMap<>(),
+                MessageKinda.QUERY, new HashMap<>(),
+                MessageKinda.NOTIFICATION, new HashMap<>(),
+                MessageKinda.EVENT, new HashMap<>());
 
         resolveAnnotatedMethods(applicationContext);
     }
@@ -62,28 +62,28 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
                         var parameterType = method.getParameterTypes()[0].getSimpleName();
 
                         if (method.isAnnotationPresent(Command.class)) {
-                            registreHandler(MessageAction.COMMAND, method, parameterType);
+                            registreHandler(MessageKinda.COMMAND, method, parameterType);
                             return;
                         }
 
                         if (method.isAnnotationPresent(Query.class)) {
-                            registreHandler(MessageAction.QUERY, method, parameterType);
+                            registreHandler(MessageKinda.QUERY, method, parameterType);
                             return;
                         }
 
                         if (method.isAnnotationPresent(Event.class)) {
-                            registreHandler(MessageAction.EVENT, method, parameterType);
+                            registreHandler(MessageKinda.EVENT, method, parameterType);
                             return;
                         }
 
                         if (method.isAnnotationPresent(Notification.class)) {
-                            registreHandler(MessageAction.NOTIFICATION, method, parameterType);
+                            registreHandler(MessageKinda.NOTIFICATION, method, parameterType);
                             return;
                         }
 
                         if (method.isAnnotationPresent(MessageHandler.class)) {
                             var annotation = method.getAnnotation(MessageHandler.class);
-                            registreHandler(annotation.action(), method, parameterType);
+                            registreHandler(annotation.kinda(), method, parameterType);
                         }
                     } catch (ArrayIndexOutOfBoundsException e) {
                         var ex = new MessageHandlerWithoutInputParameterException("Handler não possui parâmetros de entrada.");
@@ -95,7 +95,7 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
                 });
     }
 
-    private void registreHandler(MessageAction actionType, Method method, String parameterType) throws MessageHandlerMultipleInputParametersException, MessageHandlerDuplicatedInputParameterException {
+    private void registreHandler(MessageKinda actionType, Method method, String parameterType) throws MessageHandlerMultipleInputParametersException, MessageHandlerDuplicatedInputParameterException {
         log.debug("Registrando handler {} para o tipo {}", method.getName(), parameterType);
 
         if (method.getParameterCount() > 1) {
@@ -123,7 +123,7 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
     }
 
     @Override
-    public Method getHandler(MessageAction actionType, String parameterType) {
+    public Method getHandler(MessageKinda actionType, String parameterType) {
         var method = handlers.get(actionType).get(parameterType);
 
         if (method == null) {

@@ -1,8 +1,13 @@
 package br.com.ccs.messagedispatcher.messaging.annotation;
 
-import br.com.ccs.messagedispatcher.messaging.MessageAction;
+import br.com.ccs.messagedispatcher.messaging.MessageKinda;
+import org.springframework.core.annotation.AliasFor;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Anotação para marcar os métodos que processam mensagens.
@@ -15,20 +20,15 @@ import java.lang.annotation.*;
 public @interface MessageHandler {
 
     /**
-     * Ação que o método processa (command, query or event).
-     * Action that's handler process (command, query or event).
+     * Ação que o método processa (command, query, notification or event).
+     * Action that's handler process (command, query, notification or event).
      */
-    MessageAction action();
+    MessageKinda kinda();
 
     /**
-     * Tipo de mensagem que este handler processa
-     * Type of message That's handler process.
+     * Tipo de Payload que este handler processa
+     * Type of Payload that's handler process.
      */
+    @AliasFor("forClass")
     String type() default "";
-
-    /**
-     * Classe que o handler processa.
-     * Class that's handler process.
-     */
-    Class<?> forClass() default Void.class;
 }
