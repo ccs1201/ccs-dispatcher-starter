@@ -59,7 +59,6 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
                 .filter(MessageDispatcherAnnotatedMethodDiscoverImpl::isAnnotationPresent)
                 .forEach(method -> {
 
-
                     if (method.isAnnotationPresent(Command.class)) {
                         registreHandler(MessageKinda.COMMAND, method);
                         return;
@@ -110,11 +109,5 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
         }
 
         return method;
-    }
-
-    private void handleMappingError(Exception e) {
-        log.error("Erro ao registrar handler : ", e);
-//        ApplicationContextTestUtils.closeAll(applicationContext);
-        System.exit(999);
     }
 }
