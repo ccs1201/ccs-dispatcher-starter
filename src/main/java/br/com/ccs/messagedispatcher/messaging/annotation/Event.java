@@ -1,6 +1,6 @@
 package br.com.ccs.messagedispatcher.messaging.annotation;
 
-import br.com.ccs.messagedispatcher.messaging.MessageAction;
+import br.com.ccs.messagedispatcher.messaging.MessageKinda;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
  * Podem ser usados para sincronizar diferentes modelos de dados
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(action = MessageAction.EVENT)
+@MessageHandler(kinda = MessageKinda.EVENT)
 @Documented
 public @interface Event {
 

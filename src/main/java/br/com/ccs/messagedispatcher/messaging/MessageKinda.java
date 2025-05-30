@@ -1,6 +1,6 @@
 package br.com.ccs.messagedispatcher.messaging;
 
-public enum MessageAction {
+public enum MessageKinda {
     COMMAND,
     EVENT,
     NOTIFICATION,

@@ -2,7 +2,7 @@ package br.com.ccs.messagedispatcher.router.impl;
 
 import br.com.ccs.messagedispatcher.beandiscover.MessageDispatcherAnnotatedMethodDiscover;
 import br.com.ccs.messagedispatcher.exceptions.MessageRouterMissingHeaderException;
-import br.com.ccs.messagedispatcher.messaging.MessageAction;
+import br.com.ccs.messagedispatcher.messaging.MessageKinda;
 import br.com.ccs.messagedispatcher.messaging.model.MessageDispatcherErrorResponse;
 import br.com.ccs.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,7 +47,7 @@ public class AnnotatedMessageRouter implements MessageRouter {
         }
 
         try {
-            var handler = annotatedMethodDiscover.getHandler(MessageAction
+            var handler = annotatedMethodDiscover.getHandler(MessageKinda
                     .valueOf(message.getMessageProperties().getHeader(MESSAGE_KINDA)), typeId);
 
             var payload = objectMapper.readValue(message.getBody(), handler.getParameterTypes()[0]);
