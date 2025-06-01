@@ -3,7 +3,7 @@ package br.com.ccs.messagedispatcher.util.validator;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerDuplicatedInputParameterException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerMultipleInputParametersException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerNoInputParameterException;
-import br.com.ccs.messagedispatcher.messaging.MessageKinda;
+import br.com.ccs.messagedispatcher.messaging.MessageType;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -25,7 +25,7 @@ class HandlerValidatorUtilTest {
         HashMap<String, Method> handlers = new HashMap<>();
 
         assertThrows(MessageHandlerMultipleInputParametersException.class, () ->
-                HandlerValidatorUtil.validate(MessageKinda.COMMAND, method, handlers)
+                HandlerValidatorUtil.validate(MessageType.COMMAND, method, handlers)
         );
     }
 
@@ -35,7 +35,7 @@ class HandlerValidatorUtilTest {
         HashMap<String, Method> handlers = new HashMap<>();
 
         assertThrows(MessageHandlerNoInputParameterException.class, () ->
-                HandlerValidatorUtil.validate(MessageKinda.EVENT, method, handlers)
+                HandlerValidatorUtil.validate(MessageType.EVENT, method, handlers)
         );
     }
 
@@ -47,7 +47,7 @@ class HandlerValidatorUtilTest {
         handlers.put("String", existingMethod);
 
         assertThrows(MessageHandlerDuplicatedInputParameterException.class, () ->
-                HandlerValidatorUtil.validate(MessageKinda.COMMAND, duplicateMethod, handlers)
+                HandlerValidatorUtil.validate(MessageType.COMMAND, duplicateMethod, handlers)
         );
     }
 
@@ -57,7 +57,7 @@ class HandlerValidatorUtilTest {
         HashMap<String, Method> handlers = new HashMap<>();
 
         assertDoesNotThrow(() ->
-                HandlerValidatorUtil.validate(MessageKinda.EVENT, method, handlers)
+                HandlerValidatorUtil.validate(MessageType.EVENT, method, handlers)
         );
     }
 

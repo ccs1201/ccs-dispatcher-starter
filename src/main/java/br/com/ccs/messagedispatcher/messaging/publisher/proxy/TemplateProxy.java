@@ -1,6 +1,6 @@
 package br.com.ccs.messagedispatcher.messaging.publisher.proxy;
 
-import br.com.ccs.messagedispatcher.messaging.MessageKinda;
+import br.com.ccs.messagedispatcher.messaging.MessageType;
 
 public interface TemplateProxy {
 
@@ -17,7 +17,7 @@ public interface TemplateProxy {
      * @return (responseClass) object
      */
     <T> T convertSendAndReceive(String exchange, String routingKey, Object body, Class<T> responseClass,
-                                MessageKinda messageKinda);
+                                MessageType messageType);
 
 
     /**
@@ -29,5 +29,5 @@ public interface TemplateProxy {
      * @param routingKey - chave de roteamento
      * @param body       - corpo da mensagem
      */
-    void convertAndSend(String exchange, String routingKey, Object body, MessageKinda messageKinda);
+    void convertAndSend(String exchange, String routingKey, Object body, MessageType messageType);
 }

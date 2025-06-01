@@ -4,7 +4,7 @@ import br.com.ccs.messagedispatcher.beandiscover.MessageDispatcherAnnotatedMetho
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerDuplicatedInputParameterException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerMultipleInputParametersException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerNotFoundException;
-import br.com.ccs.messagedispatcher.messaging.MessageKinda;
+import br.com.ccs.messagedispatcher.messaging.MessageType;
 import br.com.ccs.messagedispatcher.messaging.annotation.Command;
 import br.com.ccs.messagedispatcher.messaging.annotation.Event;
 import br.com.ccs.messagedispatcher.messaging.annotation.MessageHandler;
@@ -28,14 +28,14 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
 
     private static final Logger log = LoggerFactory.getLogger(MessageDispatcherAnnotatedMethodDiscoverImpl.class);
 
-    private final Map<MessageKinda, HashMap<String, Method>> handlers;
+    private final Map<MessageType, HashMap<String, Method>> handlers;
 
     public MessageDispatcherAnnotatedMethodDiscoverImpl(ApplicationContext applicationContext) {
         this.handlers = Map.of(
-                MessageKinda.COMMAND, new HashMap<>(),
-                MessageKinda.QUERY, new HashMap<>(),
-                MessageKinda.NOTIFICATION, new HashMap<>(),
-                MessageKinda.EVENT, new HashMap<>());
+                MessageType.COMMAND, new HashMap<>(),
+                MessageType.QUERY, new HashMap<>(),
+                MessageType.NOTIFICATION, new HashMap<>(),
+                MessageType.EVENT, new HashMap<>());
 
         resolveAnnotatedMethods(applicationContext);
     }
@@ -60,36 +60,36 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
                 .forEach(method -> {
 
                     if (method.isAnnotationPresent(Command.class)) {
-                        registreHandler(MessageKinda.COMMAND, method);
+                        registreHandler(MessageType.COMMAND, method);
                         return;
                     }
 
                     if (method.isAnnotationPresent(Query.class)) {
-                        registreHandler(MessageKinda.QUERY, method);
+                        registreHandler(MessageType.QUERY, method);
                         return;
                     }
 
                     if (method.isAnnotationPresent(Event.class)) {
-                        registreHandler(MessageKinda.EVENT, method);
+                        registreHandler(MessageType.EVENT, method);
                         return;
                     }
 
                     if (method.isAnnotationPresent(Notification.class)) {
-                        registreHandler(MessageKinda.NOTIFICATION, method);
+                        registreHandler(MessageType.NOTIFICATION, method);
                         return;
                     }
 
                     if (method.isAnnotationPresent(MessageHandler.class)) {
                         var annotation = method.getAnnotation(MessageHandler.class);
-                        registreHandler(annotation.kinda(), method);
+                        registreHandler(annotation.type(), method);
                     }
                 });
     }
 
-    private void registreHandler(MessageKinda messageKinda, Method method) throws MessageHandlerMultipleInputParametersException, MessageHandlerDuplicatedInputParameterException {
+    private void registreHandler(MessageType messageType, Method method) throws MessageHandlerMultipleInputParametersException, MessageHandlerDuplicatedInputParameterException {
         log.debug("Registrando handler {}", method.getName());
-        HandlerValidatorUtil.validate(messageKinda, method, handlers.get(messageKinda));
-        handlers.get(messageKinda).put(method.getParameterTypes()[0].getSimpleName(), method);
+        HandlerValidatorUtil.validate(messageType, method, handlers.get(messageType));
+        handlers.get(messageType).put(method.getParameterTypes()[0].getSimpleName(), method);
     }
 
     private static boolean isAnnotationPresent(Method method) {
@@ -101,7 +101,7 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
     }
 
     @Override
-    public Method getHandler(MessageKinda actionType, String parameterType) {
+    public Method getHandler(MessageType actionType, String parameterType) {
         var method = handlers.get(actionType).get(parameterType);
 
         if (method == null) {

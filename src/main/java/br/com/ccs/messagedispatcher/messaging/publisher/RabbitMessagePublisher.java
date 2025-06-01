@@ -1,15 +1,15 @@
 package br.com.ccs.messagedispatcher.messaging.publisher;
 
 import br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties;
-import br.com.ccs.messagedispatcher.messaging.MessageKinda;
+import br.com.ccs.messagedispatcher.messaging.MessageType;
 import br.com.ccs.messagedispatcher.messaging.publisher.proxy.TemplateProxy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import static br.com.ccs.messagedispatcher.messaging.MessageKinda.COMMAND;
-import static br.com.ccs.messagedispatcher.messaging.MessageKinda.EVENT;
-import static br.com.ccs.messagedispatcher.messaging.MessageKinda.NOTIFICATION;
-import static br.com.ccs.messagedispatcher.messaging.MessageKinda.QUERY;
+import static br.com.ccs.messagedispatcher.messaging.MessageType.COMMAND;
+import static br.com.ccs.messagedispatcher.messaging.MessageType.EVENT;
+import static br.com.ccs.messagedispatcher.messaging.MessageType.NOTIFICATION;
+import static br.com.ccs.messagedispatcher.messaging.MessageType.QUERY;
 
 
 @Component
@@ -109,11 +109,11 @@ public final class RabbitMessagePublisher implements MessagePublisher {
         this.convertAndSend(properties.getExchangeName(), routingKey, body, NOTIFICATION);
     }
 
-    private void convertAndSend(String exchangeName, String routingKey, Object body, MessageKinda messageKinda) {
-        templateProxy.convertAndSend(exchangeName, routingKey, body, messageKinda);
+    private void convertAndSend(String exchangeName, String routingKey, Object body, MessageType messageType) {
+        templateProxy.convertAndSend(exchangeName, routingKey, body, messageType);
     }
 
-    private <T> T convertSendAndReceive(String exchangeName, String routingKey, Object body, Class<T> responseClass, MessageKinda messageKinda) {
-        return templateProxy.convertSendAndReceive(exchangeName, routingKey, body, responseClass, messageKinda);
+    private <T> T convertSendAndReceive(String exchangeName, String routingKey, Object body, Class<T> responseClass, MessageType messageType) {
+        return templateProxy.convertSendAndReceive(exchangeName, routingKey, body, responseClass, messageType);
     }
 }

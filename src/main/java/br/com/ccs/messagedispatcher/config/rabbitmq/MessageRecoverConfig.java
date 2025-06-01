@@ -15,10 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.EXCEPTION_MESSAGE;
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.EXCEPTION_TYPE;
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.FAILED_AT;
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HAS_ERROR;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.*;
 
 @Configuration
 public class MessageRecoverConfig {
@@ -37,6 +34,24 @@ public class MessageRecoverConfig {
                 if (cause instanceof ListenerExecutionFailedException e) {
                     rootCause = ExceptionUtils.getRootCause(e);
                 }
+
+                //exemplo senior
+//                public void reject(Message message, boolean requeue) throws BrokerException {
+//                    Preconditions.checkState(this.isConnected(), "Not connected");
+//
+//                    try {
+//                        synchronized(this.ack) {
+//                            if (requeue) {
+//                                this.sendRequeue(message);
+//                            } else {
+//                                this.doReject(message);
+//                            }
+//
+//                        }
+//                    } catch (IOException e) {
+//                        throw new BrokerException("Error rejecting the message", e);
+//                    }
+//                }
 
                 if (log.isDebugEnabled()) {
                     log.debug("Enviando mensagem para dead letter queue.", rootCause);

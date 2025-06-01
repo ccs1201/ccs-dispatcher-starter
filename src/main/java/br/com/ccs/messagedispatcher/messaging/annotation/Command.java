@@ -1,6 +1,6 @@
 package br.com.ccs.messagedispatcher.messaging.annotation;
 
-import br.com.ccs.messagedispatcher.messaging.MessageKinda;
+import br.com.ccs.messagedispatcher.messaging.MessageType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
@@ -23,10 +23,10 @@ import java.lang.annotation.RetentionPolicy;
  * Podem ser rejeitados, gerar erro ou produzir eventos
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(kinda = MessageKinda.COMMAND)
+@MessageHandler(type = MessageType.COMMAND)
 @Documented
 public @interface Command {
 
     @AliasFor(annotation = MessageHandler.class)
-    String type() default "";
+    Class<?> kind() default Void.class;
 }

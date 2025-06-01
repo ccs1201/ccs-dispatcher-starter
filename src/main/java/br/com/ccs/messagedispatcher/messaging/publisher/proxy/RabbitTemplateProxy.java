@@ -3,7 +3,7 @@ package br.com.ccs.messagedispatcher.messaging.publisher.proxy;
 import br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties;
 import br.com.ccs.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException;
 import br.com.ccs.messagedispatcher.exceptions.MessagePublisherTimeOutException;
-import br.com.ccs.messagedispatcher.messaging.MessageKinda;
+import br.com.ccs.messagedispatcher.messaging.MessageType;
 import br.com.ccs.messagedispatcher.messaging.model.MessageDispatcherErrorResponse;
 import br.com.ccs.messagedispatcher.messaging.model.MessageWrapperResponse;
 import br.com.ccs.messagedispatcher.util.EnvironmentUtils;
@@ -61,18 +61,18 @@ public class RabbitTemplateProxy implements TemplateProxy {
 
     @Override
     public <T> T convertSendAndReceive(final String exchange, final String routingKey, final Object body, final Class<T> responseClass,
-                                       MessageKinda messageKinda) {
-        return this.sendAndReceive(exchange, routingKey, body, responseClass, messageKinda);
+                                       MessageType messageType) {
+        return this.sendAndReceive(exchange, routingKey, body, responseClass, messageType);
     }
 
     @Override
-    public void convertAndSend(final String exchange, final String routingKey, final Object body, MessageKinda messageKinda) {
-        this.send(exchange, routingKey, body, messageKinda);
+    public void convertAndSend(final String exchange, final String routingKey, final Object body, MessageType messageType) {
+        this.send(exchange, routingKey, body, messageType);
     }
 
 
     private <T> T sendAndReceive(final String exchange, final String routingKey, final Object body, final Class<T> responseClass,
-                                 MessageKinda messageKinda) {
+                                 MessageType messageType) {
         try {
 
             var response = Optional.ofNullable(
@@ -80,7 +80,7 @@ public class RabbitTemplateProxy implements TemplateProxy {
                             routingKey,
                             body,
                             m ->
-                                    setMessageHeaders(body, m, messageKinda)));
+                                    setMessageHeaders(body, m, messageType)));
 
             var messageWrapperResponse = objectMapper
                     .convertValue(response.orElseThrow(() ->
@@ -102,15 +102,15 @@ public class RabbitTemplateProxy implements TemplateProxy {
         }
     }
 
-    private void send(final String exchange, final String routingKey, final Object body, MessageKinda messageKinda) {
+    private void send(final String exchange, final String routingKey, final Object body, MessageType messageType) {
         rabbitTemplate.convertAndSend(exchange,
                 routingKey,
                 body,
                 m ->
-                        setMessageHeaders(body, m, messageKinda));
+                        setMessageHeaders(body, m, messageType));
     }
 
-    private Message setMessageHeaders(Object body, Message message, MessageKinda action) {
+    private Message setMessageHeaders(Object body, Message message, MessageType action) {
         var messageProperties = message.getMessageProperties();
         messageProperties.setHeader(MESSAGE_TIMESTAMP, OffsetDateTime.now());
         messageProperties.setHeader(TYPE_ID, body.getClass().getSimpleName());
