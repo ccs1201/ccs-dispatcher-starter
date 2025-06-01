@@ -102,9 +102,9 @@ public class ExchangesQueuesBindingConfig {
     }
 
     private void log(String info, Exchange exchange, Queue queue, Binding binding) {
-        log.debug("Criando Exchange, Queue e Binding {}", info);
+        log.debug("Criando Exchange, Queue e Binding para {}", info);
         log.debug("Exchange {} criada", exchange.getName());
         log.debug("Queue {} criada", queue.getName());
-        log.debug("Binding {} criado", binding.getExchange());
+        log.debug("Binding com {} criado", binding.getExchange());
     }
 }
