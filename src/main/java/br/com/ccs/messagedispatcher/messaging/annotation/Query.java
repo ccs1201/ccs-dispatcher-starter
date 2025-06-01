@@ -1,6 +1,6 @@
 package br.com.ccs.messagedispatcher.messaging.annotation;
 
-import br.com.ccs.messagedispatcher.messaging.MessageKinda;
+import br.com.ccs.messagedispatcher.messaging.MessageType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
@@ -21,10 +21,10 @@ import java.lang.annotation.RetentionPolicy;
  * Exemplo: GetProducts, FindOrderById, ListCustomers
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(kinda = MessageKinda.QUERY)
+@MessageHandler(type = MessageType.QUERY)
 @Documented
 public @interface Query {
 
     @AliasFor(annotation = MessageHandler.class)
-    String type() default "";
+    Class<?> kind() default Void.class;
 }

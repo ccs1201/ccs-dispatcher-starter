@@ -1,6 +1,6 @@
 package br.com.ccs.messagedispatcher.messaging.annotation;
 
-import br.com.ccs.messagedispatcher.messaging.MessageKinda;
+import br.com.ccs.messagedispatcher.messaging.MessageType;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -19,14 +19,14 @@ import java.lang.annotation.Target;
 public @interface MessageHandler {
 
     /**
-     * Ação que o método processa (command, query, notification or event).
-     * Action that's handler process (command, query, notification or event).
+     * Tipo de mensagem que o método processa (command, query, notification ou event).
+     * Type of message that's handler process (command, query, notification or event).
      */
-    MessageKinda kinda();
+    MessageType type();
 
     /**
      * Tipo de Payload que este handler processa
      * Type of Payload that's handler process.
      */
-    String type() default "";
+    Class<?> kind() default Void.class;
 }

@@ -15,10 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.EXCEPTION_MESSAGE;
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.EXCEPTION_TYPE;
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.FAILED_AT;
-import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.HAS_ERROR;
+import static br.com.ccs.messagedispatcher.messaging.publisher.MessageDispatcherHeaders.*;
 
 @Configuration
 public class MessageRecoverConfig {

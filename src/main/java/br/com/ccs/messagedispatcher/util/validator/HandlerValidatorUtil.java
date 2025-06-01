@@ -3,29 +3,29 @@ package br.com.ccs.messagedispatcher.util.validator;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerDuplicatedInputParameterException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerMultipleInputParametersException;
 import br.com.ccs.messagedispatcher.exceptions.MessageHandlerNoInputParameterException;
-import br.com.ccs.messagedispatcher.messaging.MessageKinda;
+import br.com.ccs.messagedispatcher.messaging.MessageType;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
 public final class HandlerValidatorUtil {
 
-    public static void validate(MessageKinda messageKinda, Method method, HashMap<String, Method> handlers) {
+    public static void validate(MessageType messageType, Method method, HashMap<String, Method> handlers) {
         String parameterType;
         try {
             parameterType = method.getParameterTypes()[0].getSimpleName();
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new MessageHandlerNoInputParameterException(String.format(
-                    "Handler: @%s %s não possui parâmetros de entrada.", messageKinda, method));
+                    "Handler: @%s %s não possui parâmetros de entrada.", messageType, method));
         }
 
         if (method.getParameterCount() > 1) {
             throw new MessageHandlerMultipleInputParametersException(String.format(
-                    "Handler: @%s %s possui mais de um parâmetro de entrada.", messageKinda, method));
+                    "Handler: @%s %s possui mais de um parâmetro de entrada.", messageType, method));
         }
 
         if (handlers.containsKey(parameterType)) {
-            throw new MessageHandlerDuplicatedInputParameterException(" Handler: @" + messageKinda + " - " + handlers.get(parameterType).getName().toUpperCase()
+            throw new MessageHandlerDuplicatedInputParameterException(" Handler: @" + messageType + " - " + handlers.get(parameterType).getName().toUpperCase()
                     + " na Classe: " + handlers.get(parameterType).getDeclaringClass().getName()
                     + " já declara o mesmo tipo de entrada que a Classe: " + method.getDeclaringClass().getName()
                     + " está declarando no Handler: " + method.getName().toUpperCase() + " para o Tipo de Entrada: " + parameterType.toUpperCase()
