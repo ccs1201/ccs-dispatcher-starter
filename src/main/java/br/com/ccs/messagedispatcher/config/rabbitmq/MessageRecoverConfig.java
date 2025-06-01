@@ -35,24 +35,6 @@ public class MessageRecoverConfig {
                     rootCause = ExceptionUtils.getRootCause(e);
                 }
 
-                //exemplo senior
-//                public void reject(Message message, boolean requeue) throws BrokerException {
-//                    Preconditions.checkState(this.isConnected(), "Not connected");
-//
-//                    try {
-//                        synchronized(this.ack) {
-//                            if (requeue) {
-//                                this.sendRequeue(message);
-//                            } else {
-//                                this.doReject(message);
-//                            }
-//
-//                        }
-//                    } catch (IOException e) {
-//                        throw new BrokerException("Error rejecting the message", e);
-//                    }
-//                }
-
                 if (log.isDebugEnabled()) {
                     log.debug("Enviando mensagem para dead letter queue.", rootCause);
                 }
