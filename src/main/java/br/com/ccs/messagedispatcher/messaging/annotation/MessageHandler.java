@@ -28,5 +28,5 @@ public @interface MessageHandler {
      * Tipo de Payload que este handler processa
      * Type of Payload that's handler process.
      */
-    Class<?> kind() default Void.class;
+    Class<?> kind() default Object.class;
 }
