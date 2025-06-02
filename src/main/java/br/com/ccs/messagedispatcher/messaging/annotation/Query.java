@@ -26,5 +26,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Query {
 
     @AliasFor(annotation = MessageHandler.class)
-    Class<?> kind() default Void.class;
+    Class<?> kind() default Object.class;
 }
