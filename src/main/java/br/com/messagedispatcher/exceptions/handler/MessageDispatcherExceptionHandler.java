@@ -34,7 +34,7 @@ public class MessageDispatcherExceptionHandler {
                 .body(MessageDispatcherProblemDetailExceptionResponse.of(httpStatus.name(), httpStatus.value(), message, orinService));
     }
 
-    private record MessageDispatcherProblemDetailExceptionResponse(String type,
+    protected record MessageDispatcherProblemDetailExceptionResponse(String type,
                                                                    String title,
                                                                    int status,
                                                                    String detail,

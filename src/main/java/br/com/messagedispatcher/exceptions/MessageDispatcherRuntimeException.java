@@ -9,8 +9,4 @@ public class MessageDispatcherRuntimeException extends RuntimeException {
     public MessageDispatcherRuntimeException(String message) {
         super(message);
     }
-
-    public MessageDispatcherRuntimeException(Throwable cause) {
-        super(cause);
-    }
 }
