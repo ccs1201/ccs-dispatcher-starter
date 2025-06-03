@@ -4,7 +4,8 @@ import br.com.messagedispatcher.beandiscover.impl.MessageDispatcherAnnotatedMeth
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationContext;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
@@ -18,9 +19,8 @@ public class MessageDispatcherAnnotatedMethodDiscoverImplTest {
     @Test
     public void testMessageDispatcherAnnotatedMethodDiscover_EmptyApplicationContext() {
         ApplicationContext emptyContext = mock(ApplicationContext.class);
-        assertThrows(IllegalArgumentException.class, () -> {
-            new MessageDispatcherAnnotatedMethodDiscoverImpl(emptyContext);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+                new MessageDispatcherAnnotatedMethodDiscoverImpl(emptyContext));
     }
 
     /**
@@ -29,14 +29,13 @@ public class MessageDispatcherAnnotatedMethodDiscoverImplTest {
      */
     @Test
     public void testMessageDispatcherAnnotatedMethodDiscover_NullApplicationContext() {
-        assertThrows(NullPointerException.class, () -> {
-            new MessageDispatcherAnnotatedMethodDiscoverImpl(null);
-        });
+        assertThrows(NullPointerException.class, () ->
+                new MessageDispatcherAnnotatedMethodDiscoverImpl(null)
+        );
     }
 
     /**
      * Test case for MessageDispatcherAnnotatedMethodDiscover constructor
-     * 
      * This test verifies that the MessageDispatcherAnnotatedMethodDiscover
      * constructor initializes the object correctly with an ApplicationContext.
      * It checks that the object is created without throwing any exceptions and
