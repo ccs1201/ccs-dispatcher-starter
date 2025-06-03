@@ -22,10 +22,11 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_KINDA;
+import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.BODY_TYPE;
+import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TYPE;
 import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_SOURCE;
 import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TIMESTAMP;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.TYPE_ID;
+import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.BODY_TYPE;
 
 /**
  * Classe de proxy para o {@link RabbitTemplate} com métodos prontos
@@ -113,8 +114,8 @@ public class RabbitTemplateProxy implements TemplateProxy {
     private Message setMessageHeaders(Object body, Message message, MessageType action) {
         var messageProperties = message.getMessageProperties();
         messageProperties.setHeader(MESSAGE_TIMESTAMP, OffsetDateTime.now());
-        messageProperties.setHeader(TYPE_ID, body.getClass().getSimpleName());
-        messageProperties.setHeader(MESSAGE_KINDA, action);
+        messageProperties.setHeader(BODY_TYPE, body.getClass().getSimpleName());
+        messageProperties.setHeader(MESSAGE_TYPE, action);
         messageProperties.setHeader(MESSAGE_SOURCE, EnvironmentUtils.getAppName());
 
         Arrays.stream(properties.getMappedHeaders())

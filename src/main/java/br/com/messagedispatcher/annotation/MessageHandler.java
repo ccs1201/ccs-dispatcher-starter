@@ -22,7 +22,7 @@ public @interface MessageHandler {
      * Tipo de mensagem que o método processa (command, query, notification ou event).
      * Type of message that's handler process (command, query, notification or event).
      */
-    MessageType type();
+    MessageType messageType();
 
     /**
      * Tipo de Payload que este handler processa

@@ -81,7 +81,7 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
 
                     if (method.isAnnotationPresent(MessageHandler.class)) {
                         var annotation = method.getAnnotation(MessageHandler.class);
-                        registreHandler(annotation.type(), method);
+                        registreHandler(annotation.messageType(), method);
                     }
                 });
     }

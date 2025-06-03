@@ -5,10 +5,10 @@ public final class MessageDispatcherHeaders {
     }
 
     private static final String HEADER_PREFIX = "x-message-dispatcher-";
-    public static final String MESSAGE_KINDA = HEADER_PREFIX + "kinda";
+    public static final String MESSAGE_TYPE = HEADER_PREFIX + "message-type";
     public static final String MESSAGE_TIMESTAMP = HEADER_PREFIX + "timestamp";
     public static final String MESSAGE_SOURCE = HEADER_PREFIX + "originService";
-    public static final String TYPE_ID = HEADER_PREFIX + "typeid";
+    public static final String BODY_TYPE = HEADER_PREFIX + "body-type";
     public static final String RESPONSE_FROM = HEADER_PREFIX + "response-from";
     public static final String RESPONSE_TIME_STAMP = HEADER_PREFIX + "response-timestamp";
     public static final String HAS_ERROR = HEADER_PREFIX + "has-error";

@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
  * Podem ser rejeitados, gerar erro ou produzir eventos
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(type = MessageType.COMMAND)
+@MessageHandler(messageType = MessageType.COMMAND)
 @Documented
 public @interface Command {
 

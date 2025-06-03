@@ -34,10 +34,10 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_KINDA;
+import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TYPE;
 import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.RESPONSE_FROM;
 import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.RESPONSE_TIME_STAMP;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.TYPE_ID;
+import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.BODY_TYPE;
 
 /**
  * Classe responsável por receber as mensagens do RabbitMQ e despachá-las para a implementação de {@link MessageRouter}.
@@ -124,9 +124,9 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
         try {
             log.debug("Mensagem recebida Kinda:{} | TypeId:{} | Body:{}",
                     message.getMessageProperties()
-                            .getHeaders().get(MESSAGE_KINDA),
+                            .getHeaders().get(MESSAGE_TYPE),
                     message.getMessageProperties()
-                            .getHeaders().get(TYPE_ID),
+                            .getHeaders().get(BODY_TYPE),
                     objectMapper.readValue(message.getBody(), JsonNode.class));
         } catch (IOException e) {
             throw new MessageDispatcherLoggerException("Erro ao gerar logs", e);

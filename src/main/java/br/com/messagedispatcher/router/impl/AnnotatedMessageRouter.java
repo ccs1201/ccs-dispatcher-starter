@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_KINDA;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.TYPE_ID;
+import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TYPE;
+import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.BODY_TYPE;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @SuppressWarnings("unused")
@@ -40,15 +40,15 @@ public class AnnotatedMessageRouter implements MessageRouter {
     @Override
     public Object routeMessage(Object objectMessage) {
         var message = (Message) objectMessage;
-        var typeId = message.getMessageProperties().getHeaders().get(TYPE_ID).toString();
+        var typeId = message.getMessageProperties().getHeaders().get(BODY_TYPE).toString();
 
         if (isEmpty(typeId)) {
-            throw new MessageRouterMissingHeaderException("Missing " + TYPE_ID + " header in the message");
+            throw new MessageRouterMissingHeaderException("Missing " + BODY_TYPE + " header in the message");
         }
 
         try {
             var handler = annotatedMethodDiscover.getHandler(MessageType
-                    .valueOf(message.getMessageProperties().getHeader(MESSAGE_KINDA)), typeId);
+                    .valueOf(message.getMessageProperties().getHeader(MESSAGE_TYPE)), typeId);
 
             var payload = objectMapper.readValue(message.getBody(), handler.getParameterTypes()[0]);
 

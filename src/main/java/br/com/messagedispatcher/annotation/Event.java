@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
  * Podem ser usados para sincronizar diferentes modelos de dados
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(type = MessageType.EVENT)
+@MessageHandler(messageType = MessageType.EVENT)
 @Documented
 public @interface Event {
 
