@@ -8,6 +8,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 
+
+/**
+ * @author Cleber Souza
+ * @version 1.0
+ */
 @Configuration
 public class ListenerContainerFactory {
 
@@ -25,9 +30,11 @@ public class ListenerContainerFactory {
 
         //configura o número de mensagens que serão consumidas de uma vez
         factory.setPrefetchCount(properties.getPrefetchCount());
+
         //configura a concorrência de consumidores
         factory.setConcurrentConsumers(
                 Integer.parseInt(properties.getConcurrency().split("-")[0]));
+
         factory.setMaxConcurrentConsumers(
                 Integer.parseInt(properties.getConcurrency().split("-")[1]));
 

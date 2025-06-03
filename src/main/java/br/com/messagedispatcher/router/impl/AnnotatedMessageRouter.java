@@ -3,7 +3,6 @@ package br.com.messagedispatcher.router.impl;
 import br.com.messagedispatcher.beandiscover.MessageDispatcherAnnotatedMethodDiscover;
 import br.com.messagedispatcher.exceptions.MessageRouterMissingHeaderException;
 import br.com.messagedispatcher.model.MessageType;
-import br.com.messagedispatcher.model.MessageDispatcherErrorResponse;
 import br.com.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -15,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TYPE;
 import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.BODY_TYPE;
+import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TYPE;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @SuppressWarnings("unused")
@@ -55,16 +54,10 @@ public class AnnotatedMessageRouter implements MessageRouter {
             return handler.invoke(applicationContext.getBean(handler.getDeclaringClass()), payload);
 
         } catch (InvocationTargetException e) {
-            return handleMappingError(e.getTargetException());
+            throw new RuntimeException(e.getTargetException());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        catch (Exception e) {
-            return handleMappingError(e);
-        }
-    }
-
-    private Object handleMappingError(Throwable e) {
-        log.error("Erro ao processar mensagem: {}", e.getMessage(), e);
-        return MessageDispatcherErrorResponse.of(e);
     }
 }
 

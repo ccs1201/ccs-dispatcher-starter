@@ -4,8 +4,6 @@ import br.com.messagedispatcher.config.properties.MessageDispatcherProperties;
 import br.com.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException;
 import br.com.messagedispatcher.exceptions.MessagePublisherTimeOutException;
 import br.com.messagedispatcher.model.MessageType;
-import br.com.messagedispatcher.model.MessageDispatcherErrorResponse;
-import br.com.messagedispatcher.model.MessageWrapperResponse;
 import br.com.messagedispatcher.util.EnvironmentUtils;
 import br.com.messagedispatcher.util.httpservlet.RequestContextUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +13,7 @@ import org.springframework.amqp.AmqpRemoteException;
 import org.springframework.amqp.core.AmqpReplyTimeoutException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.RemoteInvocationResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -23,10 +22,9 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.BODY_TYPE;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TYPE;
 import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_SOURCE;
 import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TIMESTAMP;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.BODY_TYPE;
+import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TYPE;
 
 /**
  * Classe de proxy para o {@link RabbitTemplate} com métodos prontos
@@ -77,25 +75,24 @@ public class RabbitTemplateProxy implements TemplateProxy {
         try {
 
             var response = Optional.ofNullable(
-                    (MessageWrapperResponse) rabbitTemplate.convertSendAndReceive(exchange,
+                    rabbitTemplate.convertSendAndReceive(exchange,
                             routingKey,
                             body,
                             m ->
                                     setMessageHeaders(body, m, messageType)));
 
-            var messageWrapperResponse = objectMapper
+            var remoteInvocationResult = objectMapper
                     .convertValue(response.orElseThrow(() ->
-                            new MessageDispatcherRemoteProcessException(HttpStatus.FAILED_DEPENDENCY, "Nenhuma resposta recebida do consumidor")), MessageWrapperResponse.class);
+                            new MessageDispatcherRemoteProcessException(HttpStatus.FAILED_DEPENDENCY, "Nenhuma resposta recebida do consumidor")), RemoteInvocationResult.class);
 
             if (log.isDebugEnabled()) {
                 log.debug("Resposta recebida: {}", response.get());
             }
-            if (messageWrapperResponse.hasError()) {
-                var errorData = objectMapper.convertValue(messageWrapperResponse.data(), MessageDispatcherErrorResponse.class);
-                throw new MessageDispatcherRemoteProcessException(errorData);
+            if (remoteInvocationResult.hasException()) {
+                throw new MessageDispatcherRemoteProcessException(remoteInvocationResult.getException());
             }
 
-            return objectMapper.convertValue(messageWrapperResponse.data(), responseClass);
+            return objectMapper.convertValue(remoteInvocationResult.getValue(), responseClass);
         } catch (AmqpReplyTimeoutException e) {
             throw new MessagePublisherTimeOutException("Tempo de espera pela reposta excedido.", e);
         } catch (AmqpRemoteException e) {

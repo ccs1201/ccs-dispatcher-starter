@@ -19,25 +19,24 @@ package br.com.messagedispatcher.listener;
 
 import br.com.messagedispatcher.MessageDispatcherListener;
 import br.com.messagedispatcher.exceptions.MessageDispatcherLoggerException;
-import br.com.messagedispatcher.model.MessageDispatcherErrorResponse;
-import br.com.messagedispatcher.model.MessageWrapperResponse;
 import br.com.messagedispatcher.router.MessageRouter;
 import br.com.messagedispatcher.util.EnvironmentUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.support.converter.RemoteInvocationResult;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.BODY_TYPE;
 import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TYPE;
 import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.RESPONSE_FROM;
 import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.RESPONSE_TIME_STAMP;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.BODY_TYPE;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * Classe responsável por receber as mensagens do RabbitMQ e despachá-las para a implementação de {@link MessageRouter}.
@@ -69,17 +68,13 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
             concurrency = "#{@messageDispatcherProperties.concurrency}",
             returnExceptions = returnExceptions)
     @Override
-    public MessageWrapperResponse onMessage(Message message) {
+    public RemoteInvocationResult onMessage(Message message) {
         if (log.isDebugEnabled()) {
 //            sleep();
             log(message);
         }
 
         var resultProcess = messageRouter.routeMessage(message);
-
-        //se não tiver replyTo, mas ocorrer uma exception
-        //então devemos fazer o retry, se a exception persistir
-        //então devemos enviar a mensagem para o DLQ
 
         if (resultProcess == null) {
             return null;
@@ -93,13 +88,8 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
         return null;
     }
 
-    private MessageWrapperResponse buildResponse(Object resultProcess) {
-
-        if (resultProcess instanceof MessageDispatcherErrorResponse) {
-            return MessageWrapperResponse.withError(resultProcess);
-        }
-
-        return MessageWrapperResponse.withSuccess(resultProcess);
+    private RemoteInvocationResult buildResponse(Object resultProcess) {
+        return new RemoteInvocationResult(resultProcess);
     }
 
     @SuppressWarnings("unused")
@@ -112,7 +102,7 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
     }
 
     private static boolean requiresReplyTo(Message message) {
-        return StringUtils.isNotBlank(message.getMessageProperties().getReplyTo());
+        return isNotBlank(message.getMessageProperties().getReplyTo());
     }
 
     private void setResponseHeaders(Message message) {
@@ -122,7 +112,7 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
 
     private void log(Message message) {
         try {
-            log.debug("Mensagem recebida Kinda:{} | TypeId:{} | Body:{}",
+            log.debug("Mensagem recebida MessageType:{} | BodyType:{} | Body:{}",
                     message.getMessageProperties()
                             .getHeaders().get(MESSAGE_TYPE),
                     message.getMessageProperties()
