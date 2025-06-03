@@ -2,9 +2,9 @@
 
 ## Visão Geral
 
-O **CCS Message Dispatcher** é um Spring Boot Starter desenvolvido para simplificar a implementação de microsserviços com mensageria,
+O **Message Dispatcher** é um Spring Boot Starter desenvolvido para simplificar a implementação de microsserviços com mensageria,
 eliminando a necessidade de criar múltiplos listeners ou handlers para diferentes tipos de mensagens.
-O projeto atua como uma camada de abstração inteligente entre o RabbitMQ e os controllers Spring.
+O projeto atua como uma camada de abstração inteligente entre o RabbitMQ e os beans Spring.
 
 ---
 
@@ -46,8 +46,8 @@ O projeto atua como uma camada de abstração inteligente entre o RabbitMQ e os 
 
 ```xml
 <dependency>
-    <groupId>br.com.ccs</groupId>
-    <artifactId>ccs-dispatcher-starter</artifactId>
+    <groupId>br.com</groupId>
+    <artifactId>message-dispatcher-starter</artifactId>
     <version>${version}</version>
 </dependency>
 ```
@@ -113,7 +113,7 @@ public class ExampleController {
 ### Exemplo de MessagePublisher
 
 ```java
-import br.com.ccs.messagedispatcher.messaging.publisher.RabbitMessagePublisher;
+import br.com.messagedispatcher.messaging.publisher.RabbitMessagePublisher;
 
 @Service
 public class ExampleService {

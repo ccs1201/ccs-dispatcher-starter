@@ -1,8 +1,8 @@
 package br.com.ccs.dispatcher.resolver.impl;
 
-import br.com.ccs.messagedispatcher.exceptions.MessageRouterProcessingException;
-import br.com.ccs.messagedispatcher.messaging.model.MockedMessageWrapper;
-import br.com.ccs.messagedispatcher.router.impl.MockedMessageRouter;
+import br.com.messagedispatcher.exceptions.MessageRouterProcessingException;
+import br.com.messagedispatcher.model.MockedMessageWrapper;
+import br.com.messagedispatcher.router.impl.MockedMessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
