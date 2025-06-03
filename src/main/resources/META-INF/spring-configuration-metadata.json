@@ -2,8 +2,8 @@
   "groups": [
     {
       "name": "message.dispatcher",
-      "type": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties"
+      "type": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties"
     }
   ],
   "properties": [
@@ -11,146 +11,146 @@
       "name": "message.dispatcher.queue-name",
       "type": "java.lang.String",
       "description": "Nome da fila RabbitMQ. Se não configurado, usa o nome da aplicação.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties"
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties"
     },
     {
       "name": "message.dispatcher.exchange-name",
       "type": "java.lang.String",
       "description": "Nome da exchange RabbitMQ.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "ccs.dispatcher.ex"
     },
     {
       "name": "message.dispatcher.exchange-type",
       "type": "java.lang.String",
       "description": "Tipo da exchange RabbitMQ.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "topic"
     },
     {
       "name": "message.dispatcher.routing-key",
       "type": "java.lang.String",
       "description": "Routing key para binding.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "#"
     },
     {
       "name": "message.dispatcher.concurrency",
       "type": "java.lang.String",
       "description": "Configuração de concorrência do consumidor.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "1-10"
     },
     {
       "name": "message.dispatcher.queue-durable",
       "type": "java.lang.Boolean",
       "description": "Se true, a fila será durável.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": true
     },
     {
       "name": "message.dispatcher.exchange-durable",
       "type": "java.lang.Boolean",
       "description": "Se true, a exchange será durável.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": true
     },
     {
       "name": "message.dispatcher.host",
       "type": "java.lang.String",
       "description": "Ip ou Nome do Host do RabbitMQ",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "localhost"
     },
     {
       "name": "message.dispatcher.port",
       "type": "java.lang.Integer",
       "description": "Porta do RabbitMQ. Padrão é 5672",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": 5672
     },
     {
       "name": "message.dispatcher.username",
       "type": "java.lang.String",
       "description": "Usuário do RabbitMQ. Padrão é 'guest'",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "guest"
     },
     {
       "name": "message.dispatcher.password",
       "type": "java.lang.String",
       "description": "Senha do RabbitMQ. Padrão é 'guest'",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "guest"
     },
     {
       "name": "message.dispatcher.virtual-host",
       "type": "java.lang.String",
       "description": "Virtual host do RabbitMQ. Padrão é '/'",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "/"
     },
     {
       "name": "message.dispatcher.dead-letter-queue-name",
       "type": "java.lang.String",
       "description": "Nome da fila de mensagens de erro.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "message.dispatcher.dlq"
     },
     {
       "name": "message.dispatcher.dead-letter-exchange-name",
       "type": "java.lang.String",
       "description": "Nome da exchange de mensagens de erro.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "message.dispatcher.dlx"
     },
     {
       "name": "message.dispatcher.dead-letter-routing-key",
       "type": "java.lang.String",
       "description": "Routing key para mensagens de erro.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "{app-name}.dlq"
     },
     {
       "name": "message.dispatcher.max-retry-attempts",
       "type": "java.lang.Integer",
       "description": "Número máximo de tentativas de reenvio.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": 3
     },
     {
       "name": "message.dispatcher.initial-interval",
       "type": "java.lang.Integer",
       "description": "Intervalo inicial entre tentativas de reenvio (em milissegundos).",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": 5000
     },
     {
       "name": "message.dispatcher.multiplier",
       "type": "java.lang.Integer",
       "description": "Multiplicador para o intervalo entre tentativas de reenvio.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": 2
     },
     {
       "name": "message.dispatcher.max-interval",
       "type": "java.lang.Integer",
       "description": "Intervalo máximo entre tentativas de reenvio (em milissegundos).",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": 10000
     },
     {
       "name": "message.dispatcher.prefetch-count",
       "type": "java.lang.Integer",
       "description": "Quantidade de mensagens que serão consumidas por vez. Padrão é 10.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": 10
     },
     {
       "name": "message.dispatcher.reply-timeout",
       "type": "java.lang.long",
       "description": "Tempo máximo de espera por uma resposta em mile segundos. Padrão é 10_000",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": 10000
     },
 
@@ -158,20 +158,20 @@
       "name": "message.dispatcher.returnExceptions",
       "type": "java.lang.boolean",
       "description": "Indica se exceções ocorridas durante o processamento das mensagens dem ser retornadas ao cliente publicador.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": true
     },
     {
       "name": "message.dispatcher.mapped.headers ",
       "type": "java.lang.String",
       "description": "Os nomes dos Headers presentes na Request e que serão injetados como Headers das mensagens publicadas pelo MessagePublisher, separados por virgula.",
-      "sourceType": "br.com.ccs.messagedispatcher.config.properties.MessageDispatcherProperties.Mapped"
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties.Mapped"
     },
     {
       "name": "message.dispatcher.router ",
       "type": "java.lang.String",
       "description": "Implementação de MessageRouter que deve ser usada no MessageDispatcherListener.",
-      "sourceType": "br.com.ccs.messagedispatcher.router.MessageRouter",
+      "sourceType": "br.com.messagedispatcher.router.MessageRouter",
       "defaultValue": "annotated"
     }
   ],

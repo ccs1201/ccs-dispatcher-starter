@@ -1,7 +1,7 @@
 package br.com.ccs.dispatcher.util.validator;
 
 
-import br.com.ccs.messagedispatcher.util.validator.BeanValidatorUtil;
+import br.com.messagedispatcher.util.validator.BeanValidatorUtil;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotEmpty;
 import org.junit.jupiter.api.Test;
