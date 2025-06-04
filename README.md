@@ -46,7 +46,7 @@ O projeto atua como uma camada de abstração inteligente entre o RabbitMQ e os 
 
 ```xml
 <dependency>
-    <groupId>br.com</groupId>
+    <groupId>br.com.messagedispatcher</groupId>
     <artifactId>message-dispatcher-starter</artifactId>
     <version>${version}</version>
 </dependency>
