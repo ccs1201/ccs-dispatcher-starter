@@ -93,50 +93,103 @@ ccs:
 ### Exemplo de Controller
 
 ```java
+
 @RestController
-@RequestMapping("/api")
-public class ExampleController {
+@RequestMapping("/")
+@RequiredArgsConstructor
+@Slf4j
+@Validated
+@MessageListener // tornar a classe elegível para processar mensagens 
+public class NotificationController {
 
-    @PostMapping("/process")
-    public ResponseEntity<Result> process(@RequestBody Message message) {
-        // Processamento da mensagem
-        return ResponseEntity.ok(new Result());
-    }
+   private final MessagePublisher publisher;
 
-    @PostMapping("/async-process")
-    public void asyncProcess(@RequestBody Message message) {
-        // Processamento assíncrono
-    }
+   @PostMapping("sendNotificationSucesso")
+   @ResponseStatus(HttpStatus.ACCEPTED)
+   @Notification // tonar o método um Handler de mensagens para o tipo especifica, neste exemplo Mensagens do tipo Notification
+   public void sendNotificationSucesso(@RequestBody SucessoRecord input) {
+      log.info("Método sendNotificationSucesso | Mensagem consumida: {}", input);
+      publisher.sendNotification(MsConsumidor.MS_CONSUMIDOR_RK, input);
+   }
+
+   @PostMapping("sendNotificationError")
+   @ResponseStatus(HttpStatus.ACCEPTED)
+   public void sendNotificationError(@RequestBody ExceptionRecord input) {
+      publisher.sendNotification(MsConsumidor.MS_CONSUMIDOR_RK, input);
+   }
+
+   public record SucessoRecord(@NotNull int id) {
+   }
+
+   public record ExceptionRecord(@NotBlank String mensagem) {
+   }
 }
+
 ```
 
 ### Exemplo de MessagePublisher
 
 ```java
-import br.com.messagedispatcher.messaging.publisher.RabbitMessagePublisher;
+import br.com.messagedispatcher.annotation.MessageListener;
+import br.com.messagedispatcher.annotation.Notification;
+import br.com.messagedispatcher.publisher.MessagePublisher;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-@Service
-public class ExampleService {
+@RequiredArgsConstructor
+@Slf4j
+@MessageListener
+public class NotificationHandler {
 
-    private final RabbitMessagePublisher publisher;
+   private final MessagePublisher publisher;
 
-    public ExampleService(RabbitMessagePublisher publisher) {
-        this.publisher = publisher;
-    }
+   @Notification
+   public void Sucesso(@Valid SucessoRecord payload) {
+      log.info("Método sendNotificationSucesso | Mensagem consumida: {}", payload);
+      publisher.sendNotification(MsProdutor.MS_PRODUTOR_RK, payload);
+   }
 
-    @PostMapping("Publish")
-    public void publica(@RequestBody MessageInput input) {
-        //Publica um evento / Publish an event (Fire and Forget) no return
-        publisher.sendEvent(input);
+   @Notification
+   public void erro(@Valid ExceptionRecord payload) {
+      throw new UnsupportedOperationException("Método sendNotificationError não implementado");
+   }
 
-        //Executa uma chamada RPC utilizando o broker de menssageria
-        //Execute a RPC call through message broker
-        String response = publisher.doPost("domain", "namespace", "/doSomething", input, String.class);
-    }
+   public record SucessoRecord(@NotNull int id) {
+   }
 
+   public record ExceptionRecord(@NotBlank String mensagem) {
+   }
 }
 ```
+### Exemplo de Consumidor
 
+```java
+@MessageListener
+public class MeuListener {
+
+   @Notification
+   public void processNotification(SucessoRecord payload) {
+      ...
+   }
+
+   @Query
+   public List<Reponse> doQuery(QueryPayload payload) {
+      retrun repository.find(payload);
+   }
+
+   @Commando
+   public Payload processCommand(Commandpayload payload) {
+       return...
+   }
+   @Event
+   public void processEvent(@NotBlank String mensagem) {
+      ...
+   }
+}
+```
 ---
 
 ## Funcionalidades Principais
