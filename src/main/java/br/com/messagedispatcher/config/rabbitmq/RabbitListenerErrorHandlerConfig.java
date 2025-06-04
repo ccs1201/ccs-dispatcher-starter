@@ -3,6 +3,7 @@ package br.com.messagedispatcher.config.rabbitmq;
 import br.com.messagedispatcher.exceptions.MessageDispatcherRetryableException;
 import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.model.MessageType;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -14,7 +15,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders;
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.REPLY_TO_HEADER;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 
 @Configuration
@@ -28,7 +28,6 @@ public class RabbitListenerErrorHandlerConfig {
         return (amqpMessage, channel, message, exception) -> {
             String messageType = (String) amqpMessage.getMessageProperties().getHeaders().get(MessageDispatcherHeaders.MESSAGE_TYPE);
 
-
             if (retryableMessageTypes.contains(messageType) && shouldReply(amqpMessage)) {
                 return MessageDispatcherRemoteInvocationResult.of(getRootCause(exception));
             } else {
@@ -41,6 +40,6 @@ public class RabbitListenerErrorHandlerConfig {
 
     private boolean shouldReply(Message message) {
         Objects.requireNonNull(message, "A mensagem não deveria ser null");
-        return message.getMessageProperties().getHeaders().containsKey(REPLY_TO_HEADER);
+        return StringUtils.isNotEmpty(message.getMessageProperties().getReplyTo());
     }
 }
