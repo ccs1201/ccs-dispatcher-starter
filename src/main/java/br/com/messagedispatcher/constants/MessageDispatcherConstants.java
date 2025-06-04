@@ -4,8 +4,6 @@ public final class MessageDispatcherConstants {
     private MessageDispatcherConstants() {
     }
 
-    public static final String REPLY_TO_HEADER = "amqp_replyTo";
-
     public static class MessageDispatcherHeaders {
         private MessageDispatcherHeaders() {
         }

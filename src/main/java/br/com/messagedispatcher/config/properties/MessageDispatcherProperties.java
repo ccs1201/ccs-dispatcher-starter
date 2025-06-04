@@ -201,7 +201,7 @@ public class MessageDispatcherProperties {
     /**
      * Intervalo inicial entre as tentativas. Padrão é 5000ms
      */
-    private int initialInterval = 5000;
+    private int initialInterval = 2000;
 
     /**
      * Multiplicador do intervalo entre as tentativas. Padrão é 2
@@ -223,7 +223,7 @@ public class MessageDispatcherProperties {
     /**
      * Tempo máximo de espera por uma resposta. Padrão é 10 segundos
      */
-    private long replyTimeOut = 10_000;
+    private long replyTimeOut = 15_000;
 
     private Mapped mapped = new Mapped();
 
