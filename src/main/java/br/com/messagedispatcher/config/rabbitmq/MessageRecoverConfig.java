@@ -29,7 +29,7 @@ public class MessageRecoverConfig {
                 properties.getDeadLetterRoutingKey()) {
             @Override
             protected Map<String, Object> additionalHeaders(Message message, Throwable cause) {
-                Throwable rootCause = cause;
+                var rootCause = cause;
 
                 if (cause instanceof ListenerExecutionFailedException e) {
                     rootCause = ExceptionUtils.getRootCause(e);

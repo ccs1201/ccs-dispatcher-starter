@@ -39,15 +39,15 @@ public class AnnotatedMessageRouter implements MessageRouter {
     @Override
     public Object routeMessage(Object objectMessage) {
         var message = (Message) objectMessage;
-        var typeId = message.getMessageProperties().getHeaders().get(BODY_TYPE).toString();
+        var bodyType = message.getMessageProperties().getHeaders().get(BODY_TYPE).toString();
 
-        if (isEmpty(typeId)) {
+        if (isEmpty(bodyType)) {
             throw new MessageRouterMissingHeaderException("Missing " + BODY_TYPE + " header in the message");
         }
 
         try {
             var handler = annotatedMethodDiscover.getHandler(MessageType
-                    .valueOf(message.getMessageProperties().getHeader(MESSAGE_TYPE)), typeId);
+                    .valueOf(message.getMessageProperties().getHeader(MESSAGE_TYPE)), bodyType);
 
             var payload = objectMapper.readValue(message.getBody(), handler.getParameterTypes()[0]);
 
