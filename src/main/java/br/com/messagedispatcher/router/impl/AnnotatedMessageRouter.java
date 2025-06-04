@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.BODY_TYPE;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TYPE;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.BODY_TYPE;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.MESSAGE_TYPE;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @SuppressWarnings("unused")

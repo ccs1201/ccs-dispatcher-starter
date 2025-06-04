@@ -19,6 +19,7 @@ package br.com.messagedispatcher.listener;
 
 import br.com.messagedispatcher.MessageDispatcherListener;
 import br.com.messagedispatcher.exceptions.MessageDispatcherLoggerException;
+import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.router.MessageRouter;
 import br.com.messagedispatcher.util.EnvironmentUtils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,15 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.support.converter.RemoteInvocationResult;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.BODY_TYPE;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TYPE;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.RESPONSE_FROM;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.RESPONSE_TIME_STAMP;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.*;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
@@ -66,9 +63,9 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
 
     @RabbitListener(queues = "#{@messageDispatcherProperties.queueName}",
             concurrency = "#{@messageDispatcherProperties.concurrency}",
-            returnExceptions = returnExceptions)
+            returnExceptions = returnExceptions, errorHandler = "messageDispatcherErrorHandler")
     @Override
-    public RemoteInvocationResult onMessage(Message message) {
+    public MessageDispatcherRemoteInvocationResult onMessage(Message message) {
         if (log.isDebugEnabled()) {
 //            sleep();
             log(message);
@@ -88,8 +85,8 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
         return null;
     }
 
-    private RemoteInvocationResult buildResponse(Object resultProcess) {
-        return new RemoteInvocationResult(resultProcess);
+    private MessageDispatcherRemoteInvocationResult buildResponse(Object resultProcess) {
+        return MessageDispatcherRemoteInvocationResult.of(resultProcess);
     }
 
     @SuppressWarnings("unused")

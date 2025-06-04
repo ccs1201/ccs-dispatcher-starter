@@ -1,38 +1,28 @@
 package br.com.messagedispatcher.exceptions;
 
-import br.com.messagedispatcher.model.MessageDispatcherErrorResponse;
 import org.springframework.http.HttpStatus;
 
-public class MessageDispatcherRemoteProcessException extends RuntimeException {
+public class MessageDispatcherRemoteProcessException extends MessageDispatcherRuntimeException {
 
     private HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
-    private String remoteCause;
-    private String originService;
+    private final String remoteService;
 
-    public MessageDispatcherRemoteProcessException(MessageDispatcherErrorResponse errorData) {
-        super(errorData.message());
-        this.remoteCause = errorData.cause();
-        this.originService = errorData.originService();
-    }
-
-    public MessageDispatcherRemoteProcessException(Throwable cause) {
+    public MessageDispatcherRemoteProcessException(Throwable cause, String remoteService) {
         super(cause);
+        this.remoteService = remoteService;
     }
 
-    public MessageDispatcherRemoteProcessException(HttpStatus status, String message) {
+    public MessageDispatcherRemoteProcessException(HttpStatus status, String message, String remoteService) {
         super(message);
         this.status = status;
+        this.remoteService = remoteService;
     }
 
     public HttpStatus getStatus() {
         return status;
     }
 
-    public String getRemoteCause() {
-        return remoteCause;
-    }
-
-    public String getOriginService() {
-        return originService;
+    public String getRemoteService() {
+        return remoteService;
     }
 }

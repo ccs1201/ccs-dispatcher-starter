@@ -455,6 +455,14 @@ public class MessageDispatcherProperties {
         this.mapped = mapped;
     }
 
+    public int minConsumers() {
+        return Integer.parseInt(getConcurrency().split("-")[0]);
+    }
+
+    public int maxConsumers() {
+        return Integer.parseInt(getConcurrency().split("-")[1]);
+    }
+
     /**
      * Mapeia os headers que serão mapeados para o objeto MessageProperties do RabbitMQ.
      * <p>

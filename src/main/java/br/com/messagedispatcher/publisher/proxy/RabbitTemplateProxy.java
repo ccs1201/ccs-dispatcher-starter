@@ -2,7 +2,9 @@ package br.com.messagedispatcher.publisher.proxy;
 
 import br.com.messagedispatcher.config.properties.MessageDispatcherProperties;
 import br.com.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException;
+import br.com.messagedispatcher.exceptions.MessagePublisherException;
 import br.com.messagedispatcher.exceptions.MessagePublisherTimeOutException;
+import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.model.MessageType;
 import br.com.messagedispatcher.util.EnvironmentUtils;
 import br.com.messagedispatcher.util.httpservlet.RequestContextUtil;
@@ -13,7 +15,6 @@ import org.springframework.amqp.AmqpRemoteException;
 import org.springframework.amqp.core.AmqpReplyTimeoutException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.RemoteInvocationResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -21,10 +22,7 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.BODY_TYPE;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_SOURCE;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TIMESTAMP;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TYPE;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.*;
 
 /**
  * Classe de proxy para o {@link RabbitTemplate} com métodos prontos
@@ -83,20 +81,20 @@ public class RabbitTemplateProxy implements TemplateProxy {
 
             var remoteInvocationResult = objectMapper
                     .convertValue(response.orElseThrow(() ->
-                            new MessageDispatcherRemoteProcessException(HttpStatus.FAILED_DEPENDENCY, "Nenhuma resposta recebida do consumidor")), RemoteInvocationResult.class);
+                            new MessageDispatcherRemoteProcessException(HttpStatus.FAILED_DEPENDENCY, "Nenhuma resposta recebida do consumidor", routingKey)), MessageDispatcherRemoteInvocationResult.class);
 
             if (log.isDebugEnabled()) {
-                log.debug("Resposta recebida: {}", response.get());
+                log.debug("Resposta recebida: {}", remoteInvocationResult);
             }
             if (remoteInvocationResult.hasException()) {
-                throw new MessageDispatcherRemoteProcessException(remoteInvocationResult.getException());
+                throw new MessageDispatcherRemoteProcessException(remoteInvocationResult.exception(), remoteInvocationResult.remoteService());
             }
 
-            return objectMapper.convertValue(remoteInvocationResult.getValue(), responseClass);
+            return objectMapper.convertValue(remoteInvocationResult.value(), responseClass);
         } catch (AmqpReplyTimeoutException e) {
             throw new MessagePublisherTimeOutException("Tempo de espera pela reposta excedido.", e);
         } catch (AmqpRemoteException e) {
-            throw new MessageDispatcherRemoteProcessException(e.getCause());
+            throw new MessagePublisherException("Erro ao publicar mensagem.", e.getCause());
         }
     }
 

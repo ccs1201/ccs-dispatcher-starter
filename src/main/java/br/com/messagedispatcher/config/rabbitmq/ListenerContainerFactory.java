@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 
+import java.util.concurrent.Executors;
+
 
 /**
  * @author Cleber Souza
@@ -27,17 +29,19 @@ public class ListenerContainerFactory {
         factory.setMessageConverter(messageConverter);
         factory.setDefaultRequeueRejected(false);
         factory.setAdviceChain(retryOperationsInterceptor);
+        factory.setConsumerTagStrategy(queue -> queue + "-consumer");
 
         //configura o número de mensagens que serão consumidas de uma vez
         factory.setPrefetchCount(properties.getPrefetchCount());
 
+        var minConsumers = properties.minConsumers();
+        var maxConsumers = properties.maxConsumers();
+
         //configura a concorrência de consumidores
-        factory.setConcurrentConsumers(
-                Integer.parseInt(properties.getConcurrency().split("-")[0]));
+        factory.setConcurrentConsumers(minConsumers);
+        factory.setMaxConcurrentConsumers(maxConsumers);
 
-        factory.setMaxConcurrentConsumers(
-                Integer.parseInt(properties.getConcurrency().split("-")[1]));
-
+        factory.setTaskExecutor(Executors.newFixedThreadPool(maxConsumers, Thread.ofVirtual().factory()));
         return factory;
     }
 }
