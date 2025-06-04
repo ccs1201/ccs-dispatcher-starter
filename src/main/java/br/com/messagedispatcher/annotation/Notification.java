@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
  * Exemplo: OrderShipped, PaymentReceived
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(type = MessageType.NOTIFICATION)
+@MessageHandler(messageType = MessageType.NOTIFICATION)
 @Documented
 public @interface Notification {
 

@@ -12,13 +12,10 @@ import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Map;
 
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.EXCEPTION_MESSAGE;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.EXCEPTION_TYPE;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.FAILED_AT;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.HAS_ERROR;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.*;
 
 @Configuration
 public class MessageRecoverConfig {
@@ -43,10 +40,9 @@ public class MessageRecoverConfig {
                 }
 
                 Map<String, Object> headers = message.getMessageProperties().getHeaders();
-                headers.put(HAS_ERROR, true);
-                headers.put(EXCEPTION_TYPE, rootCause.getClass().getSimpleName());
+                headers.put(EXCEPTION_ROOT_CAUSE, rootCause.getClass().getSimpleName());
                 headers.put(EXCEPTION_MESSAGE, rootCause.getMessage());
-                headers.put(FAILED_AT, LocalDateTime.now());
+                headers.put(FAILED_AT, OffsetDateTime.now());
                 return headers;
             }
         };

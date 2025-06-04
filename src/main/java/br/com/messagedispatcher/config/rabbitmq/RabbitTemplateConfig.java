@@ -9,6 +9,8 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.concurrent.Executors;
+
 @Configuration
 public class RabbitTemplateConfig {
 
@@ -23,6 +25,7 @@ public class RabbitTemplateConfig {
         template.setRoutingKey(properties.getRoutingKey());
         template.setMandatory(true);
         template.setReplyTimeout(properties.getReplyTimeOut());
+        template.setTaskExecutor(Executors.newVirtualThreadPerTaskExecutor());
 
         template.setConfirmCallback((correlationData, ack, cause) -> {
             if (ack) {

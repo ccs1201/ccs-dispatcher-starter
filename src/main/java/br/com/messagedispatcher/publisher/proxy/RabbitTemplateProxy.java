@@ -2,10 +2,10 @@ package br.com.messagedispatcher.publisher.proxy;
 
 import br.com.messagedispatcher.config.properties.MessageDispatcherProperties;
 import br.com.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException;
+import br.com.messagedispatcher.exceptions.MessagePublisherException;
 import br.com.messagedispatcher.exceptions.MessagePublisherTimeOutException;
+import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.model.MessageType;
-import br.com.messagedispatcher.model.MessageDispatcherErrorResponse;
-import br.com.messagedispatcher.model.MessageWrapperResponse;
 import br.com.messagedispatcher.util.EnvironmentUtils;
 import br.com.messagedispatcher.util.httpservlet.RequestContextUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,10 +22,7 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_KINDA;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_SOURCE;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.MESSAGE_TIMESTAMP;
-import static br.com.messagedispatcher.publisher.MessageDispatcherHeaders.TYPE_ID;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.*;
 
 /**
  * Classe de proxy para o {@link RabbitTemplate} com métodos prontos
@@ -76,29 +73,28 @@ public class RabbitTemplateProxy implements TemplateProxy {
         try {
 
             var response = Optional.ofNullable(
-                    (MessageWrapperResponse) rabbitTemplate.convertSendAndReceive(exchange,
+                    rabbitTemplate.convertSendAndReceive(exchange,
                             routingKey,
                             body,
                             m ->
                                     setMessageHeaders(body, m, messageType)));
 
-            var messageWrapperResponse = objectMapper
+            var remoteInvocationResult = objectMapper
                     .convertValue(response.orElseThrow(() ->
-                            new MessageDispatcherRemoteProcessException(HttpStatus.FAILED_DEPENDENCY, "Nenhuma resposta recebida do consumidor")), MessageWrapperResponse.class);
+                            new MessageDispatcherRemoteProcessException(HttpStatus.FAILED_DEPENDENCY, "Nenhuma resposta recebida do consumidor", routingKey)), MessageDispatcherRemoteInvocationResult.class);
 
             if (log.isDebugEnabled()) {
-                log.debug("Resposta recebida: {}", response.get());
+                log.debug("Resposta recebida: {}", remoteInvocationResult);
             }
-            if (messageWrapperResponse.hasError()) {
-                var errorData = objectMapper.convertValue(messageWrapperResponse.data(), MessageDispatcherErrorResponse.class);
-                throw new MessageDispatcherRemoteProcessException(errorData);
+            if (remoteInvocationResult.hasException()) {
+                throw new MessageDispatcherRemoteProcessException(remoteInvocationResult.exception(), remoteInvocationResult.remoteService());
             }
 
-            return objectMapper.convertValue(messageWrapperResponse.data(), responseClass);
+            return objectMapper.convertValue(remoteInvocationResult.value(), responseClass);
         } catch (AmqpReplyTimeoutException e) {
             throw new MessagePublisherTimeOutException("Tempo de espera pela reposta excedido.", e);
         } catch (AmqpRemoteException e) {
-            throw new MessageDispatcherRemoteProcessException(e.getCause());
+            throw new MessagePublisherException("Erro ao publicar mensagem.", e.getCause());
         }
     }
 
@@ -113,8 +109,8 @@ public class RabbitTemplateProxy implements TemplateProxy {
     private Message setMessageHeaders(Object body, Message message, MessageType action) {
         var messageProperties = message.getMessageProperties();
         messageProperties.setHeader(MESSAGE_TIMESTAMP, OffsetDateTime.now());
-        messageProperties.setHeader(TYPE_ID, body.getClass().getSimpleName());
-        messageProperties.setHeader(MESSAGE_KINDA, action);
+        messageProperties.setHeader(BODY_TYPE, body.getClass().getSimpleName());
+        messageProperties.setHeader(MESSAGE_TYPE, action);
         messageProperties.setHeader(MESSAGE_SOURCE, EnvironmentUtils.getAppName());
 
         Arrays.stream(properties.getMappedHeaders())

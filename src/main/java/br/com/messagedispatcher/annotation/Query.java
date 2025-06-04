@@ -21,7 +21,7 @@ import java.lang.annotation.RetentionPolicy;
  * Exemplo: GetProducts, FindOrderById, ListCustomers
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(type = MessageType.QUERY)
+@MessageHandler(messageType = MessageType.QUERY)
 @Documented
 public @interface Query {
 

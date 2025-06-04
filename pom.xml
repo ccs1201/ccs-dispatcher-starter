@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>br.com</groupId>
+    <groupId>br.com.messagedispatcher</groupId>
     <artifactId>message-dispatcher-starter</artifactId>
     <version>0.0.1-ALPHA</version>
     <packaging>jar</packaging>
@@ -63,6 +63,10 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
