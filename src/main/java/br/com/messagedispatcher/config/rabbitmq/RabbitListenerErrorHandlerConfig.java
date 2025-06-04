@@ -3,10 +3,10 @@ package br.com.messagedispatcher.config.rabbitmq;
 import br.com.messagedispatcher.exceptions.MessageDispatcherRetryableException;
 import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.model.MessageType;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.api.RabbitListenerErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.Message;
 
 import java.util.List;
 import java.util.Objects;
@@ -26,7 +26,7 @@ public class RabbitListenerErrorHandlerConfig {
             String messageType = (String) amqpMessage.getMessageProperties().getHeaders().get(MessageDispatcherHeaders.MESSAGE_TYPE);
 
 
-            if (retryableMessageTypes.contains(messageType) && shoudReply(message)) {
+            if (retryableMessageTypes.contains(messageType) && shouldReply(amqpMessage)) {
                 return MessageDispatcherRemoteInvocationResult.of(getRootCause(exception));
             } else {
                 throw new MessageDispatcherRetryableException("Erro processando mensagem do tipo: " + messageType,
@@ -35,8 +35,8 @@ public class RabbitListenerErrorHandlerConfig {
         };
     }
 
-    private boolean shoudReply(Message<?> message) {
+    private boolean shouldReply(Message message) {
         Objects.requireNonNull(message, "A mensagem não deveria ser null");
-        return message.getHeaders().containsKey(REPLY_TO_HEADER);
+        return message.getMessageProperties().getHeaders().containsKey(REPLY_TO_HEADER);
     }
 }
