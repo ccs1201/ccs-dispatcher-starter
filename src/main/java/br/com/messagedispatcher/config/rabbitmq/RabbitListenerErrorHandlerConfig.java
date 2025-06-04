@@ -3,6 +3,8 @@ package br.com.messagedispatcher.config.rabbitmq;
 import br.com.messagedispatcher.exceptions.MessageDispatcherRetryableException;
 import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.model.MessageType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.api.RabbitListenerErrorHandler;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +20,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 @Configuration
 public class RabbitListenerErrorHandlerConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(RabbitListenerErrorHandlerConfig.class);
     private final List<String> retryableMessageTypes = List.of(MessageType.QUERY.name(), MessageType.COMMAND.name());
 
     @Bean
@@ -29,8 +32,9 @@ public class RabbitListenerErrorHandlerConfig {
             if (retryableMessageTypes.contains(messageType) && shouldReply(amqpMessage)) {
                 return MessageDispatcherRemoteInvocationResult.of(getRootCause(exception));
             } else {
+                log.error("Erro processando mensagem do tipo: {}", messageType, exception);
                 throw new MessageDispatcherRetryableException("Erro processando mensagem do tipo: " + messageType,
-                        getRootCause(exception));
+                        exception);
             }
         };
     }
