@@ -1,8 +1,8 @@
 package br.com.ccs.dispatcher.resolver.impl;
 
-import br.com.ccs.messagedispatcher.exceptions.MessageRouterMessageProcessException;
-import br.com.ccs.messagedispatcher.messaging.model.MessageWrapper;
-import br.com.ccs.messagedispatcher.router.impl.MockedMessageRouter;
+import br.com.messagedispatcher.exceptions.MessageRouterProcessingException;
+import br.com.messagedispatcher.model.MockedMessageWrapper;
+import br.com.messagedispatcher.router.impl.MockedMessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +44,7 @@ public class MockedMessageRouterTest {
     private Message message;
 
     @Mock
-    private MessageWrapper messageWrapper;
+    private MockedMessageWrapper mockedMessageWrapper;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -66,7 +66,7 @@ public class MockedMessageRouterTest {
     @Test
     public void testRouteMessageWithNullBodyAndNoHandler() throws Exception {
 
-        MessageWrapper messageWrapper = MessageWrapper.builder()
+        MockedMessageWrapper mockedMessageWrapper = MockedMessageWrapper.builder()
                 .path("/xxx")
                 .method("GET")
                 .body(null)
@@ -75,11 +75,11 @@ public class MockedMessageRouterTest {
                 .build();
 
         when(message.getBody()).thenReturn("message body".getBytes(StandardCharsets.UTF_8));
-        when(objectMapper.readValue(any(byte[].class), any(Class.class))).thenReturn(messageWrapper);
+        when(objectMapper.readValue(any(byte[].class), any(Class.class))).thenReturn(mockedMessageWrapper);
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
         // Act & Assert
-        var exception = assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
+        var exception = assertThrows(MessageRouterProcessingException.class, () -> router.routeMessage(message));
 
         assertEquals("Nenhum handler encontrado para path: /xxx", exception.getMessage());
     }
@@ -99,17 +99,17 @@ public class MockedMessageRouterTest {
      */
     @Test
     public void test_routeMessage_noHandlerFound() throws Exception {
-        MessageWrapper messageWrapper = MessageWrapper.builder()
+        MockedMessageWrapper mockedMessageWrapper = MockedMessageWrapper.builder()
                 .path("/invalid-path")
                 .method("GET")
                 .headers(new HashMap<>())
                 .build();
 
         when(message.getBody()).thenReturn("message body".getBytes(StandardCharsets.UTF_8));
-        when(objectMapper.readValue(any(byte[].class), any(Class.class))).thenReturn(messageWrapper);
+        when(objectMapper.readValue(any(byte[].class), any(Class.class))).thenReturn(mockedMessageWrapper);
         when(handlerMapping.getHandler(any())).thenReturn(null);
 
-        assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
+        assertThrows(MessageRouterProcessingException.class, () -> router.routeMessage(message));
 
     }
 
@@ -128,7 +128,7 @@ public class MockedMessageRouterTest {
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("param1", "value1");
 
-        MessageWrapper messageWrapper = MessageWrapper.builder()
+        MockedMessageWrapper mockedMessageWrapper = MockedMessageWrapper.builder()
                 .method("GET")
                 .path("/test")
                 .body("test body")
@@ -137,11 +137,11 @@ public class MockedMessageRouterTest {
                 .build();
 
         when(message.getBody()).thenReturn("message body".getBytes(StandardCharsets.UTF_8));
-        when(objectMapper.readValue(any(byte[].class), eq(MessageWrapper.class))).thenReturn(messageWrapper);
+        when(objectMapper.readValue(any(byte[].class), eq(MockedMessageWrapper.class))).thenReturn(mockedMessageWrapper);
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
         // Act & Assert
-        var exception = assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
+        var exception = assertThrows(MessageRouterProcessingException.class, () -> router.routeMessage(message));
         assertEquals("Nenhum handler encontrado para path: /test", exception.getMessage());
     }
 
@@ -168,7 +168,7 @@ public class MockedMessageRouterTest {
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("param", "value");
 
-        MessageWrapper wrapper = MessageWrapper.builder()
+        MockedMessageWrapper wrapper = MockedMessageWrapper.builder()
                 .method("GET")
                 .path("/test")
                 .body("test body")
@@ -179,11 +179,11 @@ public class MockedMessageRouterTest {
         try {
             // Mock behavior
             when(message.getBody()).thenReturn("message body".getBytes(StandardCharsets.UTF_8));
-            when(objectMapper.readValue(any(byte[].class), eq(MessageWrapper.class))).thenReturn(wrapper);
+            when(objectMapper.readValue(any(byte[].class), eq(MockedMessageWrapper.class))).thenReturn(wrapper);
             when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
             // Execute method and assert
-            assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
+            assertThrows(MessageRouterProcessingException.class, () -> router.routeMessage(message));
 
             // Verify interactions
             verify(handlerMapping).getHandler(any(MockHttpServletRequest.class));
@@ -209,7 +209,7 @@ public class MockedMessageRouterTest {
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("param", "value");
 
-        MessageWrapper messageWrapper = MessageWrapper.builder()
+        MockedMessageWrapper mockedMessageWrapper = MockedMessageWrapper.builder()
                 .method("GET")
                 .path("/test")
                 .body("test body")
@@ -219,11 +219,11 @@ public class MockedMessageRouterTest {
 
 
         when(message.getBody()).thenReturn("message body".getBytes(StandardCharsets.UTF_8));
-        when(objectMapper.readValue(any(byte[].class), eq(MessageWrapper.class))).thenReturn(messageWrapper);
+        when(objectMapper.readValue(any(byte[].class), eq(MockedMessageWrapper.class))).thenReturn(mockedMessageWrapper);
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
         // Act & Assert
-        assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
+        assertThrows(MessageRouterProcessingException.class, () -> router.routeMessage(message));
     }
 
     /**
@@ -237,7 +237,7 @@ public class MockedMessageRouterTest {
      */
     @Test
     public void test_routeMessage_whenNoHandlerFoundAndJsonResponse() throws Exception {
-        MessageWrapper messageWrapper = MessageWrapper.builder()
+        MockedMessageWrapper mockedMessageWrapper = MockedMessageWrapper.builder()
                 .method("GET")
                 .path("/test")
                 .body("test body")
@@ -247,14 +247,14 @@ public class MockedMessageRouterTest {
 
         // Mocking behavior
         when(message.getBody()).thenReturn("dummy".getBytes());
-        when(objectMapper.readValue(any(byte[].class), eq(MessageWrapper.class))).thenReturn(messageWrapper);
+        when(objectMapper.readValue(any(byte[].class), eq(MockedMessageWrapper.class))).thenReturn(mockedMessageWrapper);
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(null);
 
         // Executing the method and asserting the exception
-        assertThrows(MessageRouterMessageProcessException.class, () -> router.routeMessage(message));
+        assertThrows(MessageRouterProcessingException.class, () -> router.routeMessage(message));
 
         // Verifying interactions
-        verify(objectMapper).readValue(any(byte[].class), eq(MessageWrapper.class));
+        verify(objectMapper).readValue(any(byte[].class), eq(MockedMessageWrapper.class));
         verify(handlerMapping).getHandler(any(MockHttpServletRequest.class));
         verifyNoInteractions(handlerAdapter);
     }
@@ -275,7 +275,7 @@ public class MockedMessageRouterTest {
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("param", "value");
 
-        MessageWrapper messageWrapper = MessageWrapper.builder()
+        MockedMessageWrapper mockedMessageWrapper = MockedMessageWrapper.builder()
                 .method("GET")
                 .path("/test")
                 .body("test body")
@@ -285,7 +285,7 @@ public class MockedMessageRouterTest {
 
         // Mocking behavior
         when(message.getBody()).thenReturn("test message".getBytes());
-        when(objectMapper.readValue(any(byte[].class), eq(MessageWrapper.class))).thenReturn(messageWrapper);
+        when(objectMapper.readValue(any(byte[].class), eq(MockedMessageWrapper.class))).thenReturn(mockedMessageWrapper);
         when(handlerMapping.getHandler(any(MockHttpServletRequest.class))).thenReturn(mock(HandlerExecutionChain.class));
 
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
@@ -311,7 +311,7 @@ public class MockedMessageRouterTest {
         assertEquals("value", ((Map<?, ?>) result).get("key"));
 
         // Verifying interactions
-        verify(objectMapper).readValue(any(byte[].class), eq(MessageWrapper.class));
+        verify(objectMapper).readValue(any(byte[].class), eq(MockedMessageWrapper.class));
         verify(handlerMapping).getHandler(any(MockHttpServletRequest.class));
         verify(handlerAdapter).handle(any(), any(), any());
         verify(objectMapper).readValue(any(byte[].class), eq(Object.class));

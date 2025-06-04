@@ -2,9 +2,9 @@
 
 ## Visão Geral
 
-O **CCS Message Dispatcher** é um Spring Boot Starter desenvolvido para simplificar a implementação de microsserviços com mensageria,
+O **Message Dispatcher** é um Spring Boot Starter desenvolvido para simplificar a implementação de microsserviços com mensageria,
 eliminando a necessidade de criar múltiplos listeners ou handlers para diferentes tipos de mensagens.
-O projeto atua como uma camada de abstração inteligente entre o RabbitMQ e os controllers Spring.
+O projeto atua como uma camada de abstração inteligente entre o RabbitMQ e os beans Spring.
 
 ---
 
@@ -46,8 +46,8 @@ O projeto atua como uma camada de abstração inteligente entre o RabbitMQ e os 
 
 ```xml
 <dependency>
-    <groupId>br.com.ccs</groupId>
-    <artifactId>ccs-dispatcher-starter</artifactId>
+    <groupId>br.com.messagedispatcher</groupId>
+    <artifactId>message-dispatcher-starter</artifactId>
     <version>${version}</version>
 </dependency>
 ```
@@ -113,26 +113,26 @@ public class ExampleController {
 ### Exemplo de MessagePublisher
 
 ```java
-import br.com.ccs.messagedispatcher.messaging.publisher.MessagePublisher;
+import br.com.messagedispatcher.messaging.publisher.RabbitMessagePublisher;
 
 @Service
 public class ExampleService {
 
-   private final MessagePublisher publisher;
+    private final RabbitMessagePublisher publisher;
 
-   public ExampleService(MessagePublisher publisher) {
-      this.publisher = publisher;
-   }
+    public ExampleService(RabbitMessagePublisher publisher) {
+        this.publisher = publisher;
+    }
 
-   @PostMapping("Publish")
-   public void publica(@RequestBody MessageInput input) {
-      //Publica um evento / Publish an event (Fire and Forget) no return
-      publisher.sendEvent(input);
+    @PostMapping("Publish")
+    public void publica(@RequestBody MessageInput input) {
+        //Publica um evento / Publish an event (Fire and Forget) no return
+        publisher.sendEvent(input);
 
-      //Executa uma chamada RPC utilizando o broker de menssageria
-      //Execute a RPC call through message broker
-      String response = publisher.doPost("domain", "namespace", "/doSomething", input, String.class);
-   }
+        //Executa uma chamada RPC utilizando o broker de menssageria
+        //Execute a RPC call through message broker
+        String response = publisher.doPost("domain", "namespace", "/doSomething", input, String.class);
+    }
 
 }
 ```
