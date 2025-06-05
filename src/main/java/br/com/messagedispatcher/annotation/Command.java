@@ -1,6 +1,6 @@
 package br.com.messagedispatcher.annotation;
 
-import br.com.messagedispatcher.model.MessageType;
+import br.com.messagedispatcher.model.HandlerType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
  * Podem ser rejeitados, gerar erro ou produzir eventos
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(messageType = MessageType.COMMAND)
+@MessageHandler(handlerType = HandlerType.COMMAND)
 @Documented
 public @interface Command {
 

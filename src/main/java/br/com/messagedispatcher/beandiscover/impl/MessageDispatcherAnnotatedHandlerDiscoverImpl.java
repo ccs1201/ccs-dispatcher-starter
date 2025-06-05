@@ -1,10 +1,10 @@
 package br.com.messagedispatcher.beandiscover.impl;
 
-import br.com.messagedispatcher.beandiscover.MessageDispatcherAnnotatedMethodDiscover;
+import br.com.messagedispatcher.beandiscover.MessageDispatcherAnnotatedHandlerDiscover;
 import br.com.messagedispatcher.exceptions.MessageHandlerDuplicatedInputParameterException;
 import br.com.messagedispatcher.exceptions.MessageHandlerMultipleInputParametersException;
 import br.com.messagedispatcher.exceptions.MessageHandlerNotFoundException;
-import br.com.messagedispatcher.model.MessageType;
+import br.com.messagedispatcher.model.HandlerType;
 import br.com.messagedispatcher.annotation.Command;
 import br.com.messagedispatcher.annotation.Event;
 import br.com.messagedispatcher.annotation.MessageHandler;
@@ -24,18 +24,18 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 @Component
-public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDispatcherAnnotatedMethodDiscover {
+public class MessageDispatcherAnnotatedHandlerDiscoverImpl implements MessageDispatcherAnnotatedHandlerDiscover {
 
-    private static final Logger log = LoggerFactory.getLogger(MessageDispatcherAnnotatedMethodDiscoverImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(MessageDispatcherAnnotatedHandlerDiscoverImpl.class);
 
-    private final Map<MessageType, HashMap<String, Method>> handlers;
+    private final Map<HandlerType, HashMap<String, Method>> handlers;
 
-    public MessageDispatcherAnnotatedMethodDiscoverImpl(ApplicationContext applicationContext) {
+    public MessageDispatcherAnnotatedHandlerDiscoverImpl(ApplicationContext applicationContext) {
         this.handlers = Map.of(
-                MessageType.COMMAND, new HashMap<>(),
-                MessageType.QUERY, new HashMap<>(),
-                MessageType.NOTIFICATION, new HashMap<>(),
-                MessageType.EVENT, new HashMap<>());
+                HandlerType.COMMAND, new HashMap<>(),
+                HandlerType.QUERY, new HashMap<>(),
+                HandlerType.NOTIFICATION, new HashMap<>(),
+                HandlerType.EVENT, new HashMap<>());
 
         resolveAnnotatedMethods(applicationContext);
     }
@@ -56,40 +56,40 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
         final var listenerMethods = listenerClass.getMethods();
 
         Arrays.stream(listenerMethods)
-                .filter(MessageDispatcherAnnotatedMethodDiscoverImpl::isAnnotationPresent)
+                .filter(MessageDispatcherAnnotatedHandlerDiscoverImpl::isAnnotationPresent)
                 .forEach(method -> {
 
                     if (method.isAnnotationPresent(Command.class)) {
-                        registreHandler(MessageType.COMMAND, method);
+                        registreHandler(HandlerType.COMMAND, method);
                         return;
                     }
 
                     if (method.isAnnotationPresent(Query.class)) {
-                        registreHandler(MessageType.QUERY, method);
+                        registreHandler(HandlerType.QUERY, method);
                         return;
                     }
 
                     if (method.isAnnotationPresent(Event.class)) {
-                        registreHandler(MessageType.EVENT, method);
+                        registreHandler(HandlerType.EVENT, method);
                         return;
                     }
 
                     if (method.isAnnotationPresent(Notification.class)) {
-                        registreHandler(MessageType.NOTIFICATION, method);
+                        registreHandler(HandlerType.NOTIFICATION, method);
                         return;
                     }
 
                     if (method.isAnnotationPresent(MessageHandler.class)) {
                         var annotation = method.getAnnotation(MessageHandler.class);
-                        registreHandler(annotation.messageType(), method);
+                        registreHandler(annotation.handlerType(), method);
                     }
                 });
     }
 
-    private void registreHandler(MessageType messageType, Method method) throws MessageHandlerMultipleInputParametersException, MessageHandlerDuplicatedInputParameterException {
+    private void registreHandler(HandlerType handlerType, Method method) throws MessageHandlerMultipleInputParametersException, MessageHandlerDuplicatedInputParameterException {
         log.debug("Registrando handler {}", method.getName());
-        HandlerValidatorUtil.validate(messageType, method, handlers.get(messageType));
-        handlers.get(messageType).put(method.getParameterTypes()[0].getSimpleName(), method);
+        HandlerValidatorUtil.validate(handlerType, method, handlers.get(handlerType));
+        handlers.get(handlerType).put(method.getParameterTypes()[0].getSimpleName(), method);
     }
 
     private static boolean isAnnotationPresent(Method method) {
@@ -101,8 +101,8 @@ public class MessageDispatcherAnnotatedMethodDiscoverImpl implements MessageDisp
     }
 
     @Override
-    public Method getHandler(MessageType actionType, String parameterType) {
-        var method = handlers.get(actionType).get(parameterType);
+    public Method getHandler(HandlerType handlerType, String parameterType) {
+        var method = handlers.get(handlerType).get(parameterType);
 
         if (method == null) {
             throw new MessageHandlerNotFoundException("Nenhum handler encontrado capaz de processar o tipo: " + parameterType);

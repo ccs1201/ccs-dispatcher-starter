@@ -1,6 +1,6 @@
 package br.com.messagedispatcher.annotation;
 
-import br.com.messagedispatcher.model.MessageType;
+import br.com.messagedispatcher.model.HandlerType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
@@ -21,7 +21,7 @@ import java.lang.annotation.RetentionPolicy;
  * Exemplo: GetProducts, FindOrderById, ListCustomers
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(messageType = MessageType.QUERY)
+@MessageHandler(handlerType = HandlerType.QUERY)
 @Documented
 public @interface Query {
 

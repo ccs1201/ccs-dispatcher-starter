@@ -1,6 +1,6 @@
 package br.com.messagedispatcher.annotation;
 
-import br.com.messagedispatcher.model.MessageType;
+import br.com.messagedispatcher.model.HandlerType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
  * Exemplo: OrderShipped, PaymentReceived
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(messageType = MessageType.NOTIFICATION)
+@MessageHandler(handlerType = HandlerType.NOTIFICATION)
 @Documented
 public @interface Notification {
 

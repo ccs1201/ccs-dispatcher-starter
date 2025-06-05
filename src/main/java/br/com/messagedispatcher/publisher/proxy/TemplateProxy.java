@@ -1,6 +1,6 @@
 package br.com.messagedispatcher.publisher.proxy;
 
-import br.com.messagedispatcher.model.MessageType;
+import br.com.messagedispatcher.model.HandlerType;
 
 public interface TemplateProxy {
 
@@ -17,7 +17,7 @@ public interface TemplateProxy {
      * @return (responseClass) object
      */
     <T> T convertSendAndReceive(String exchange, String routingKey, Object body, Class<T> responseClass,
-                                MessageType messageType);
+                                HandlerType handlerType);
 
 
     /**
@@ -29,5 +29,5 @@ public interface TemplateProxy {
      * @param routingKey - chave de roteamento
      * @param body       - corpo da mensagem
      */
-    void convertAndSend(String exchange, String routingKey, Object body, MessageType messageType);
+    void convertAndSend(String exchange, String routingKey, Object body, HandlerType handlerType);
 }

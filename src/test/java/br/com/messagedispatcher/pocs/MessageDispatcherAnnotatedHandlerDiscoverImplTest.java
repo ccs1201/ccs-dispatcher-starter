@@ -1,13 +1,13 @@
 package br.com.messagedispatcher.pocs;
 
-import br.com.messagedispatcher.beandiscover.impl.MessageDispatcherAnnotatedMethodDiscoverImpl;
+import br.com.messagedispatcher.beandiscover.impl.MessageDispatcherAnnotatedHandlerDiscoverImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class MessageDispatcherAnnotatedMethodDiscoverImplTest {
+public class MessageDispatcherAnnotatedHandlerDiscoverImplTest {
 
     /**
      * Test case for MessageDispatcherAnnotatedMethodDiscover constructor
@@ -20,7 +20,7 @@ public class MessageDispatcherAnnotatedMethodDiscoverImplTest {
     public void test_MessageDispatcherAnnotatedMethodDiscover_Constructor() {
         ApplicationContext mockContext = Mockito.mock(ApplicationContext.class);
 
-        MessageDispatcherAnnotatedMethodDiscoverImpl discover = new MessageDispatcherAnnotatedMethodDiscoverImpl(mockContext);
+        MessageDispatcherAnnotatedHandlerDiscoverImpl discover = new MessageDispatcherAnnotatedHandlerDiscoverImpl(mockContext);
 
         assertNotNull(discover);
     }

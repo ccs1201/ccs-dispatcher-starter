@@ -9,14 +9,14 @@ public final class MessageDispatcherConstants {
         }
 
         private static final String HEADER_PREFIX = "x-message-dispatcher-";
-        public static final String MESSAGE_TYPE = HEADER_PREFIX + "message-type";
-        public static final String MESSAGE_TIMESTAMP = HEADER_PREFIX + "timestamp";
-        public static final String MESSAGE_SOURCE = HEADER_PREFIX + "remoteService";
-        public static final String BODY_TYPE = HEADER_PREFIX + "body-type";
-        public static final String RESPONSE_FROM = HEADER_PREFIX + "response-from";
-        public static final String RESPONSE_TIME_STAMP = HEADER_PREFIX + "response-timestamp";
-        public static final String EXCEPTION_MESSAGE = HEADER_PREFIX + "exception-message";
-        public static final String EXCEPTION_ROOT_CAUSE = HEADER_PREFIX + "exception-root-cause";
-        public static final String FAILED_AT = HEADER_PREFIX + "failed-at";
+        public static final String HANDLER_TYPE_HEADER = HEADER_PREFIX + "handler-type";
+        public static final String MESSAGE_TIMESTAMP_HEADER = HEADER_PREFIX + "timestamp";
+        public static final String MESSAGE_SOURCE_HEADER = HEADER_PREFIX + "remoteService";
+        public static final String BODY_TYPE_HEADER = HEADER_PREFIX + "body-type";
+        public static final String RESPONSE_FROM_HEADER = HEADER_PREFIX + "response-from";
+        public static final String RESPONSE_TIME_STAMP_HEADER = HEADER_PREFIX + "response-timestamp";
+        public static final String EXCEPTION_MESSAGE_HEADER = HEADER_PREFIX + "exception-message";
+        public static final String EXCEPTION_ROOT_CAUSE_HEADER = HEADER_PREFIX + "exception-root-cause";
+        public static final String FAILED_AT_HEADER = HEADER_PREFIX + "failed-at";
     }
 }

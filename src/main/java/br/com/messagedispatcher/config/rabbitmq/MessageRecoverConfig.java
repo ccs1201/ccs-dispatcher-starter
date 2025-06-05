@@ -40,9 +40,9 @@ public class MessageRecoverConfig {
                 }
 
                 Map<String, Object> headers = message.getMessageProperties().getHeaders();
-                headers.put(EXCEPTION_ROOT_CAUSE, rootCause.getClass().getSimpleName());
-                headers.put(EXCEPTION_MESSAGE, rootCause.getMessage());
-                headers.put(FAILED_AT, OffsetDateTime.now());
+                headers.put(EXCEPTION_ROOT_CAUSE_HEADER, rootCause.getClass().getSimpleName());
+                headers.put(EXCEPTION_MESSAGE_HEADER, rootCause.getMessage());
+                headers.put(FAILED_AT_HEADER, OffsetDateTime.now());
                 return headers;
             }
         };

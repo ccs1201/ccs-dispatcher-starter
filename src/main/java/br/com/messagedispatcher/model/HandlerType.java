@@ -1,6 +1,6 @@
 package br.com.messagedispatcher.model;
 
-public enum MessageType {
+public enum HandlerType {
     COMMAND,
     EVENT,
     NOTIFICATION,
