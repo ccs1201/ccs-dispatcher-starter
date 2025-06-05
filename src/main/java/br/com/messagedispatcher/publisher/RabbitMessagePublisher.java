@@ -16,67 +16,54 @@ import static br.com.messagedispatcher.model.MessageType.QUERY;
 public final class RabbitMessagePublisher implements MessagePublisher {
 
     private final TemplateProxy templateProxy;
-    private final MessageDispatcherProperties properties;
+    private final String DEFAULT_EXCHANGE;
+    private final String DEFAULT_ROUTING_KEY;
 
 
     public RabbitMessagePublisher(TemplateProxy templateProxy, MessageDispatcherProperties properties) {
         this.templateProxy = templateProxy;
-        this.properties = properties;
+        this.DEFAULT_EXCHANGE = properties.getExchangeName();
+        this.DEFAULT_ROUTING_KEY = properties.getRoutingKey();
     }
 
-    /**
-     * Publica um evento para a aplicação local através da exchange global.
-     * Atua como um fire and forget, não esperando por uma resposta.
-     * <p>
-     * Publishes an event to local application through the global exchange.
-     * Acts as a fire and forget, not waiting for a response.
-     *
-     * @param body - corpo da mensagem
-     */
     @Override
     public void sendEvent(final Object body) {
-        this.sendEvent(properties.getExchangeName(), properties.getRoutingKey(), body);
+        this.sendEvent(DEFAULT_EXCHANGE, DEFAULT_ROUTING_KEY, body);
     }
 
-    /**
-     * Publica um evento para uma aplicação através da exchange global.
-     * Atua como um fire and forget, não esperando por uma resposta.
-     * <p>
-     * Publishes an event to am application through the global exchange.
-     * Acts as a fire and forget, not waiting for a response.
-     *
-     * @param routingKey - chave de roteamento
-     * @param body       - corpo da mensagem
-     */
     @Override
     public void sendEvent(final String routingKey, final Object body) {
-        this.sendEvent(properties.getExchangeName(), routingKey, body);
+        this.sendEvent(DEFAULT_EXCHANGE, routingKey, body);
     }
 
-    /**
-     * Publica um evento para uma aplicação através da exchange informada.
-     * Atua como um fire and forget, não esperando por uma resposta.
-     * <p>
-     * Publishes an event to an application through the defined exchange.
-     * Acts as a fire and forget, not waiting for a response.
-     *
-     * @param exchange   - nome da exchange
-     * @param routingKey - chave de roteamento
-     * @param body       - corpo da mensagem
-     */
     @Override
     public void sendEvent(final String exchange, final String routingKey, final Object body) {
         this.convertAndSend(exchange, routingKey, body, EVENT);
     }
 
     @Override
+    public void sendCommand(Object body) {
+        this.sendCommand(DEFAULT_EXCHANGE, DEFAULT_ROUTING_KEY);
+    }
+
+    @Override
+    public void sendCommand(String routingKey, Object body) {
+        this.sendCommand(DEFAULT_EXCHANGE, routingKey, body);
+    }
+
+    @Override
+    public void sendCommand(String exchange, String routingKey, Object body) {
+        this.convertAndSend(exchange, routingKey, body, COMMAND);
+    }
+
+    @Override
     public <T> T doCommand(final Object body, final @NonNull Class<T> responseClass) {
-        return this.convertSendAndReceive(properties.getExchangeName(), properties.getRoutingKey(), body, responseClass, COMMAND);
+        return this.convertSendAndReceive(DEFAULT_EXCHANGE, DEFAULT_ROUTING_KEY, body, responseClass, COMMAND);
     }
 
     @Override
     public <T> T doCommand(final String routingKey, final Object body, final @NonNull Class<T> responseClass) {
-        return this.convertSendAndReceive(properties.getExchangeName(), routingKey, body, responseClass, COMMAND);
+        return this.convertSendAndReceive(DEFAULT_EXCHANGE, routingKey, body, responseClass, COMMAND);
     }
 
     @Override
@@ -86,12 +73,12 @@ public final class RabbitMessagePublisher implements MessagePublisher {
 
     @Override
     public <T> T doQuery(final Object body, final @NonNull Class<T> responseClass) {
-        return this.convertSendAndReceive(properties.getExchangeName(), properties.getRoutingKey(), body, responseClass, QUERY);
+        return this.convertSendAndReceive(DEFAULT_EXCHANGE, DEFAULT_ROUTING_KEY, body, responseClass, QUERY);
     }
 
     @Override
     public <T> T doQuery(final String routingKey, final Object body, final @NonNull Class<T> responseClass) {
-        return this.convertSendAndReceive(properties.getExchangeName(), routingKey, body, responseClass, QUERY);
+        return this.convertSendAndReceive(DEFAULT_EXCHANGE, routingKey, body, responseClass, QUERY);
     }
 
     @Override
@@ -101,12 +88,12 @@ public final class RabbitMessagePublisher implements MessagePublisher {
 
     @Override
     public void sendNotification(final Object body) {
-        this.convertAndSend(properties.getExchangeName(), properties.getRoutingKey(), body, NOTIFICATION);
+        this.convertAndSend(DEFAULT_EXCHANGE, DEFAULT_ROUTING_KEY, body, NOTIFICATION);
     }
 
     @Override
     public void sendNotification(final String routingKey, final Object body) {
-        this.convertAndSend(properties.getExchangeName(), routingKey, body, NOTIFICATION);
+        this.convertAndSend(DEFAULT_EXCHANGE, routingKey, body, NOTIFICATION);
     }
 
     private void convertAndSend(String exchangeName, String routingKey, Object body, MessageType messageType) {
