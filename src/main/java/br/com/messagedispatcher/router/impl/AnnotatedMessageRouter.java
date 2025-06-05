@@ -1,8 +1,8 @@
 package br.com.messagedispatcher.router.impl;
 
-import br.com.messagedispatcher.beandiscover.MessageDispatcherAnnotatedMethodDiscover;
+import br.com.messagedispatcher.beandiscover.MessageDispatcherAnnotatedHandlerDiscover;
 import br.com.messagedispatcher.exceptions.MessageRouterMissingHeaderException;
-import br.com.messagedispatcher.model.MessageType;
+import br.com.messagedispatcher.model.HandlerType;
 import br.com.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.BODY_TYPE;
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.MESSAGE_TYPE;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.BODY_TYPE_HEADER;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.HANDLER_TYPE_HEADER;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @SuppressWarnings("unused")
@@ -26,10 +26,10 @@ public class AnnotatedMessageRouter implements MessageRouter {
     private static final Logger log = LoggerFactory.getLogger(AnnotatedMessageRouter.class);
 
     private final ObjectMapper objectMapper;
-    private final MessageDispatcherAnnotatedMethodDiscover annotatedMethodDiscover;
+    private final MessageDispatcherAnnotatedHandlerDiscover annotatedMethodDiscover;
     private final ApplicationContext applicationContext;
 
-    public AnnotatedMessageRouter(ObjectMapper objectMapper, MessageDispatcherAnnotatedMethodDiscover annotatedMethodDiscover,
+    public AnnotatedMessageRouter(ObjectMapper objectMapper, MessageDispatcherAnnotatedHandlerDiscover annotatedMethodDiscover,
                                   ApplicationContext applicationContext) {
         this.objectMapper = objectMapper;
         this.annotatedMethodDiscover = annotatedMethodDiscover;
@@ -39,15 +39,19 @@ public class AnnotatedMessageRouter implements MessageRouter {
     @Override
     public Object routeMessage(Object objectMessage) {
         var message = (Message) objectMessage;
-        var bodyType = message.getMessageProperties().getHeaders().get(BODY_TYPE).toString();
+        var bodyType = message.getMessageProperties().getHeaders().get(BODY_TYPE_HEADER).toString();
 
         if (isEmpty(bodyType)) {
-            throw new MessageRouterMissingHeaderException("Missing " + BODY_TYPE + " header in the message");
+            handleHeaderError(BODY_TYPE_HEADER);
+        }
+
+        if (isEmpty(message.getMessageProperties().getHeader(HANDLER_TYPE_HEADER))) {
+            handleHeaderError(HANDLER_TYPE_HEADER);
         }
 
         try {
-            var handler = annotatedMethodDiscover.getHandler(MessageType
-                    .valueOf(message.getMessageProperties().getHeader(MESSAGE_TYPE)), bodyType);
+            var handler = annotatedMethodDiscover.getHandler(HandlerType
+                    .valueOf(message.getMessageProperties().getHeader(HANDLER_TYPE_HEADER)), bodyType);
 
             var payload = objectMapper.readValue(message.getBody(), handler.getParameterTypes()[0]);
 
@@ -58,6 +62,10 @@ public class AnnotatedMessageRouter implements MessageRouter {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void handleHeaderError(String header) {
+        throw new MessageRouterMissingHeaderException("Missing " + header + " header in the message");
     }
 }
 

@@ -1,6 +1,6 @@
 package br.com.messagedispatcher.annotation;
 
-import br.com.messagedispatcher.model.MessageType;
+import br.com.messagedispatcher.model.HandlerType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
  * Podem ser usados para sincronizar diferentes modelos de dados
  */
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(messageType = MessageType.EVENT)
+@MessageHandler(handlerType = HandlerType.EVENT)
 @Documented
 public @interface Event {
 

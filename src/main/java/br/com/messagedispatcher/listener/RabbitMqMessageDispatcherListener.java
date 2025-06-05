@@ -103,17 +103,17 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
     }
 
     private void setResponseHeaders(Message message) {
-        message.getMessageProperties().setHeader(RESPONSE_TIME_STAMP, LocalDateTime.now());
-        message.getMessageProperties().setHeader(RESPONSE_FROM, EnvironmentUtils.getAppName());
+        message.getMessageProperties().setHeader(RESPONSE_TIME_STAMP_HEADER, LocalDateTime.now());
+        message.getMessageProperties().setHeader(RESPONSE_FROM_HEADER, EnvironmentUtils.getAppName());
     }
 
     private void log(Message message) {
         try {
             log.debug("Mensagem recebida MessageType:{} | BodyType:{} | Body:{}",
                     message.getMessageProperties()
-                            .getHeaders().get(MESSAGE_TYPE),
+                            .getHeaders().get(HANDLER_TYPE_HEADER),
                     message.getMessageProperties()
-                            .getHeaders().get(BODY_TYPE),
+                            .getHeaders().get(BODY_TYPE_HEADER),
                     objectMapper.readValue(message.getBody(), JsonNode.class));
         } catch (IOException e) {
             throw new MessageDispatcherLoggerException("Erro ao gerar logs", e);

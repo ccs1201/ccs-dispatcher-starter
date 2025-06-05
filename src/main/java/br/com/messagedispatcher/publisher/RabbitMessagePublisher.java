@@ -1,15 +1,15 @@
 package br.com.messagedispatcher.publisher;
 
 import br.com.messagedispatcher.config.properties.MessageDispatcherProperties;
-import br.com.messagedispatcher.model.MessageType;
+import br.com.messagedispatcher.model.HandlerType;
 import br.com.messagedispatcher.publisher.proxy.TemplateProxy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import static br.com.messagedispatcher.model.MessageType.COMMAND;
-import static br.com.messagedispatcher.model.MessageType.EVENT;
-import static br.com.messagedispatcher.model.MessageType.NOTIFICATION;
-import static br.com.messagedispatcher.model.MessageType.QUERY;
+import static br.com.messagedispatcher.model.HandlerType.COMMAND;
+import static br.com.messagedispatcher.model.HandlerType.EVENT;
+import static br.com.messagedispatcher.model.HandlerType.NOTIFICATION;
+import static br.com.messagedispatcher.model.HandlerType.QUERY;
 
 
 @Component
@@ -96,11 +96,11 @@ public final class RabbitMessagePublisher implements MessagePublisher {
         this.convertAndSend(DEFAULT_EXCHANGE, routingKey, body, NOTIFICATION);
     }
 
-    private void convertAndSend(String exchangeName, String routingKey, Object body, MessageType messageType) {
-        templateProxy.convertAndSend(exchangeName, routingKey, body, messageType);
+    private void convertAndSend(String exchangeName, String routingKey, Object body, HandlerType handlerType) {
+        templateProxy.convertAndSend(exchangeName, routingKey, body, handlerType);
     }
 
-    private <T> T convertSendAndReceive(String exchangeName, String routingKey, Object body, Class<T> responseClass, MessageType messageType) {
-        return templateProxy.convertSendAndReceive(exchangeName, routingKey, body, responseClass, messageType);
+    private <T> T convertSendAndReceive(String exchangeName, String routingKey, Object body, Class<T> responseClass, HandlerType handlerType) {
+        return templateProxy.convertSendAndReceive(exchangeName, routingKey, body, responseClass, handlerType);
     }
 }
