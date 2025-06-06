@@ -31,18 +31,19 @@ public class RabbitTemplateConfig {
             return message;
         });
 
-        template.setConfirmCallback((correlationData, ack, cause) -> {
-            if (ack) {
-                log.debug("Mensagem entregue ao broker");
-            } else {
-                log.error("Mensagem não confirmada pelo broker: {}", cause);
-            }
-        });
+        if (log.isDebugEnabled()) {
+            template.setConfirmCallback((correlationData, ack, cause) -> {
+                if (ack) {
+                    log.debug("Mensagem entregue ao broker");
+                } else {
+                    log.debug("Mensagem não confirmada pelo broker: {}", cause);
+                }
+            });
 
-        // Configurando retorno de mensagem
-        template.setReturnsCallback(returned -> log.info("Mensagem retornada: {}", returned.getMessage() +
-                " code: " + returned.getReplyCode() +
-                " reason: " + returned.getReplyText()));
+            template.setReturnsCallback(returned -> log.debug("Mensagem retornada: {}", returned.getMessage() +
+                    " code: " + returned.getReplyCode() +
+                    " reason: " + returned.getReplyText()));
+        }
 
         log.info("RabbitTemplate configurado com exchange: {}", properties.getExchangeName() +
                 " e routing key: " + properties.getRoutingKey());
