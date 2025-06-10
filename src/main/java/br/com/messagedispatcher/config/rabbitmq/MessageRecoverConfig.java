@@ -15,7 +15,9 @@ import org.springframework.context.annotation.Configuration;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.*;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.EXCEPTION_MESSAGE_HEADER;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.EXCEPTION_ROOT_CAUSE_HEADER;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.FAILED_AT_HEADER;
 
 @Configuration
 public class MessageRecoverConfig {
