@@ -1,7 +1,6 @@
-package br.com.ccs.dispatcher.util.validator;
+package br.com.messagedispatcher.util.validator;
 
 
-import br.com.messagedispatcher.util.validator.BeanValidatorUtil;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotEmpty;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ public class BeanValidatorUtilTest {
     }
 }
 
+@SuppressWarnings("unused")
 class testeBean {
 
     @NotEmpty

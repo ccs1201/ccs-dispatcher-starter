@@ -1,6 +1,5 @@
-package br.com.ccs.dispatcher.util.httpservlet;
+package br.com.messagedispatcher.util.httpservlet;
 
-import br.com.messagedispatcher.util.httpservlet.RequestContextUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -11,7 +10,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -190,6 +192,7 @@ public class RequestContextUtilTest {
      * Tests the getHeader method when a valid request is present.
      * It verifies that the method returns a map containing the specified header name and value.
      */
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Test
     public void test_getHeader_whenRequestExists() {
         MockHttpServletRequest request = new MockHttpServletRequest();

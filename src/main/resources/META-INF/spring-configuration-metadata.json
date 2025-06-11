@@ -22,10 +22,17 @@
     },
     {
       "name": "message.dispatcher.exchange-type",
-      "type": "java.lang.String",
+      "type": "br.com.messagedispatcher.constants.Types.Exchange",
       "description": "Tipo da exchange RabbitMQ.",
       "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "topic"
+    },
+    {
+      "name": "message.dispatcher.exchangeConsistentHashArguments",
+      "type": "java.util.Map<java.lang.String,java.lang.Object>",
+      "description": "Argumentos para o hash da exchange. Quando tipo for consistent-hash, é obrigatório",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": {}
     },
     {
       "name": "message.dispatcher.routing-key",
@@ -103,6 +110,20 @@
       "description": "Nome da exchange de mensagens de erro.",
       "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": "message.dispatcher.dlx"
+    },
+    {
+      "name": "message.dispatcher.dead-letter-exchange-type",
+      "type": "br.com.messagedispatcher.constants.Types.Exchange",
+      "description": "Tipo da exchange de mensagens de erro.",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": "topic"
+    },
+    {
+      "name": "message.dispatcher.deadLetterExchangeConsistentHashArguments",
+      "type": "java.util.Map<java.lang.String,java.lang.Object>",
+      "description": "Argumentos para o hash da exchange de mensagens de erro. Quando tipo for consistent-hash, é obrigatório",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": {}
     },
     {
       "name": "message.dispatcher.dead-letter-routing-key",

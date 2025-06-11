@@ -1,4 +1,4 @@
-package br.com.ccs.dispatcher.resolver.impl;
+package br.com.messagedispatcher.impl;
 
 import br.com.messagedispatcher.exceptions.MessageRouterProcessingException;
 import br.com.messagedispatcher.model.MockedMessageWrapper;
@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
 public class MockedMessageRouterTest {
 
