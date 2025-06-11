@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.*;
@@ -112,6 +113,10 @@ public class RabbitTemplateProxy implements TemplateProxy {
         messageProperties.setHeader(BODY_TYPE_HEADER, body.getClass().getSimpleName());
         messageProperties.setHeader(HANDLER_TYPE_HEADER, action);
         messageProperties.setHeader(MESSAGE_SOURCE_HEADER, EnvironmentUtils.getAppName());
+
+        if (Objects.isNull(properties.getMappedHeaders())) {
+            return message;
+        }
 
         Arrays.stream(properties.getMappedHeaders())
                 .forEach(mappedHeader ->
