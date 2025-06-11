@@ -17,13 +17,13 @@
 package br.com.messagedispatcher.config.rabbitmq;
 
 import br.com.messagedispatcher.config.properties.MessageDispatcherProperties;
+import br.com.messagedispatcher.util.ExchangeFactoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Declarables;
 import org.springframework.amqp.core.Exchange;
-import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -50,12 +50,12 @@ public class ExchangesQueuesBindingConfig {
     private final Logger log = LoggerFactory.getLogger(ExchangesQueuesBindingConfig.class);
 
     @Bean
-    @SuppressWarnings("unused")
     public Declarables defaultExchangeAndQueue(MessageDispatcherProperties properties) {
-        var exchange = ExchangeBuilder
-                .topicExchange(properties.getExchangeName())
-                .durable(properties.isExchangeDurable())
-                .build();
+        var exchange = ExchangeFactoryUtil
+                .buildExchange(properties.getExchangeName(),
+                        properties.isExchangeDurable(),
+                        properties.getExchangeType(),
+                        properties.getExchangeConsistentHashArguments());
 
         var queue = QueueBuilder
                 .durable(properties.getQueueName())
@@ -77,12 +77,12 @@ public class ExchangesQueuesBindingConfig {
     }
 
     @Bean
-    @SuppressWarnings("unused")
     public Declarables deadLetterExchangeAndQueue(MessageDispatcherProperties properties) {
-        var exchange = ExchangeBuilder
-                .topicExchange(properties.getDeadLetterExchangeName())
-                .durable(properties.isDeadLetterExchangeDurable())
-                .build();
+        var exchange = ExchangeFactoryUtil
+                .buildExchange(properties.getDeadLetterExchangeName(),
+                        properties.isDeadLetterExchangeDurable(),
+                        properties.getDeadLetterExchangeType(),
+                        properties.getDeadLetterExchangeConsistentHashArguments());
 
         var queue = QueueBuilder
                 .durable(properties.getDeadLetterQueueName())
