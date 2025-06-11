@@ -17,6 +17,8 @@
 package br.com.messagedispatcher.config.properties;
 
 import br.com.messagedispatcher.config.MessageDispatcherAutoConfig;
+import br.com.messagedispatcher.constants.Types;
+import br.com.messagedispatcher.constants.Types.Exchange;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Arrays;
+import java.util.Map;
 
 
 /**
@@ -145,7 +148,12 @@ public class MessageDispatcherProperties {
     /**
      * Tipo da exchange. Padrão é 'topic'
      */
-    private String exchangeType = "topic";
+    private Types.Exchange exchangeType = Exchange.TOPIC;
+
+    /**
+     * Argumentos da exchange obrigatório quando o type = {@code Types.exchange.CONSISTENT_HASH} . Padrão é null
+     */
+    private Map<String, Object> exchangeConsistentHashArguments;
 
     /**
      * Nome da fila RabbitMQ. Se não configurado, usa o nome da aplicação
@@ -177,6 +185,16 @@ public class MessageDispatcherProperties {
      * Nome da exchange de dead letter. Padrão é '{exchange}.dlq'
      */
     private String deadLetterExchangeName;
+
+    /**
+     * Tipo da exchange de dead letter. Padrão é 'topic'
+     */
+    private Types.Exchange deadLetterExchangeType = Exchange.TOPIC;
+
+    /**
+     * Argumentos da exchange de dead letter obrigatório quando o type = {@code Types.exchange.CONSISTENT_HASH} . Padrão é null
+     */
+    private Map<String, Object> deadLetterExchangeConsistentHashArguments;
 
     /**
      * Nome da fila de dead letter. Padrão é '{queue}.dlq'
@@ -256,12 +274,12 @@ public class MessageDispatcherProperties {
         this.exchangeName = exchangeName.trim();
     }
 
-    public String getExchangeType() {
+    public Types.Exchange getExchangeType() {
         return exchangeType;
     }
 
-    public void setExchangeType(String exchangeType) {
-        this.exchangeType = exchangeType.trim();
+    public void setExchangeType(Types.Exchange exchangeType) {
+        this.exchangeType = exchangeType;
     }
 
     public String getRoutingKey() {
@@ -461,6 +479,30 @@ public class MessageDispatcherProperties {
 
     public int maxConsumers() {
         return Integer.parseInt(getConcurrency().split("-")[1]);
+    }
+
+    public Exchange getDeadLetterExchangeType() {
+        return deadLetterExchangeType;
+    }
+
+    public void setDeadLetterExchangeType(Exchange deadLetterExchangeType) {
+        this.deadLetterExchangeType = deadLetterExchangeType;
+    }
+
+    public Map<String, Object> getExchangeConsistentHashArguments() {
+        return exchangeConsistentHashArguments;
+    }
+
+    public void setExchangeConsistentHashArguments(Map<String, Object> exchangeConsistentHashArguments) {
+        this.exchangeConsistentHashArguments = exchangeConsistentHashArguments;
+    }
+
+    public Map<String, Object> getDeadLetterExchangeConsistentHashArguments() {
+        return deadLetterExchangeConsistentHashArguments;
+    }
+
+    public void setDeadLetterExchangeConsistentHashArguments(Map<String, Object> deadLetterExchangeConsistentHashArguments) {
+        this.deadLetterExchangeConsistentHashArguments = deadLetterExchangeConsistentHashArguments;
     }
 
     /**
