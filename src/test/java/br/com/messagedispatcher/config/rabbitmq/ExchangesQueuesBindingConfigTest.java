@@ -106,7 +106,7 @@ public class ExchangesQueuesBindingConfigTest {
      */
     @Test
     public void test_defaultExchangeAndQueue_createsCorrectDeclarables() {
-        // Arrange
+
         ExchangesQueuesBindingConfig config = new ExchangesQueuesBindingConfig();
 
         when(properties.getExchangeType()).thenReturn(DIRECT);
@@ -117,10 +117,8 @@ public class ExchangesQueuesBindingConfigTest {
         when(properties.getDeadLetterRoutingKey()).thenReturn("testDLRK");
         when(properties.getRoutingKey()).thenReturn("testRoutingKey");
 
-        // Act
         Declarables result = config.defaultExchangeAndQueue(properties);
 
-        // Assert
         assertNotNull(result);
         assertEquals(3, result.getDeclarables().size());
         assertTrue(result.getDeclarables().stream().anyMatch(d -> d instanceof Exchange));
