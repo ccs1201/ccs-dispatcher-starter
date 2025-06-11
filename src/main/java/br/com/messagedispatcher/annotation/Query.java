@@ -1,30 +1,16 @@
 package br.com.messagedispatcher.annotation;
 
 import br.com.messagedispatcher.model.HandlerType;
-import org.springframework.core.annotation.AliasFor;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.*;
 
 /**
- * Queries são executados e devem retornar um resultado.
- * <p>
- * Queries devem ser idempotentes, ou seja, podem ser executados mais de uma vez com o mesmo resultado.
- * <p>
- * Apenas recuperam dados do sistema (read operations)
- * <p>
- * Não causam mudanças de estado
- * <p>
- * São otimizadas para leitura
- * <p>
- * Exemplo: GetProducts, FindOrderById, ListCustomers
+ * Anotação para marcar métodos que processam mensagens do tipo Query.
+ * Annotation to mark methods that handle Query messages.
  */
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(handlerType = HandlerType.QUERY)
 @Documented
+@MessageHandler(handlerType = HandlerType.QUERY)
 public @interface Query {
-
-    @AliasFor(annotation = MessageHandler.class)
-    Class<?> kind() default Object.class;
 }

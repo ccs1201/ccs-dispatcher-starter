@@ -109,7 +109,7 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
 
     private void log(Message message) {
         try {
-            log.debug("Mensagem recebida MessageType:{} | BodyType:{} | Body:{}",
+            log.debug("Mensagem recebida HandlerType:{} | BodyType:{} | Body:{}",
                     message.getMessageProperties()
                             .getHeaders().get(HANDLER_TYPE_HEADER),
                     message.getMessageProperties()

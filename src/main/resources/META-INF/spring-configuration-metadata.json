@@ -126,6 +126,13 @@
       "defaultValue": {}
     },
     {
+      "name": "message.dispatcher.dead-letter-exchange-type",
+      "type": "br.com.messagedispatcher.constants.MessageDispatcherConstants.",
+      "description": "Tipo da exchange de mensagens de erro.",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": "topic"
+    },
+    {
       "name": "message.dispatcher.dead-letter-routing-key",
       "type": "java.lang.String",
       "description": "Routing key para mensagens de erro.",

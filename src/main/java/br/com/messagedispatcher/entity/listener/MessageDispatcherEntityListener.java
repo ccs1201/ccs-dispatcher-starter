@@ -7,9 +7,11 @@ import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnClass(name = "org.springframework.data.jpa.repository.JpaRepository")
 public class MessageDispatcherEntityListener {
 
     private static final Logger log = LoggerFactory.getLogger(MessageDispatcherEntityListener.class);
