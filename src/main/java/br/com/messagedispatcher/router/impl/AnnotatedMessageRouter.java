@@ -5,8 +5,6 @@ import br.com.messagedispatcher.exceptions.MessageRouterMissingHeaderException;
 import br.com.messagedispatcher.model.HandlerType;
 import br.com.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
@@ -18,12 +16,9 @@ import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Mess
 import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.HANDLER_TYPE_HEADER;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
-@SuppressWarnings("unused")
 @Component
 @ConditionalOnProperty(value = "message.dispatcher.router", havingValue = "annotated", matchIfMissing = true)
 public class AnnotatedMessageRouter implements MessageRouter {
-
-    private static final Logger log = LoggerFactory.getLogger(AnnotatedMessageRouter.class);
 
     private final ObjectMapper objectMapper;
     private final MessageDispatcherAnnotatedHandlerDiscover annotatedMethodDiscover;
@@ -65,7 +60,7 @@ public class AnnotatedMessageRouter implements MessageRouter {
     }
 
     private void handleHeaderError(String header) {
-        throw new MessageRouterMissingHeaderException("Missing " + header + " header in the message");
+        throw new MessageRouterMissingHeaderException("Header " + header + " ausente na mensagem.");
     }
 }
 
