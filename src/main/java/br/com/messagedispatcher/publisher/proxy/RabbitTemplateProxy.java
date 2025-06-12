@@ -4,8 +4,8 @@ import br.com.messagedispatcher.config.properties.MessageDispatcherProperties;
 import br.com.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException;
 import br.com.messagedispatcher.exceptions.MessagePublisherException;
 import br.com.messagedispatcher.exceptions.MessagePublisherTimeOutException;
-import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.model.HandlerType;
+import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.util.EnvironmentUtils;
 import br.com.messagedispatcher.util.httpservlet.RequestContextUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,10 +20,13 @@ import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.*;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.BODY_TYPE_HEADER;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.HANDLER_TYPE_HEADER;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.MESSAGE_SOURCE_HEADER;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.MESSAGE_TIMESTAMP_HEADER;
+import static java.util.Objects.nonNull;
 
 /**
  * Classe de proxy para o {@link RabbitTemplate} com métodos prontos
@@ -77,8 +80,8 @@ public class RabbitTemplateProxy implements TemplateProxy {
                     rabbitTemplate.convertSendAndReceive(exchange,
                             routingKey,
                             body,
-                            m ->
-                                    setMessageHeaders(body, m, handlerType)));
+                            message ->
+                                    setMessageHeaders(body, message, handlerType, exchange, routingKey)));
 
             var remoteInvocationResult = objectMapper
                     .convertValue(response.orElseThrow(() ->
@@ -103,26 +106,41 @@ public class RabbitTemplateProxy implements TemplateProxy {
         rabbitTemplate.convertAndSend(exchange,
                 routingKey,
                 body,
-                m ->
-                        setMessageHeaders(body, m, handlerType));
+                message ->
+                        setMessageHeaders(body, message, handlerType, exchange, routingKey));
     }
 
-    private Message setMessageHeaders(Object body, Message message, HandlerType handlerType) {
+    private Message setMessageHeaders(final Object body, final Message message, final HandlerType handlerType,
+                                      final String exchange, final String routingKey) {
+
         var messageProperties = message.getMessageProperties();
         messageProperties.setHeader(MESSAGE_TIMESTAMP_HEADER, OffsetDateTime.now());
         messageProperties.setHeader(BODY_TYPE_HEADER, body.getClass().getSimpleName());
         messageProperties.setHeader(HANDLER_TYPE_HEADER, handlerType);
         messageProperties.setHeader(MESSAGE_SOURCE_HEADER, EnvironmentUtils.getAppName());
 
-        if (Objects.isNull(properties.getMappedHeaders())) {
-            return message;
+        if (nonNull(properties.getMappedHeaders())) {
+            Arrays.stream(properties.getMappedHeaders())
+                    .forEach(mappedHeader ->
+                            RequestContextUtil.getHeader(mappedHeader)
+                                    .ifPresent(headerValue ->
+                                            messageProperties.setHeader(mappedHeader, headerValue)));
         }
 
-        Arrays.stream(properties.getMappedHeaders())
-                .forEach(mappedHeader ->
-                        RequestContextUtil.getHeader(mappedHeader)
-                                .ifPresent(headerValue ->
-                                        messageProperties.setHeader(mappedHeader, headerValue)));
+        if (log.isDebugEnabled()) {
+            log.debug("""
+                            
+                                Mensagem enviada ao Broker:
+                                Exchange: {}
+                                RoutingKey: {}
+                                Headers: {}
+                                Body: {}
+                            """,
+                    exchange,
+                    routingKey,
+                    message.getMessageProperties().getHeaders(),
+                    body);
+        }
 
         return message;
     }
