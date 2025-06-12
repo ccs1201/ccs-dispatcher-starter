@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -45,6 +47,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * @since 09/05/2025
  */
 
+@Component
+@ConditionalOnProperty(prefix = "message.dispatcher", name = "default-listener-enable", havingValue = "true", matchIfMissing = true)
 public class RabbitMqMessageDispatcherListener implements MessageDispatcherListener {
 
     private final Logger log = LoggerFactory.getLogger(RabbitMqMessageDispatcherListener.class);
@@ -58,7 +62,7 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
     public RabbitMqMessageDispatcherListener(MessageRouter messageRouter, ObjectMapper objectMapper) {
         this.messageRouter = messageRouter;
         this.objectMapper = objectMapper;
-        log.debug("MessageDispatcherListener inicializado com o MessageRouter: {} ", messageRouter.getClass().getSimpleName());
+        log.debug("RabbitMqMessageDispatcherListener inicializado com o MessageRouter: {} ", messageRouter.getClass().getSimpleName());
     }
 
     @RabbitListener(queues = "#{@messageDispatcherProperties.queueName}",

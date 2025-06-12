@@ -16,14 +16,10 @@
 
 package br.com.messagedispatcher.config;
 
-import br.com.messagedispatcher.MessageDispatcherListener;
 import br.com.messagedispatcher.config.rabbitmq.ExchangesQueuesBindingConfig;
 import br.com.messagedispatcher.listener.RabbitMqMessageDispatcherListener;
-import br.com.messagedispatcher.router.MessageRouter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,10 +36,5 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureBefore({RabbitAutoConfiguration.class, ExchangesQueuesBindingConfig.class})
 @ComponentScan(basePackages = "br.com.messagedispatcher")
 public class MessageDispatcherAutoConfig {
-
-    @Bean
-    public MessageDispatcherListener messageDispatcherListener(MessageRouter messageRouter, ObjectMapper objectMapper) {
-        return new RabbitMqMessageDispatcherListener(messageRouter, objectMapper);
-    }
 
 }
