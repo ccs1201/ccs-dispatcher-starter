@@ -1,32 +1,16 @@
 package br.com.messagedispatcher.annotation;
 
 import br.com.messagedispatcher.model.HandlerType;
-import org.springframework.core.annotation.AliasFor;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.*;
 
 /**
- * Notificações são mensagens que avisam (notificam) sistemas sobre eventos que ocorreram
- * em outros sistemas.
- * <p>
- * Notificações são intra-domínio, ou seja, são publicadas no mesmo domínio (exchange)
- * que a aplicação pertence.
- * <p>
- * Informam sobre mudanças no sistema
- * <p>
- * Não carregam dados completos, apenas referências
- * <p>
- * Usadas para comunicação entre diferentes partes do sistema
- * <p>
- * Exemplo: OrderShipped, PaymentReceived
+ * Anotação para marcar métodos que processam mensagens do tipo Notification.
+ * Annotation to mark methods that handle Notification messages.
  */
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@MessageHandler(handlerType = HandlerType.NOTIFICATION)
 @Documented
+@MessageHandler(handlerType = HandlerType.NOTIFICATION)
 public @interface Notification {
-
-    @AliasFor(annotation = MessageHandler.class)
-    Class<?> kind() default Object.class;
 }

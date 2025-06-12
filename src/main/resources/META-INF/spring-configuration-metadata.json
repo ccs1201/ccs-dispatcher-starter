@@ -126,6 +126,13 @@
       "defaultValue": {}
     },
     {
+      "name": "message.dispatcher.dead-letter-exchange-type",
+      "type": "br.com.messagedispatcher.constants.MessageDispatcherConstants.",
+      "description": "Tipo da exchange de mensagens de erro.",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": "topic"
+    },
+    {
       "name": "message.dispatcher.dead-letter-routing-key",
       "type": "java.lang.String",
       "description": "Routing key para mensagens de erro.",
@@ -194,6 +201,13 @@
       "description": "Implementação de MessageRouter que deve ser usada no MessageDispatcherListener.",
       "sourceType": "br.com.messagedispatcher.router.MessageRouter",
       "defaultValue": "annotated"
+    },
+    {
+      "name": "message.dispatcher.default-listener-enable",
+      "type": "java.lang.Boolean",
+      "description": "Habilita o MessageDispatcherListener padrão.",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": true
     }
   ],
   "hints": [

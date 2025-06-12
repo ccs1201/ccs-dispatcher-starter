@@ -107,11 +107,11 @@ public class RabbitTemplateProxy implements TemplateProxy {
                         setMessageHeaders(body, m, handlerType));
     }
 
-    private Message setMessageHeaders(Object body, Message message, HandlerType action) {
+    private Message setMessageHeaders(Object body, Message message, HandlerType handlerType) {
         var messageProperties = message.getMessageProperties();
         messageProperties.setHeader(MESSAGE_TIMESTAMP_HEADER, OffsetDateTime.now());
         messageProperties.setHeader(BODY_TYPE_HEADER, body.getClass().getSimpleName());
-        messageProperties.setHeader(HANDLER_TYPE_HEADER, action);
+        messageProperties.setHeader(HANDLER_TYPE_HEADER, handlerType);
         messageProperties.setHeader(MESSAGE_SOURCE_HEADER, EnvironmentUtils.getAppName());
 
         if (Objects.isNull(properties.getMappedHeaders())) {

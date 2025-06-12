@@ -250,6 +250,19 @@ public class MessageDispatcherProperties {
      */
     private boolean returnExceptions = true;
 
+    /**
+     * Indica se o listener padrão deve ser habilitado. Padrão é true
+     */
+    private boolean defaultListenerEnable = true;
+
+    public boolean isDefaultListenerEnable() {
+        return defaultListenerEnable;
+    }
+
+    public void setDefaultListenerEnable(boolean defaultListenerEnable) {
+        this.defaultListenerEnable = defaultListenerEnable;
+    }
+
     public long getReplyTimeOut() {
         return replyTimeOut;
     }
