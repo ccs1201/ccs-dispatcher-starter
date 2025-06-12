@@ -177,7 +177,7 @@
     {
       "name": "message.dispatcher.reply-timeout",
       "type": "java.lang.long",
-      "description": "Tempo máximo de espera por uma resposta em mile segundos. Padrão é 10_000",
+      "description": "Tempo máximo de espera por uma resposta em Milisegundos. Padrão é 10_000",
       "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": 10000
     },
@@ -206,6 +206,13 @@
       "name": "message.dispatcher.default-listener-enable",
       "type": "java.lang.Boolean",
       "description": "Habilita o MessageDispatcherListener padrão.",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "message.dispatcher.logging.messagerouter.logging-enable",
+      "type": "java.lang.Boolean",
+      "description": "Habilita o logging via spring AOP do MessageRouter.",
       "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": true
     }
