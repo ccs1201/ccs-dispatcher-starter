@@ -25,7 +25,6 @@ public class RabbitTemplateConfig {
         template.setRoutingKey(properties.getRoutingKey());
         template.setMandatory(true);
         template.setReplyTimeout(properties.getReplyTimeOut());
-        template.setTaskExecutor(Executors.newVirtualThreadPerTaskExecutor());
         template.addBeforePublishPostProcessors(message -> {
             message.getMessageProperties().getHeaders().remove("__TypeId__");
             return message;
