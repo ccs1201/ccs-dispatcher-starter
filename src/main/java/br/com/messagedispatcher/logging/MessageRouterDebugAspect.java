@@ -25,8 +25,16 @@ public class MessageRouterDebugAspect {
     public MessageRouterDebugAspect(ObjectMapper objectMapper, MessageConverter messageConverter) {
         this.mapper = objectMapper;
         this.messageConverter = messageConverter;
-        log.warn("\n\n########### Message Dispatcher com modo DEBUG ativo ###########\n");
-        log.info("MessageRouterDebugAspect inicializado e ativo, as mensagens roteadas no log de depuração serão exibidas");
+        log.warn("""
+                
+                    
+                    ########################################## Message Router com modo DEBUG ativo ##########################################
+                    
+                    Mensagens roteadas serão exibidas no log de depuração.
+                    Para desativar o modo debug, altere a propriedade 'message.dispatcher.logging.messagerouter.logging-enable' para 'false'
+                    
+                    #########################################################################################################################
+                """);
     }
 
     @Pointcut("execution(* br.com.messagedispatcher.router.MessageRouter.routeMessage(..))")
