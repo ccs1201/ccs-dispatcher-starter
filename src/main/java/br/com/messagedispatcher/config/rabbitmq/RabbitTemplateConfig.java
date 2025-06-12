@@ -15,7 +15,10 @@ public class RabbitTemplateConfig {
     private final Logger log = LoggerFactory.getLogger(RabbitTemplateConfig.class);
 
     @Bean
-    protected RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory, final MessageConverter messageConverter, final MessageDispatcherProperties properties) {
+    protected RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory,
+                                            final MessageConverter messageConverter,
+                                            final MessageDispatcherProperties properties) {
+
         log.debug("Configurando RabbitTemplate");
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter);
@@ -23,6 +26,10 @@ public class RabbitTemplateConfig {
         template.setRoutingKey(properties.getRoutingKey());
         template.setMandatory(true);
         template.setReplyTimeout(properties.getReplyTimeOut());
+
+        //todo
+//        template.setReplyErrorHandler(); //estudar isto
+
         template.addBeforePublishPostProcessors(message -> {
             message.getMessageProperties().getHeaders().remove("__TypeId__");
             return message;
@@ -31,7 +38,7 @@ public class RabbitTemplateConfig {
         if (log.isDebugEnabled()) {
             template.setConfirmCallback((correlationData, ack, cause) -> {
                 if (ack) {
-                    log.debug("Mensagem entregue ao broker");
+                    log.debug("Mensagem confirmada pelo broker: {}", ack);
                 } else {
                     log.debug("Mensagem não confirmada pelo broker: {}", cause);
                 }

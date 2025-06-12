@@ -19,6 +19,7 @@ package br.com.messagedispatcher.config.properties;
 import br.com.messagedispatcher.config.MessageDispatcherAutoConfig;
 import br.com.messagedispatcher.constants.Types;
 import br.com.messagedispatcher.constants.Types.Exchange;
+import br.com.messagedispatcher.exceptions.MessageDispatcherBeanResolutionException;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -32,6 +33,8 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.Arrays;
 import java.util.Map;
+
+import static java.util.Objects.isNull;
 
 
 /**
@@ -95,20 +98,29 @@ public class MessageDispatcherProperties {
     public void init() {
         final Logger log = LoggerFactory.getLogger(MessageDispatcherProperties.class);
         // Se não foram configurados, criar nomes padrão para DLQ
-        if (deadLetterQueueName == null) {
+        if (isNull(deadLetterQueueName)) {
             deadLetterQueueName = queueName.concat(".dlq");
         }
-        if (deadLetterExchangeName == null) {
+        if (isNull(deadLetterExchangeName)) {
             deadLetterExchangeName = exchangeName.replace(".ex", ".dlx");
         }
 
-        if (deadLetterRoutingKey == null) {
+        if (isNull(deadLetterRoutingKey)) {
             deadLetterRoutingKey = deadLetterQueueName;
         }
 
-        if (routingKey == null) {
+        if (isNull(routingKey)) {
             routingKey = queueName;
         }
+
+        if (this.exchangeType == Exchange.CONSISTENT_HASH) {
+            if (isNull(this.exchangeConsistentHashArguments)) {
+                throw new MessageDispatcherBeanResolutionException("Quando a exchange é do tipo ConsistenHash é " +
+                        "obrigatório informar o argumento exchangeConsistentHashArguments");
+            }
+        }
+
+        this.queueName = this.queueName.concat(".inbox");
 
         getMappedHeaders();
 
