@@ -2,7 +2,6 @@ package br.com.messagedispatcher.router.impl;
 
 import br.com.messagedispatcher.beandiscover.MessageDispatcherAnnotatedHandlerDiscover;
 import br.com.messagedispatcher.exceptions.MessageRouterMissingHeaderException;
-import br.com.messagedispatcher.model.HandlerType;
 import br.com.messagedispatcher.router.MessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.Message;
@@ -11,10 +10,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.BODY_TYPE_HEADER;
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.HANDLER_TYPE_HEADER;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType.valueOf;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Headers.BODY_TYPE;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Headers.HANDLER_TYPE;
+import static java.util.Objects.isNull;
 
 @Component
 @ConditionalOnProperty(value = "message.dispatcher.router", havingValue = "annotated", matchIfMissing = true)
@@ -34,23 +35,23 @@ public class AnnotatedMessageRouter implements MessageRouter {
     @Override
     public Object routeMessage(Object objectMessage) {
         var message = (Message) objectMessage;
-        var bodyType = message.getMessageProperties().getHeaders().get(BODY_TYPE_HEADER).toString();
+        var bodyType = message.getMessageProperties().getHeaders().get(BODY_TYPE.getHeaderName());
+        var handlerType = Optional.ofNullable(message.getMessageProperties().getHeaders().get(HANDLER_TYPE.getHeaderName()));
 
-        if (isEmpty(bodyType)) {
-            handleHeaderError(BODY_TYPE_HEADER);
+        if (isNull(bodyType)) {
+            handleHeaderError(BODY_TYPE.getHeaderName());
         }
 
-        if (isEmpty(message.getMessageProperties().getHeader(HANDLER_TYPE_HEADER))) {
-            handleHeaderError(HANDLER_TYPE_HEADER);
+        if (handlerType.isEmpty()) {
+            handleHeaderError(HANDLER_TYPE.getHeaderName());
         }
 
         try {
-            var handler = annotatedMethodDiscover.getHandler(HandlerType
-                    .valueOf(message.getMessageProperties().getHeader(HANDLER_TYPE_HEADER)), bodyType);
+            var handlerMethod = annotatedMethodDiscover.getHandler(valueOf(handlerType.get().toString()), bodyType.toString());
 
-            var payload = objectMapper.readValue(message.getBody(), handler.getParameterTypes()[0]);
+            var payload = objectMapper.readValue(message.getBody(), handlerMethod.getParameterTypes()[0]);
 
-            return handler.invoke(applicationContext.getBean(handler.getDeclaringClass()), payload);
+            return handlerMethod.invoke(applicationContext.getBean(handlerMethod.getDeclaringClass()), payload);
 
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e.getTargetException());

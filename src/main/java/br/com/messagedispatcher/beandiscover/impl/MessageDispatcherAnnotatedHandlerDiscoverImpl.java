@@ -1,15 +1,14 @@
 package br.com.messagedispatcher.beandiscover.impl;
 
-import br.com.messagedispatcher.beandiscover.MessageDispatcherAnnotatedHandlerDiscover;
-import br.com.messagedispatcher.exceptions.MessageHandlerDuplicatedInputParameterException;
-import br.com.messagedispatcher.exceptions.MessageHandlerMultipleInputParametersException;
-import br.com.messagedispatcher.exceptions.MessageHandlerNotFoundException;
-import br.com.messagedispatcher.model.HandlerType;
 import br.com.messagedispatcher.annotation.Command;
 import br.com.messagedispatcher.annotation.Event;
 import br.com.messagedispatcher.annotation.MessageHandler;
 import br.com.messagedispatcher.annotation.Notification;
 import br.com.messagedispatcher.annotation.Query;
+import br.com.messagedispatcher.beandiscover.MessageDispatcherAnnotatedHandlerDiscover;
+import br.com.messagedispatcher.exceptions.MessageHandlerDuplicatedInputParameterException;
+import br.com.messagedispatcher.exceptions.MessageHandlerMultipleInputParametersException;
+import br.com.messagedispatcher.exceptions.MessageHandlerNotFoundException;
 import br.com.messagedispatcher.util.validator.HandlerValidatorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +20,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType;
 
 @SuppressWarnings("unused")
 @Component
