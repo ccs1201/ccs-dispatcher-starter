@@ -1,4 +1,4 @@
-package br.com.messagedispatcher.entity.listener;
+package br.com.messagedispatcher.listener;
 
 import br.com.messagedispatcher.annotation.EntityEventPublishes;
 import br.com.messagedispatcher.publisher.MessagePublisher;
