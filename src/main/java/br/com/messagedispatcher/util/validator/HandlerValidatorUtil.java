@@ -3,10 +3,11 @@ package br.com.messagedispatcher.util.validator;
 import br.com.messagedispatcher.exceptions.MessageHandlerDuplicatedInputParameterException;
 import br.com.messagedispatcher.exceptions.MessageHandlerMultipleInputParametersException;
 import br.com.messagedispatcher.exceptions.MessageHandlerNoInputParameterException;
-import br.com.messagedispatcher.model.HandlerType;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType;
 
 public final class HandlerValidatorUtil {
 

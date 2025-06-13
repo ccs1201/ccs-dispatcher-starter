@@ -1,16 +1,12 @@
 package br.com.messagedispatcher.publisher;
 
 import br.com.messagedispatcher.config.properties.MessageDispatcherProperties;
-import br.com.messagedispatcher.model.HandlerType;
 import br.com.messagedispatcher.publisher.proxy.TemplateProxy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import static br.com.messagedispatcher.model.HandlerType.COMMAND;
-import static br.com.messagedispatcher.model.HandlerType.EVENT;
-import static br.com.messagedispatcher.model.HandlerType.NOTIFICATION;
-import static br.com.messagedispatcher.model.HandlerType.QUERY;
-
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType.*;
 
 @Component
 public final class RabbitMessagePublisher implements MessagePublisher {

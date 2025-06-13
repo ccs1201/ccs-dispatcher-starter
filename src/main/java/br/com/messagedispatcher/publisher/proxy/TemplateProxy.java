@@ -1,6 +1,6 @@
 package br.com.messagedispatcher.publisher.proxy;
 
-import br.com.messagedispatcher.model.HandlerType;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType;
 
 public interface TemplateProxy {
 

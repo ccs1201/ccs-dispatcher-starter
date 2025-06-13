@@ -1,6 +1,6 @@
 package br.com.messagedispatcher.annotation;
 
-import br.com.messagedispatcher.model.HandlerType;
+import br.com.messagedispatcher.constants.MessageDispatcherConstants;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -22,7 +22,7 @@ public @interface MessageHandler {
      * Tipo de mensagem que o método processa (command, query, notification ou event).
      * Type of message that's handler process (command, query, notification or event).
      */
-    HandlerType handlerType();
+    MessageDispatcherConstants.HandlerType handlerType();
 
     /**
      * Tipo de Payload que este handler processa
