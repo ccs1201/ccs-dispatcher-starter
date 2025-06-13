@@ -29,11 +29,11 @@ public class RabbitListenerErrorHandlerAutoConfig {
     @Bean
     public RabbitListenerErrorHandler messageDispatcherErrorHandler() {
         return (amqpMessage, channel, message, exception) -> {
-            var handlerType = amqpMessage.getMessageProperties().getHeaders().get(Headers.HANDLER_TYPE);
+            var handlerType = amqpMessage.getMessageProperties().getHeaders().get(Headers.HANDLER_TYPE.getHeaderName());
 
             incrementRetryCount(amqpMessage);
 
-            if (nonNull(handlerType) && retryableMessageTypes.contains(handlerType) && shouldReply(amqpMessage)) {
+            if (nonNull(handlerType) && retryableMessageTypes.contains(handlerType.toString()) && shouldReply(amqpMessage)) {
                 return MessageDispatcherRemoteInvocationResult.of(getRootCause(exception));
             } else {
                 log.error("Erro processando mensagem do tipo: {}", handlerType, exception);

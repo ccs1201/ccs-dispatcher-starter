@@ -4,11 +4,11 @@ import br.com.messagedispatcher.config.properties.MessageDispatcherProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EnvironmentUtils {
+public class MessageDispatcherUtils {
 
     private static String appName;
 
-    public EnvironmentUtils(MessageDispatcherProperties properties) {
+    public MessageDispatcherUtils(MessageDispatcherProperties properties) {
         appName = properties.getRoutingKey();
     }
 

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType;
+import static java.util.Objects.isNull;
 
 @SuppressWarnings("unused")
 @Component
@@ -105,7 +106,7 @@ public class MessageDispatcherAnnotatedHandlerDiscoverImpl implements MessageDis
     public Method getHandler(HandlerType handlerType, String parameterType) {
         var method = handlers.get(handlerType).get(parameterType);
 
-        if (method == null) {
+        if (isNull(method)) {
             throw new MessageHandlerNotFoundException("Nenhum handler encontrado capaz de processar o tipo: " + parameterType);
         }
 

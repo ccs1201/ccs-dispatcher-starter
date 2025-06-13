@@ -7,8 +7,9 @@ public class MessageDispatcherRemoteProcessException extends MessageDispatcherRu
     private HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
     private final String remoteService;
 
+
     public MessageDispatcherRemoteProcessException(Throwable cause, String remoteService) {
-        super(cause);
+        super(cause.getMessage(), cause);
         this.remoteService = remoteService;
     }
 

@@ -1,11 +1,12 @@
 package br.com.messagedispatcher.publisher.proxy;
 
 import br.com.messagedispatcher.config.properties.MessageDispatcherProperties;
-import br.com.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException;
+import br.com.messagedispatcher.exceptions.MessageDispatcherNoRemoteResponseException;
+import br.com.messagedispatcher.exceptions.MessageDispatcherRemoteResultException;
 import br.com.messagedispatcher.exceptions.MessagePublisherException;
 import br.com.messagedispatcher.exceptions.MessagePublisherTimeOutException;
 import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
-import br.com.messagedispatcher.util.EnvironmentUtils;
+import br.com.messagedispatcher.util.MessageDispatcherUtils;
 import br.com.messagedispatcher.util.httpservlet.RequestContextUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -83,13 +84,14 @@ public class RabbitTemplateProxy implements TemplateProxy {
 
             var remoteInvocationResult = objectMapper
                     .convertValue(response.orElseThrow(() ->
-                            new MessageDispatcherRemoteProcessException(HttpStatus.FAILED_DEPENDENCY, "Nenhuma resposta recebida do consumidor", routingKey)), MessageDispatcherRemoteInvocationResult.class);
+                            new MessageDispatcherNoRemoteResponseException(HttpStatus.FAILED_DEPENDENCY, routingKey)),
+                            MessageDispatcherRemoteInvocationResult.class);
 
             if (log.isDebugEnabled()) {
                 log.debug("Resposta recebida: {}", remoteInvocationResult);
             }
             if (remoteInvocationResult.hasException()) {
-                throw new MessageDispatcherRemoteProcessException(remoteInvocationResult.exception(), remoteInvocationResult.remoteService());
+                throw new MessageDispatcherRemoteResultException(remoteInvocationResult);
             }
 
             return objectMapper.convertValue(remoteInvocationResult.value(), responseClass);
@@ -115,7 +117,7 @@ public class RabbitTemplateProxy implements TemplateProxy {
         messageProperties.setHeader(MESSAGE_TIMESTAMP.getHeaderName(), OffsetDateTime.now());
         messageProperties.setHeader(BODY_TYPE.getHeaderName(), body.getClass().getSimpleName());
         messageProperties.setHeader(HANDLER_TYPE.getHeaderName(), handlerType);
-        messageProperties.setHeader(MESSAGE_SOURCE.getHeaderName(), EnvironmentUtils.getAppName());
+        messageProperties.setHeader(MESSAGE_SOURCE.getHeaderName(), MessageDispatcherUtils.getAppName());
 
         if (nonNull(properties.getMappedHeaders())) {
             Arrays.stream(properties.getMappedHeaders())
