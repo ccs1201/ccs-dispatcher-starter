@@ -1,9 +1,0 @@
-<entity-mappings xmlns="...">
-    <persistence-unit-metadata>
-        <persistence-unit-defaults>
-            <entity-listeners>
-                <entity-listener class="br.com.messagedispatcher.listener.MessageDispatcherEntityListener"/>
-            </entity-listeners>
-        </persistence-unit-defaults>
-    </persistence-unit-metadata>
-</entity-mappings>

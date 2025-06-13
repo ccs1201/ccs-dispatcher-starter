@@ -16,7 +16,7 @@
 
 package br.com.messagedispatcher.config;
 
-import br.com.messagedispatcher.config.rabbitmq.ExchangesQueuesBindingConfig;
+import br.com.messagedispatcher.config.rabbitmq.ExchangesQueuesBindingConfigAutoConfig;
 import br.com.messagedispatcher.listener.RabbitMqMessageDispatcherListener;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 09/05/2025
  */
 @Configuration
-@AutoConfigureBefore({RabbitAutoConfiguration.class, ExchangesQueuesBindingConfig.class})
+@AutoConfigureBefore({RabbitAutoConfiguration.class, ExchangesQueuesBindingConfigAutoConfig.class})
 @ComponentScan(basePackages = "br.com.messagedispatcher")
 public class MessageDispatcherAutoConfig {
 

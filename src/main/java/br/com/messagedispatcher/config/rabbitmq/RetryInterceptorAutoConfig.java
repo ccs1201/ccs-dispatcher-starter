@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 
 @Configuration
-public class RetryInterceptorConfig {
+public class RetryInterceptorAutoConfig {
 
     @Bean
     protected RetryOperationsInterceptor retryOperationsInterceptor(MessageRecoverer messageRecoverer,

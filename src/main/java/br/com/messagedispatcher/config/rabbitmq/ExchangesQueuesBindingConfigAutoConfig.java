@@ -45,9 +45,9 @@ import java.util.List;
 
 @Configuration
 @ConditionalOnProperty(name = "message.dispatcher.enabled", havingValue = "true", matchIfMissing = true)
-public class ExchangesQueuesBindingConfig {
+public class ExchangesQueuesBindingConfigAutoConfig {
 
-    private final Logger log = LoggerFactory.getLogger(ExchangesQueuesBindingConfig.class);
+    private final Logger log = LoggerFactory.getLogger(ExchangesQueuesBindingConfigAutoConfig.class);
 
     @Bean
     public Declarables defaultExchangeAndQueue(MessageDispatcherProperties properties) {

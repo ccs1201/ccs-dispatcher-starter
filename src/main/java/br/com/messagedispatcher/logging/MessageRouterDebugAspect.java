@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Aspect
 @Component
-@ConditionalOnProperty(value = "message.dispatcher.logging.messagerouter.logging-enable", havingValue = "true")
+@ConditionalOnProperty(value = "message.dispatcher.logging.message-router.enabled", havingValue = "true")
 public class MessageRouterDebugAspect {
 
     private static final Logger log = LoggerFactory.getLogger(MessageRouterDebugAspect.class);
@@ -27,12 +27,12 @@ public class MessageRouterDebugAspect {
         this.messageConverter = messageConverter;
         log.warn("""
                 
-                    
+                
                     ########################################## Message Router com modo DEBUG ativo ##########################################
-                    
+                
                     Mensagens roteadas serão exibidas no log de depuração.
                     Para desativar o modo debug, altere a propriedade 'message.dispatcher.logging.messagerouter.logging-enable' para 'false'
-                    
+                
                     #########################################################################################################################
                 """);
     }

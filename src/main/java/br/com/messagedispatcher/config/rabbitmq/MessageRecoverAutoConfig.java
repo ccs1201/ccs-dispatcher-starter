@@ -20,9 +20,9 @@ import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Mess
 import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.FAILED_AT_HEADER;
 
 @Configuration
-public class MessageRecoverConfig {
+public class MessageRecoverAutoConfig {
 
-    private final Logger log = LoggerFactory.getLogger(MessageRecoverConfig.class);
+    private final Logger log = LoggerFactory.getLogger(MessageRecoverAutoConfig.class);
 
     @Bean
     protected MessageRecoverer messageRecoverer(RabbitTemplate rabbitTemplate, MessageDispatcherProperties properties) {

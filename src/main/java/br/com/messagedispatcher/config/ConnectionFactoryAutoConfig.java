@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ConnectionFactoryConfig {
+public class ConnectionFactoryAutoConfig {
 
-    private final Logger log = LoggerFactory.getLogger(ConnectionFactoryConfig.class);
+    private final Logger log = LoggerFactory.getLogger(ConnectionFactoryAutoConfig.class);
 
     @Bean
     @SuppressWarnings("unused")

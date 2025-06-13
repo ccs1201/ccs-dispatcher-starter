@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ExchangesQueuesBindingConfigTest {
+public class ExchangesQueuesBindingConfigAutoConfigTest {
 
     @Mock
     private MessageDispatcherProperties properties;
@@ -32,7 +32,7 @@ public class ExchangesQueuesBindingConfigTest {
      */
     @Test
     public void testDeadLetterExchangeAndQueue_NullProperties() {
-        ExchangesQueuesBindingConfig config = new ExchangesQueuesBindingConfig();
+        ExchangesQueuesBindingConfigAutoConfig config = new ExchangesQueuesBindingConfigAutoConfig();
 
         when(properties.getDeadLetterExchangeName()).thenReturn(null);
 
@@ -45,7 +45,7 @@ public class ExchangesQueuesBindingConfigTest {
      */
     @Test
     public void testDefaultExchangeAndQueue_UnsupportedExchangeType() {
-        ExchangesQueuesBindingConfig config = new ExchangesQueuesBindingConfig();
+        ExchangesQueuesBindingConfigAutoConfig config = new ExchangesQueuesBindingConfigAutoConfig();
 
         properties.setExchangeType(null);
 
@@ -60,7 +60,7 @@ public class ExchangesQueuesBindingConfigTest {
     @Test
     public void test_deadLetterExchangeAndQueue_createsCorrectDeclarables() {
 
-        ExchangesQueuesBindingConfig config = new ExchangesQueuesBindingConfig();
+        ExchangesQueuesBindingConfigAutoConfig config = new ExchangesQueuesBindingConfigAutoConfig();
 
         when(properties.getDeadLetterExchangeName()).thenReturn("test.dlx");
         when(properties.isDeadLetterExchangeDurable()).thenReturn(true);
@@ -107,7 +107,7 @@ public class ExchangesQueuesBindingConfigTest {
     @Test
     public void test_defaultExchangeAndQueue_createsCorrectDeclarables() {
 
-        ExchangesQueuesBindingConfig config = new ExchangesQueuesBindingConfig();
+        ExchangesQueuesBindingConfigAutoConfig config = new ExchangesQueuesBindingConfigAutoConfig();
 
         when(properties.getExchangeType()).thenReturn(DIRECT);
         when(properties.getExchangeName()).thenReturn("testExchange");

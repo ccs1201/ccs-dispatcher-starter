@@ -20,9 +20,9 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 
 @Configuration
-public class RabbitListenerErrorHandlerConfig {
+public class RabbitListenerErrorHandlerAutoConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(RabbitListenerErrorHandlerConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(RabbitListenerErrorHandlerAutoConfig.class);
     private final List<String> retryableMessageTypes = List.of(HandlerType.QUERY.name(), HandlerType.COMMAND.name());
 
     @Bean

@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class MessageConverterConfig {
+public class MessageConverterAutoConfig {
 
-    private final Logger log = LoggerFactory.getLogger(MessageConverterConfig.class);
+    private final Logger log = LoggerFactory.getLogger(MessageConverterAutoConfig.class);
 
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter(ObjectMapper objectMapper) {
