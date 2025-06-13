@@ -21,5 +21,4 @@ public @interface EntityEventPublishes {
 
     boolean publishCreate() default true;
     boolean publishUpdate() default true;
-    boolean publishDelete() default true;
 }

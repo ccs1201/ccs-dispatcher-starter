@@ -3,7 +3,6 @@ package br.com.messagedispatcher.listener;
 import br.com.messagedispatcher.annotation.EntityEventPublishes;
 import br.com.messagedispatcher.publisher.MessagePublisher;
 import jakarta.persistence.PostPersist;
-import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +26,6 @@ public class MessageDispatcherEntityListener {
             publish(entity, "criada");
     }
 
-    @PostRemove
-    public void onRemove(Object entity) {
-        if (shouldPublish(entity) && entity.getClass().getAnnotation(EntityEventPublishes.class).publishDelete())
-            publish(entity, "removida");
-    }
-
     @PostUpdate
     public void onUpdate(Object entity) {
         if (shouldPublish(entity) && entity.getClass().getAnnotation(EntityEventPublishes.class).publishUpdate())
@@ -43,7 +36,6 @@ public class MessageDispatcherEntityListener {
         publisher.sendEvent(entity);
         if (log.isDebugEnabled()) {
             log.debug("Evento publicado Entity {} {} Dados: {}.", action, entity.getClass().getSimpleName(), entity);
-
         }
     }
 
