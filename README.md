@@ -435,6 +435,9 @@ public class MeuServico {
 - Java 17+
 - Spring Boot 3.x
 - RabbitMQ 3.4.x ou superior
+- 
+## Visão da arquitetura
+![architecture.png](architecture.png)
 
 ## Licença
 

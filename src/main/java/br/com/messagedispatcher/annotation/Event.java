@@ -1,8 +1,12 @@
 package br.com.messagedispatcher.annotation;
 
-import br.com.messagedispatcher.model.HandlerType;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.lang.annotation.*;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType;
 
 /**
  * Anotação para marcar métodos que processam mensagens do tipo Event.

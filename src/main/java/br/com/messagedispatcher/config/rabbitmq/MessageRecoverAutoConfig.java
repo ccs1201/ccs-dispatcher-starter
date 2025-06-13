@@ -15,9 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.EXCEPTION_MESSAGE_HEADER;
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.EXCEPTION_ROOT_CAUSE_HEADER;
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.FAILED_AT_HEADER;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Headers.*;
 
 @Configuration
 public class MessageRecoverAutoConfig {
@@ -41,10 +39,10 @@ public class MessageRecoverAutoConfig {
                     log.debug("Enviando mensagem para dead letter queue.", rootCause);
                 }
 
-                Map<String, Object> headers = message.getMessageProperties().getHeaders();
-                headers.put(EXCEPTION_ROOT_CAUSE_HEADER, rootCause.getClass().getSimpleName());
-                headers.put(EXCEPTION_MESSAGE_HEADER, rootCause.getMessage());
-                headers.put(FAILED_AT_HEADER, OffsetDateTime.now());
+                var headers = message.getMessageProperties().getHeaders();
+                headers.put(EXCEPTION_ROOT_CAUSE.getHeaderName(), rootCause.getClass().getSimpleName());
+                headers.put(EXCEPTION_MESSAGE.getHeaderName(), rootCause.getMessage());
+                headers.put(FAILED_AT.getHeaderName(), OffsetDateTime.now());
                 return headers;
             }
         };

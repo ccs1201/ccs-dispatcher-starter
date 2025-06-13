@@ -1,7 +1,6 @@
 package br.com.messagedispatcher.config.rabbitmq;
 
 import br.com.messagedispatcher.exceptions.MessageDispatcherRetryableException;
-import br.com.messagedispatcher.model.HandlerType;
 import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -14,7 +13,9 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType.COMMAND;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType.QUERY;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Headers;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
@@ -22,13 +23,13 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 @Configuration
 public class RabbitListenerErrorHandlerAutoConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(RabbitListenerErrorHandlerAutoConfig.class);
-    private final List<String> retryableMessageTypes = List.of(HandlerType.QUERY.name(), HandlerType.COMMAND.name());
+    private static final Logger log = LoggerFactory.getLogger(RabbitListenerErrorHandlerConfig.class);
+    private final List<String> retryableMessageTypes = List.of(QUERY.name(), COMMAND.name());
 
     @Bean
     public RabbitListenerErrorHandler messageDispatcherErrorHandler() {
         return (amqpMessage, channel, message, exception) -> {
-            String handlerType = (String) amqpMessage.getMessageProperties().getHeaders().get(MessageDispatcherHeaders.HANDLER_TYPE_HEADER);
+            var handlerType = amqpMessage.getMessageProperties().getHeaders().get(Headers.HANDLER_TYPE);
 
             incrementRetryCount(amqpMessage);
 

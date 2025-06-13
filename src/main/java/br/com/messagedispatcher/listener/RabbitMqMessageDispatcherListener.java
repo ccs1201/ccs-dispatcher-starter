@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.*;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Headers.*;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
@@ -107,17 +107,17 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
     }
 
     private void setResponseHeaders(Message message) {
-        message.getMessageProperties().setHeader(RESPONSE_TIME_STAMP_HEADER, LocalDateTime.now());
-        message.getMessageProperties().setHeader(RESPONSE_FROM_HEADER, EnvironmentUtils.getAppName());
+        message.getMessageProperties().setHeader(RESPONSE_TIME_STAMP.getHeaderName(), LocalDateTime.now());
+        message.getMessageProperties().setHeader(RESPONSE_FROM.getHeaderName(), EnvironmentUtils.getAppName());
     }
 
     private void log(Message message) {
         try {
             log.debug("Mensagem recebida HandlerType:{} | BodyType:{} | Body:{}",
                     message.getMessageProperties()
-                            .getHeaders().get(HANDLER_TYPE_HEADER),
+                            .getHeaders().get(HANDLER_TYPE.getHeaderName()),
                     message.getMessageProperties()
-                            .getHeaders().get(BODY_TYPE_HEADER),
+                            .getHeaders().get(BODY_TYPE.getHeaderName()),
                     objectMapper.readValue(message.getBody(), JsonNode.class));
         } catch (IOException e) {
             throw new MessageDispatcherLoggerException("Erro ao gerar logs", e);

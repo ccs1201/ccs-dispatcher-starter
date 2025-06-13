@@ -4,19 +4,42 @@ public final class MessageDispatcherConstants {
     private MessageDispatcherConstants() {
     }
 
-    public static class MessageDispatcherHeaders {
-        private MessageDispatcherHeaders() {
-        }
+    public enum Headers {
+        HANDLER_TYPE("handler-type"),
+        MESSAGE_TIMESTAMP("timestamp"),
+        MESSAGE_SOURCE("remoteService"),
+        BODY_TYPE("body-type"),
+        RESPONSE_FROM("response-from"),
+        RESPONSE_TIME_STAMP("response-timestamp"),
+        EXCEPTION_MESSAGE("exception-message"),
+        EXCEPTION_ROOT_CAUSE("exception-root-cause"),
+        FAILED_AT("failed-at");
 
         private static final String HEADER_PREFIX = "x-message-dispatcher-";
-        public static final String HANDLER_TYPE_HEADER = HEADER_PREFIX + "handler-type";
-        public static final String MESSAGE_TIMESTAMP_HEADER = HEADER_PREFIX + "timestamp";
-        public static final String MESSAGE_SOURCE_HEADER = HEADER_PREFIX + "remoteService";
-        public static final String BODY_TYPE_HEADER = HEADER_PREFIX + "body-type";
-        public static final String RESPONSE_FROM_HEADER = HEADER_PREFIX + "response-from";
-        public static final String RESPONSE_TIME_STAMP_HEADER = HEADER_PREFIX + "response-timestamp";
-        public static final String EXCEPTION_MESSAGE_HEADER = HEADER_PREFIX + "exception-message";
-        public static final String EXCEPTION_ROOT_CAUSE_HEADER = HEADER_PREFIX + "exception-root-cause";
-        public static final String FAILED_AT_HEADER = HEADER_PREFIX + "failed-at";
+        private final String headerName;
+
+        Headers(String headerName) {
+            this.headerName = HEADER_PREFIX + headerName;
+        }
+
+        public String getHeaderName() {
+            return headerName;
+        }
+
+        @Override
+        public String toString() {
+            return headerName;
+        }
+    }
+
+    /**
+     * Enum que define os tipos de handlers suportados.
+     * Enum that defines the supported handler types.
+     */
+    public enum HandlerType {
+        COMMAND,
+        QUERY,
+        NOTIFICATION,
+        EVENT
     }
 }

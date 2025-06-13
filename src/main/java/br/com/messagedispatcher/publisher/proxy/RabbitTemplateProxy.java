@@ -4,7 +4,6 @@ import br.com.messagedispatcher.config.properties.MessageDispatcherProperties;
 import br.com.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException;
 import br.com.messagedispatcher.exceptions.MessagePublisherException;
 import br.com.messagedispatcher.exceptions.MessagePublisherTimeOutException;
-import br.com.messagedispatcher.model.HandlerType;
 import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.util.EnvironmentUtils;
 import br.com.messagedispatcher.util.httpservlet.RequestContextUtil;
@@ -23,10 +22,8 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.BODY_TYPE_HEADER;
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.HANDLER_TYPE_HEADER;
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.MESSAGE_SOURCE_HEADER;
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.MessageDispatcherHeaders.MESSAGE_TIMESTAMP_HEADER;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Headers.*;
 import static java.util.Objects.nonNull;
 
 /**
@@ -115,10 +112,10 @@ public class RabbitTemplateProxy implements TemplateProxy {
                                       final String exchange, final String routingKey) {
 
         var messageProperties = message.getMessageProperties();
-        messageProperties.setHeader(MESSAGE_TIMESTAMP_HEADER, OffsetDateTime.now());
-        messageProperties.setHeader(BODY_TYPE_HEADER, body.getClass().getSimpleName());
-        messageProperties.setHeader(HANDLER_TYPE_HEADER, handlerType);
-        messageProperties.setHeader(MESSAGE_SOURCE_HEADER, EnvironmentUtils.getAppName());
+        messageProperties.setHeader(MESSAGE_TIMESTAMP.getHeaderName(), OffsetDateTime.now());
+        messageProperties.setHeader(BODY_TYPE.getHeaderName(), body.getClass().getSimpleName());
+        messageProperties.setHeader(HANDLER_TYPE.getHeaderName(), handlerType);
+        messageProperties.setHeader(MESSAGE_SOURCE.getHeaderName(), EnvironmentUtils.getAppName());
 
         if (nonNull(properties.getMappedHeaders())) {
             Arrays.stream(properties.getMappedHeaders())
