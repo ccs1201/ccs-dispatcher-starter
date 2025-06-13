@@ -210,11 +210,18 @@
       "defaultValue": true
     },
     {
-      "name": "message.dispatcher.logging.messagerouter.logging-enable",
+      "name": "message.dispatcher.logging.messagerouter.enabled",
       "type": "java.lang.Boolean",
       "description": "Habilita o logging via spring AOP do MessageRouter.",
-      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherLoggingProperties",
       "defaultValue": true
+    },
+    {
+      "name": "message.dispatcher.entity-listener",
+      "type": "java.lang.Boolean",
+      "description": "Habilita a publicação de eventos de entidades através do MessageDispatcherEntityEventsListener.",
+      "sourceType": "br.com.messagedispatcher.config.properties.EntityListenerProperties",
+      "defaultValue": false
     }
   ],
   "hints": [

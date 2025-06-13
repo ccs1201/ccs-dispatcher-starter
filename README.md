@@ -122,6 +122,57 @@ public class MyHandler {
 }
 ```
 
+### Entity Event Publishing
+
+The library provides automatic event publishing for JPA entities through the `@EntityEventPublishes` annotation and `MessageDispatcherEntityListener`. This feature allows you to automatically publish events when entities are created or updated.
+
+#### Configuration
+
+To enable entity event publishing, add the following to your properties file:
+
+```properties
+    message.dispatcher.entity-listener = true
+```
+
+#### Entity Example
+
+```java
+@Entity
+@EntityEventPublishes(
+    publishCreate = true, 
+    publishUpdate = true
+)
+public class Product {
+    @Id
+    private Long id;
+    private String name;
+    private BigDecimal price;
+    
+    // Getters, setters, constructors...
+}
+```
+
+When this entity is created or updated, an event will be automatically published to the configured exchange. You can control which operations trigger events by setting the appropriate flags in the `@EntityEventPublishes` annotation:
+
+- `publishCreate`: Publishes events when entities are created (default: true)
+- `publishUpdate`: Publishes events when entities are updated (default: true)
+
+#### Consuming Entity Events
+
+To consume these entity events in another service:
+
+```java
+@MessageListener
+public class ProductEventHandler {
+    
+    @Event
+    public void handleProductEvent(Product product) {
+        // Process the product event
+        System.out.println("Received product event: " + product.getName());
+    }
+}
+```
+
 ### Message Publisher Usage
 
 ```java
@@ -298,6 +349,57 @@ public class MeuHandler {
     @Event
     public void manipularEvento(DadosEvento payload) {
         // Processar evento
+    }
+}
+```
+
+### Publicação de Eventos de Entidade
+
+A biblioteca fornece publicação automática de eventos para entidades JPA através da anotação `@EntityEventPublishes` e `MessageDispatcherEntityListener`. Este recurso permite publicar eventos automaticamente quando entidades são criadas, atualizadas ou excluídas.
+
+#### Configuração
+
+Para habilitar a publicação de eventos de entidade, adicione o seguinte à sua configuração:
+
+```properties
+    message.dispatcher.entity-listener = true
+```
+
+#### Exemplo de Entidade
+
+```java
+@Entity
+@EntityEventPublishes(
+    publishCreate = true,
+    publishUpdate = true
+)
+public class Produto {
+    @Id
+    private Long id;
+    private String nome;
+    private BigDecimal preco;
+    
+    // Getters, setters, construtores...
+}
+```
+
+Quando esta entidade é criada ou atualizada, um evento será automaticamente publicado para a exchange configurada. Você pode controlar quais operações disparam eventos configurando as flags apropriadas na anotação `@EntityEventPublishes`:
+
+- `publishCreate`: Publica eventos quando entidades são criadas (padrão: true)
+- `publishUpdate`: Publica eventos quando entidades são atualizadas (padrão: true)
+
+#### Consumindo Eventos de Entidade
+
+Para consumir esses eventos de entidade em outro serviço:
+
+```java
+@MessageListener
+public class ProdutoEventHandler {
+    
+    @Event
+    public void handleProdutoEvent(Produto produto) {
+        // Processar o evento do produto
+        System.out.println("Evento de produto recebido: " + produto.getNome());
     }
 }
 ```

@@ -13,9 +13,9 @@ import org.springframework.context.annotation.Primary;
 
 
 @Configuration
-public class ObjectMapperConfig {
+public class ObjectMapperAutoConfig {
 
-    private final Logger log = LoggerFactory.getLogger(ObjectMapperConfig.class);
+    private final Logger log = LoggerFactory.getLogger(ObjectMapperAutoConfig.class);
 
     @Bean
     @Primary

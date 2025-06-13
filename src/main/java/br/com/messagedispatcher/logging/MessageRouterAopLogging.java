@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Aspect
 @Component
-@ConditionalOnProperty(value = "message.dispatcher.logging.messagerouter.logging-enable", havingValue = "true")
+@ConditionalOnProperty(value = "message.dispatcher.logging.message-router.enabled", havingValue = "true")
 public class MessageRouterAopLogging {
 
     private static final Logger log = LoggerFactory.getLogger(MessageRouterAopLogging.class);

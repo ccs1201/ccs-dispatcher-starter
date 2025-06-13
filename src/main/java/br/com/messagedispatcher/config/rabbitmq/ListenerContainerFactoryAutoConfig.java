@@ -18,9 +18,9 @@ import org.springframework.retry.interceptor.RetryOperationsInterceptor;
  */
 @Configuration
 @ConditionalOnProperty(value = "message.dispatcher.default-listener-enable", havingValue = "true", matchIfMissing = true)
-public class ListenerContainerFactory {
+public class ListenerContainerFactoryAutoConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(ListenerContainerFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(ListenerContainerFactoryAutoConfig.class);
 
     @Bean
     protected SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory,

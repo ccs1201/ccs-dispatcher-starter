@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RabbitTemplateConfig {
+public class RabbitTemplateAutoConfig {
 
-    private final Logger log = LoggerFactory.getLogger(RabbitTemplateConfig.class);
+    private final Logger log = LoggerFactory.getLogger(RabbitTemplateAutoConfig.class);
 
     @Bean
     protected RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory,

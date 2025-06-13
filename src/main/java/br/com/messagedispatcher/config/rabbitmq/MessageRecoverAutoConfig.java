@@ -18,9 +18,9 @@ import java.util.Map;
 import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Headers.*;
 
 @Configuration
-public class MessageRecoverConfig {
+public class MessageRecoverAutoConfig {
 
-    private final Logger log = LoggerFactory.getLogger(MessageRecoverConfig.class);
+    private final Logger log = LoggerFactory.getLogger(MessageRecoverAutoConfig.class);
 
     @Bean
     protected MessageRecoverer messageRecoverer(RabbitTemplate rabbitTemplate, MessageDispatcherProperties properties) {

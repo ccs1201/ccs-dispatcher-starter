@@ -7,6 +7,7 @@ import br.com.messagedispatcher.exceptions.MessagePublisherTimeOutException;
 import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.util.EnvironmentUtils;
 import br.com.messagedispatcher.util.httpservlet.RequestContextUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,9 +126,17 @@ public class RabbitTemplateProxy implements TemplateProxy {
         }
 
         if (log.isDebugEnabled()) {
+            logMessageTosend(body, message, exchange, routingKey);
+        }
+
+        return message;
+    }
+
+    private void logMessageTosend(Object body, Message message, String exchange, String routingKey) {
+        try {
             log.debug("""
                             
-                                Mensagem enviada ao Broker:
+                                Mensagem sendo enviada ao Broker:
                                 Exchange: {}
                                 RoutingKey: {}
                                 Headers: {}
@@ -136,10 +145,9 @@ public class RabbitTemplateProxy implements TemplateProxy {
                     exchange,
                     routingKey,
                     message.getMessageProperties().getHeaders(),
-                    body);
+                    objectMapper.writeValueAsString(body));
+        } catch (JsonProcessingException e) {
+            log.error("Erro ao tentar converter objeto para json.", e);
         }
-
-        return message;
     }
-
 }

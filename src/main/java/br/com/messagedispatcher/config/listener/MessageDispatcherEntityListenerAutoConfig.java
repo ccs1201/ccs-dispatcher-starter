@@ -1,0 +1,23 @@
+package br.com.messagedispatcher.config.listener;
+
+import br.com.messagedispatcher.listener.MessageDispatcherEntityEventsListener;
+import br.com.messagedispatcher.listener.MessageDispatcherEntityEventsListenerImpl;
+import br.com.messagedispatcher.publisher.MessagePublisher;
+import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ConditionalOnProperty(value = "message.dispatcher.entity-listener.enabled", havingValue = "true")
+public class MessageDispatcherEntityListenerAutoConfig {
+
+    private final Logger log = org.slf4j.LoggerFactory.getLogger(MessageDispatcherEntityListenerAutoConfig.class);
+
+
+    @Bean
+    public MessageDispatcherEntityEventsListener messageDispatcherEntityListener(MessagePublisher publisher) {
+        log.debug("Iniciando Entity Listener.");
+        return new MessageDispatcherEntityEventsListenerImpl(publisher);
+    }
+}
