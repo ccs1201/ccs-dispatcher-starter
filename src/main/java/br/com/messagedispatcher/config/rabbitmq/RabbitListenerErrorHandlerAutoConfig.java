@@ -23,7 +23,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 @Configuration
 public class RabbitListenerErrorHandlerAutoConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(RabbitListenerErrorHandlerConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(RabbitListenerErrorHandlerAutoConfig.class);
     private final List<String> retryableMessageTypes = List.of(QUERY.name(), COMMAND.name());
 
     @Bean
