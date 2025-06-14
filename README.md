@@ -143,7 +143,7 @@ public class MyHandler {
 
 ### Entity Event Publishing
 
-The library provides automatic event publishing for JPA entities through the `@EntityEventPublishes` annotation and `MessageDispatcherEntityListener`. This feature allows you to automatically publish events when entities are created or updated.
+The library provides automatic event publishing for JPA entities through the `@EntityEventsPublish` annotation and `MessageDispatcherEntityListener`. This feature allows you to automatically publish events when entities are created or updated.
 
 #### Configuration
 
@@ -157,7 +157,7 @@ To enable entity event publishing, add the following to your properties file:
 
 ```java
 @Entity
-@EntityEventPublishes(
+@EntityEventsPublish(
     publishCreate = true, 
     publishUpdate = true
 )
@@ -393,7 +393,7 @@ public class MeuHandler {
 
 ### Publicação de Eventos de Entidade
 
-A biblioteca fornece publicação automática de eventos para entidades JPA através da anotação `@EntityEventPublishes` e `MessageDispatcherEntityListener`. Este recurso permite publicar eventos automaticamente quando entidades são criadas, atualizadas ou excluídas.
+A biblioteca fornece publicação automática de eventos para entidades JPA através da anotação `@EntityEventsPublish` e `MessageDispatcherEntityListener`. Este recurso permite publicar eventos automaticamente quando entidades são criadas, atualizadas ou excluídas.
 
 #### Configuração
 
@@ -407,7 +407,7 @@ Para habilitar a publicação de eventos de entidade, adicione o seguinte à sua
 
 ```java
 @Entity
-@EntityEventPublishes(
+@EntityEventsPublish(
     publishCreate = true,
     publishUpdate = true
 )
