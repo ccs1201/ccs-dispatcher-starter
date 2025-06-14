@@ -1,7 +1,8 @@
 package br.com.messagedispatcher.util;
 
-import br.com.messagedispatcher.constants.Types;
+import br.com.messagedispatcher.constants.MessageDispatcherConstants;
 import br.com.messagedispatcher.exceptions.MessageDispatcherBeanResolutionException;
+import br.com.messagedispatcher.util.factory.ExchangeFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Exchange;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ExchangeFactoryUtilTest {
+class ExchangeFactoryTest {
 
 
     /**
@@ -30,7 +31,7 @@ class ExchangeFactoryUtilTest {
     public void testBuildExchangeWithConsistentHashAndEmptyArguments() {
         Map<String, Object> emptyArguments = new HashMap<>();
         assertThrows(MessageDispatcherBeanResolutionException.class, () ->
-                ExchangeFactoryUtil.buildExchange("TestExchange", true, Types.Exchange.CONSISTENT_HASH, emptyArguments));
+                ExchangeFactory.buildExchange("TestExchange", true, MessageDispatcherConstants.Exchange.CONSISTENT_HASH, emptyArguments));
     }
 
     /**
@@ -40,7 +41,7 @@ class ExchangeFactoryUtilTest {
     @Test
     public void testBuildExchangeWithConsistentHashAndNullArguments() {
         assertThrows(MessageDispatcherBeanResolutionException.class, () ->
-                ExchangeFactoryUtil.buildExchange("TestExchange", true, Types.Exchange.CONSISTENT_HASH, null));
+                ExchangeFactory.buildExchange("TestExchange", true, MessageDispatcherConstants.Exchange.CONSISTENT_HASH, null));
     }
 
     /**
@@ -50,7 +51,7 @@ class ExchangeFactoryUtilTest {
     @Test
     public void testBuildExchangeWithUnsupportedType() {
         assertThrows(MessageDispatcherBeanResolutionException.class, () ->
-            ExchangeFactoryUtil.buildExchange("TestExchange", true, null, null));
+            ExchangeFactory.buildExchange("TestExchange", true, null, null));
     }
 
     /**
@@ -61,9 +62,9 @@ class ExchangeFactoryUtilTest {
     public void test_buildExchangeWithTopicType() {
         String exchangeName = "testTopicExchange";
         boolean durable = true;
-        Types.Exchange exchangeType = Types.Exchange.TOPIC;
+        MessageDispatcherConstants.Exchange exchangeType = MessageDispatcherConstants.Exchange.TOPIC;
 
-        Exchange result = ExchangeFactoryUtil.buildExchange(exchangeName, durable, exchangeType, null);
+        Exchange result = ExchangeFactory.buildExchange(exchangeName, durable, exchangeType, null);
 
         assertNotNull(result);
         assertInstanceOf(TopicExchange.class, result);
@@ -78,7 +79,7 @@ class ExchangeFactoryUtilTest {
     @Test
     public void test_buildExchange_consistentHashWithEmptyArguments() {
         assertThrows(MessageDispatcherBeanResolutionException.class, () ->
-                ExchangeFactoryUtil.buildExchange("TestExchange", true, Types.Exchange.CONSISTENT_HASH, new HashMap<>()));
+                ExchangeFactory.buildExchange("TestExchange", true, MessageDispatcherConstants.Exchange.CONSISTENT_HASH, new HashMap<>()));
     }
 
     /**
@@ -89,11 +90,11 @@ class ExchangeFactoryUtilTest {
     public void test_buildExchange_consistentHashWithValidArguments() {
         String exchangeName = "testExchange";
         boolean durable = true;
-        Types.Exchange exchangeType = Types.Exchange.CONSISTENT_HASH;
+        MessageDispatcherConstants.Exchange exchangeType = MessageDispatcherConstants.Exchange.CONSISTENT_HASH;
         Map<String, Object> arguments = new HashMap<>();
         arguments.put("hash-header", "correlation-id");
 
-        Exchange result = ExchangeFactoryUtil.buildExchange(exchangeName, durable, exchangeType, arguments);
+        Exchange result = ExchangeFactory.buildExchange(exchangeName, durable, exchangeType, arguments);
 
         assertNotNull(result);
         assertEquals(exchangeName, result.getName());
@@ -110,9 +111,9 @@ class ExchangeFactoryUtilTest {
     public void test_buildExchange_headers() {
         String exchangeName = "test-headers-exchange";
         boolean durable = true;
-        Types.Exchange exchangeType = Types.Exchange.HEADERS;
+        MessageDispatcherConstants.Exchange exchangeType = MessageDispatcherConstants.Exchange.HEADERS;
 
-        Exchange result = ExchangeFactoryUtil.buildExchange(exchangeName, durable, exchangeType, null);
+        Exchange result = ExchangeFactory.buildExchange(exchangeName, durable, exchangeType, null);
 
         assertNotNull(result);
         assertInstanceOf(HeadersExchange.class, result);
@@ -128,14 +129,14 @@ class ExchangeFactoryUtilTest {
     public void test_buildExchange_invalidExchangeType() {
         String exchangeName = "testExchange";
         boolean durable = true;
-        Types.Exchange invalidExchangeType = null;
+        MessageDispatcherConstants.Exchange invalidExchangeType = null;
 
         MessageDispatcherBeanResolutionException exception = assertThrows(
                 MessageDispatcherBeanResolutionException.class,
-                () -> ExchangeFactoryUtil.buildExchange(exchangeName, durable, invalidExchangeType, null)
+                () -> ExchangeFactory.buildExchange(exchangeName, durable, invalidExchangeType, null)
         );
 
-        String expectedErrorMessage = "Não possível configurar a exchange, verifique suas configurações e informe um tipo de exchange válido." + Arrays.toString(Types.Exchange.values());
+        String expectedErrorMessage = "Não possível configurar a exchange, verifique suas configurações e informe um tipo de exchange válido." + Arrays.toString(MessageDispatcherConstants.Exchange.values());
         assertEquals(expectedErrorMessage, exception.getMessage());
     }
 
@@ -147,9 +148,9 @@ class ExchangeFactoryUtilTest {
     public void test_buildExchange_returnsFanoutExchange() {
         String exchangeName = "testFanoutExchange";
         boolean durable = true;
-        Types.Exchange exchangeType = Types.Exchange.FANOUT;
+        MessageDispatcherConstants.Exchange exchangeType = MessageDispatcherConstants.Exchange.FANOUT;
 
-        Exchange result = ExchangeFactoryUtil.buildExchange(exchangeName, durable, exchangeType, null);
+        Exchange result = ExchangeFactory.buildExchange(exchangeName, durable, exchangeType, null);
 
         assertNotNull(result);
         assertInstanceOf(FanoutExchange.class, result);
@@ -165,9 +166,9 @@ class ExchangeFactoryUtilTest {
     public void test_buildExchange_whenExchangeTypeIsDirect() {
         String exchangeName = "testDirectExchange";
         boolean durable = true;
-        Types.Exchange exchangeType = Types.Exchange.DIRECT;
+        MessageDispatcherConstants.Exchange exchangeType = MessageDispatcherConstants.Exchange.DIRECT;
 
-        Exchange result = ExchangeFactoryUtil.buildExchange(exchangeName, durable, exchangeType, null);
+        Exchange result = ExchangeFactory.buildExchange(exchangeName, durable, exchangeType, null);
 
         assertNotNull(result);
         assertInstanceOf(DirectExchange.class, result);

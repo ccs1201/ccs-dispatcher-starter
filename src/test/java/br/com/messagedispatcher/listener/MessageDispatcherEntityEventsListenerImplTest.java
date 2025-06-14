@@ -1,13 +1,14 @@
 package br.com.messagedispatcher.listener;
 
 import br.com.messagedispatcher.annotation.EntityEventsPublish;
+import br.com.messagedispatcher.config.properties.EntityEventsProperties;
 import br.com.messagedispatcher.publisher.MessagePublisher;
 import org.hibernate.event.spi.PostInsertEvent;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.persister.entity.EntityPersister;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -17,11 +18,12 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class MessageDispatcherEntityEventsListenerImplTest {
 
+    private MessageDispatcherEntityEventsListenerImpl listener;
+
     @Mock
     private MessagePublisher publisher;
 
-    @InjectMocks
-    private MessageDispatcherEntityEventsListenerImpl listener;
+    private EntityEventsProperties entityEventsProperties;
 
     @Mock
     private PostInsertEvent postInsertEvent;
@@ -32,6 +34,18 @@ class MessageDispatcherEntityEventsListenerImplTest {
     @Mock
     private EntityPersister entityPersister;
 
+
+    private static final String exchange = "teste.ex";
+    private static final String routingKey = "teste.rk";
+
+    @BeforeEach
+    void setUp() {
+        entityEventsProperties = new EntityEventsProperties();
+        entityEventsProperties.setExchange(exchange);
+        entityEventsProperties.setRoutingKey(routingKey);
+        listener = new MessageDispatcherEntityEventsListenerImpl(publisher, entityEventsProperties);
+    }
+
     @Test
     void onPostInsertShouldPublishWhenEntityHasAnnotationAndPublishCreateIsTrue() {
         TestEntityWithPublishCreate entity = new TestEntityWithPublishCreate();
@@ -39,7 +53,7 @@ class MessageDispatcherEntityEventsListenerImplTest {
 
         listener.onPostInsert(postInsertEvent);
 
-        verify(publisher, times(1)).sendEvent(entity);
+        verify(publisher, times(1)).sendEvent(exchange, routingKey, entity);
     }
 
     @Test
@@ -49,7 +63,7 @@ class MessageDispatcherEntityEventsListenerImplTest {
 
         listener.onPostInsert(postInsertEvent);
 
-        verify(publisher, never()).sendEvent(any());
+        verify(publisher, never()).sendEvent(exchange, routingKey, entity);
     }
 
     @Test
@@ -59,7 +73,7 @@ class MessageDispatcherEntityEventsListenerImplTest {
 
         listener.onPostInsert(postInsertEvent);
 
-        verify(publisher, never()).sendEvent(any());
+        verify(publisher, never()).sendEvent(exchange, routingKey, entity);
     }
 
     @Test
@@ -69,7 +83,7 @@ class MessageDispatcherEntityEventsListenerImplTest {
 
         listener.onPostUpdate(postUpdateEvent);
 
-        verify(publisher, times(1)).sendEvent(entity);
+        verify(publisher, times(1)).sendEvent(exchange, routingKey, entity);
     }
 
     @Test
@@ -79,7 +93,7 @@ class MessageDispatcherEntityEventsListenerImplTest {
 
         listener.onPostUpdate(postUpdateEvent);
 
-        verify(publisher, never()).sendEvent(any());
+        verify(publisher, never()).sendEvent(exchange, routingKey, entity);
     }
 
     @Test
@@ -89,7 +103,7 @@ class MessageDispatcherEntityEventsListenerImplTest {
 
         listener.onPostUpdate(postUpdateEvent);
 
-        verify(publisher, never()).sendEvent(any());
+        verify(publisher, never()).sendEvent(exchange, routingKey, entity);
     }
 
     @Test

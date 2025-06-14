@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnProperty(value = "message.dispatcher.entity-listener.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "message.dispatcher.entity-events.enabled", havingValue = "true")
 public class HibernateListenerAutoConfig {
 
     @Bean

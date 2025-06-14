@@ -17,8 +17,9 @@
 package br.com.messagedispatcher.config.properties;
 
 import br.com.messagedispatcher.config.MessageDispatcherAutoConfig;
-import br.com.messagedispatcher.constants.Types;
-import br.com.messagedispatcher.constants.Types.Exchange;
+import br.com.messagedispatcher.config.rabbitmq.RabbitTemplateAutoConfig;
+import br.com.messagedispatcher.constants.MessageDispatcherConstants;
+import br.com.messagedispatcher.constants.MessageDispatcherConstants.Exchange;
 import br.com.messagedispatcher.exceptions.MessageDispatcherBeanResolutionException;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.Max;
@@ -88,7 +89,7 @@ import static java.util.Objects.isNull;
  * @since 09/05/2025
  */
 
-@AutoConfigureBefore(MessageDispatcherAutoConfig.class)
+@AutoConfigureBefore({MessageDispatcherAutoConfig.class, RabbitTemplateAutoConfig.class})
 @Component("messageDispatcherProperties")
 @ConfigurationProperties(prefix = "message.dispatcher")
 @Validated
@@ -113,7 +114,7 @@ public class MessageDispatcherProperties {
             routingKey = queueName;
         }
 
-        if (this.exchangeType == Exchange.CONSISTENT_HASH) {
+        if (this.exchangeType == MessageDispatcherConstants.Exchange.CONSISTENT_HASH) {
             if (isNull(this.exchangeConsistentHashArguments)) {
                 throw new MessageDispatcherBeanResolutionException("Quando a exchange é do tipo ConsistenHash é " +
                         "obrigatório informar o argumento exchangeConsistentHashArguments");
@@ -160,7 +161,7 @@ public class MessageDispatcherProperties {
     /**
      * Tipo da exchange. Padrão é 'topic'
      */
-    private Types.Exchange exchangeType = Exchange.TOPIC;
+    private Exchange exchangeType = MessageDispatcherConstants.Exchange.TOPIC;
 
     /**
      * Argumentos da exchange obrigatório quando o type = {@code Types.exchange.CONSISTENT_HASH} . Padrão é null
@@ -201,7 +202,7 @@ public class MessageDispatcherProperties {
     /**
      * Tipo da exchange de dead letter. Padrão é 'topic'
      */
-    private Types.Exchange deadLetterExchangeType = Exchange.TOPIC;
+    private Exchange deadLetterExchangeType = MessageDispatcherConstants.Exchange.TOPIC;
 
     /**
      * Argumentos da exchange de dead letter obrigatório quando o type = {@code Types.exchange.CONSISTENT_HASH} . Padrão é null
@@ -263,16 +264,16 @@ public class MessageDispatcherProperties {
     private boolean returnExceptions = true;
 
     /**
-     * Indica se o listener padrão deve ser habilitado. Padrão é true
+     * Indica se o listener padrão deve ser ativado. Padrão é true
      */
-    private boolean defaultListenerEnable = true;
+    private boolean defaultListenerEnabled = true;
 
-    public boolean isDefaultListenerEnable() {
-        return defaultListenerEnable;
+    public boolean isDefaultListenerEnabled() {
+        return defaultListenerEnabled;
     }
 
-    public void setDefaultListenerEnable(boolean defaultListenerEnable) {
-        this.defaultListenerEnable = defaultListenerEnable;
+    public void setDefaultListenerEnabled(boolean defaultListenerEnabled) {
+        this.defaultListenerEnabled = defaultListenerEnabled;
     }
 
     public long getReplyTimeOut() {
@@ -299,11 +300,11 @@ public class MessageDispatcherProperties {
         this.exchangeName = exchangeName.trim();
     }
 
-    public Types.Exchange getExchangeType() {
+    public Exchange getExchangeType() {
         return exchangeType;
     }
 
-    public void setExchangeType(Types.Exchange exchangeType) {
+    public void setExchangeType(Exchange exchangeType) {
         this.exchangeType = exchangeType;
     }
 

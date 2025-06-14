@@ -1,6 +1,7 @@
 package br.com.messagedispatcher.listener;
 
 import br.com.messagedispatcher.annotation.EntityEventsPublish;
+import br.com.messagedispatcher.config.properties.EntityEventsProperties;
 import br.com.messagedispatcher.publisher.MessagePublisher;
 import org.hibernate.event.spi.PostInsertEvent;
 import org.hibernate.event.spi.PostUpdateEvent;
@@ -12,10 +13,14 @@ public class MessageDispatcherEntityEventsListenerImpl implements MessageDispatc
 
     private static final Logger log = LoggerFactory.getLogger(MessageDispatcherEntityEventsListenerImpl.class);
     private final MessagePublisher publisher;
+    private final String exchange;
+    private final String routingKey;
 
-    public MessageDispatcherEntityEventsListenerImpl(MessagePublisher publisher) {
+    public MessageDispatcherEntityEventsListenerImpl(MessagePublisher publisher, EntityEventsProperties entityEventsProperties) {
         this.publisher = publisher;
-        log.debug("Entity Listener iniciado.");
+        this.exchange = entityEventsProperties.getExchange();
+        this.routingKey = entityEventsProperties.getRoutingKey();
+        log.debug("Entity Listener inicializada. Eventos de entidades serão publicados em Exchange: {}, RoutingKey: {}", exchange, routingKey);
     }
 
     @Override
@@ -50,7 +55,7 @@ public class MessageDispatcherEntityEventsListenerImpl implements MessageDispatc
     }
 
     private void publish(Object entity, String action) {
-        publisher.sendEvent(entity);
+        publisher.sendEvent(exchange, routingKey, entity);
         if (log.isDebugEnabled()) {
             try {
                 log.debug("Evento publicado Entity: {} {} ", entity.getClass().getSimpleName(), action);

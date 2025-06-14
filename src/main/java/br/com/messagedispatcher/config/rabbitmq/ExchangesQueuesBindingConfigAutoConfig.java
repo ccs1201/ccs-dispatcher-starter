@@ -17,7 +17,7 @@
 package br.com.messagedispatcher.config.rabbitmq;
 
 import br.com.messagedispatcher.config.properties.MessageDispatcherProperties;
-import br.com.messagedispatcher.util.ExchangeFactoryUtil;
+import br.com.messagedispatcher.util.factory.ExchangeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Binding;
@@ -44,14 +44,14 @@ import java.util.List;
  */
 
 @Configuration
-@ConditionalOnProperty(name = "message.dispatcher.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "message.dispatcher.default-listener-enabled", havingValue = "true", matchIfMissing = true)
 public class ExchangesQueuesBindingConfigAutoConfig {
 
     private final Logger log = LoggerFactory.getLogger(ExchangesQueuesBindingConfigAutoConfig.class);
 
     @Bean
     public Declarables defaultExchangeAndQueue(MessageDispatcherProperties properties) {
-        var exchange = ExchangeFactoryUtil
+        var exchange = ExchangeFactory
                 .buildExchange(properties.getExchangeName(),
                         properties.isExchangeDurable(),
                         properties.getExchangeType(),
@@ -78,7 +78,7 @@ public class ExchangesQueuesBindingConfigAutoConfig {
 
     @Bean
     public Declarables deadLetterExchangeAndQueue(MessageDispatcherProperties properties) {
-        var exchange = ExchangeFactoryUtil
+        var exchange = ExchangeFactory
                 .buildExchange(properties.getDeadLetterExchangeName(),
                         properties.isDeadLetterExchangeDurable(),
                         properties.getDeadLetterExchangeType(),

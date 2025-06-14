@@ -181,7 +181,6 @@
       "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",
       "defaultValue": 10000
     },
-
     {
       "name": "message.dispatcher.returnExceptions",
       "type": "java.lang.boolean",
@@ -217,11 +216,39 @@
       "defaultValue": true
     },
     {
-      "name": "message.dispatcher.entity-listener",
+      "name": "message.dispatcher.defaultListenerEnabled",
+      "type": "java.lang.Boolean",
+      "description": "Habilita o MessageDispatcherListener padrão. Você pode querer desabilitar o listener padrão em alguns cenários, como por exemplo quando a aplicação for somente um produtor e não precisa processar mensagens de outras aplicações. Neste não serão criadas as filas par a aplicação (fila de entrada e dlq) nem os bindings com a exchange.",
+      "sourceType": "br.com.messagedispatcher.config.properties.EntityEventsProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "message.dispatcher.entity-events.enabled",
       "type": "java.lang.Boolean",
       "description": "Habilita a publicação de eventos de entidades através do MessageDispatcherEntityEventsListener.",
-      "sourceType": "br.com.messagedispatcher.config.properties.EntityListenerProperties",
+      "sourceType": "br.com.messagedispatcher.config.properties.EntityEventsProperties",
       "defaultValue": false
+    },
+    {
+      "name": "message.dispatcher.entity-events.routing-key",
+      "type": "java.lang.String",
+      "description": "Routing key para mensagens de eventos de entidades.",
+      "sourceType": "br.com.messagedispatcher.config.properties.EntityEventsProperties",
+      "defaultValue": "${spring.application.name}.entity-events"
+    },
+    {
+      "name": "message.dispatcher.entity-events.exchange",
+      "type": "java.lang.String",
+      "description": "Nome da exchange de eventos de entidades.",
+      "sourceType": "br.com.messagedispatcher.config.properties.EntityEventsProperties",
+      "defaultValue": "${spring.application.name}.entity-events"
+    },
+    {
+      "name": "message.dispatcher.entity-events.exchange-type",
+      "type": "br.com.messagedispatcher.constants.MessageDispatcherConstants.Exchange",
+      "description": "Tipo da exchange de eventos de entidades.",
+      "sourceType": "br.com.messagedispatcher.config.properties.EntityEventsProperties",
+      "defaultValue": "topic"
     }
   ],
   "hints": [

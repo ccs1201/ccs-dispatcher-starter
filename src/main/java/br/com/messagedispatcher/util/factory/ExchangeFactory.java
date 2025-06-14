@@ -1,6 +1,6 @@
-package br.com.messagedispatcher.util;
+package br.com.messagedispatcher.util.factory;
 
-import br.com.messagedispatcher.constants.Types;
+import br.com.messagedispatcher.constants.MessageDispatcherConstants;
 import br.com.messagedispatcher.exceptions.MessageDispatcherBeanResolutionException;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.ExchangeBuilder;
@@ -8,16 +8,16 @@ import org.springframework.amqp.core.ExchangeBuilder;
 import java.util.Arrays;
 import java.util.Map;
 
-import static br.com.messagedispatcher.constants.Types.Exchange.CONSISTENT_HASH;
-import static br.com.messagedispatcher.constants.Types.Exchange.DIRECT;
-import static br.com.messagedispatcher.constants.Types.Exchange.HEADERS;
-import static br.com.messagedispatcher.constants.Types.Exchange.TOPIC;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Exchange.CONSISTENT_HASH;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Exchange.DIRECT;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Exchange.HEADERS;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Exchange.TOPIC;
 import static java.util.Objects.isNull;
 
-public class ExchangeFactoryUtil {
+public class ExchangeFactory {
     public static Exchange buildExchange(String ExchangeName,
                                          boolean durable,
-                                         Types.Exchange exchangeType,
+                                         MessageDispatcherConstants.Exchange exchangeType,
                                          Map<String, Object> arguments) {
 
         if (exchangeType == TOPIC) {
@@ -28,7 +28,7 @@ public class ExchangeFactoryUtil {
             return buildDirect(ExchangeName, durable);
         }
 
-        if (exchangeType == Types.Exchange.FANOUT) {
+        if (exchangeType == MessageDispatcherConstants.Exchange.FANOUT) {
             return buildFanout(ExchangeName, durable);
         }
 
@@ -44,7 +44,7 @@ public class ExchangeFactoryUtil {
         }
 
         throw new MessageDispatcherBeanResolutionException("Não possível configurar a exchange, " +
-                "verifique suas configurações e informe um tipo de exchange válido." + Arrays.toString(Types.Exchange.values()));
+                "verifique suas configurações e informe um tipo de exchange válido." + Arrays.toString(MessageDispatcherConstants.Exchange.values()));
 
     }
 

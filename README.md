@@ -88,6 +88,17 @@ message:
     reply-time-out: 15000
     mapped:
       headers: X-Request-ID,X-Correlation-ID,X-User-ID
+    # Publisher-only mode (no listener creation)
+    default-listener-enable: false
+    # Entity events configuration
+    entity-events:
+      enabled: true
+      exchange: app.entity.events
+      routing-key: entity.events
+    # Debug logging configuration
+    logging:
+      message-router:
+        enabled: true
 ```
 
 ### Header Mapping
@@ -106,6 +117,44 @@ message:
 ```
 
 With this configuration, if an HTTP request comes in with an `X-Request-ID` header, that value will be automatically included in any messages published by the service during the processing of that request. When another service receives the message, it can access the same header value from the ThreadLocal context.
+
+### Publisher-Only Mode
+
+If your application only needs to publish messages without consuming them, you can disable the default listener creation:
+
+```yaml
+message:
+  dispatcher:
+    default-listener-enable: false
+```
+
+This configuration is useful for applications that only need to send messages or publish entity events without setting up queues and exchanges for consuming messages. When in publisher-only mode, the library will:
+
+1. Not create any default queues or bindings
+2. Not register any message listeners
+3. Still allow you to use the `MessagePublisher` to send messages
+4. Still allow entity event publishing if enabled
+
+### Message Router Logging
+
+For debugging purposes, you can enable detailed logging of message routing:
+
+```yaml
+message:
+  dispatcher:
+    logging:
+      message-router:
+        enabled: true
+```
+
+When enabled, this feature uses Spring AOP to intercept all calls to the `MessageRouter.routeMessage()` method and logs detailed information about each message:
+
+- The class and method that received the message
+- Exchange and routing key information
+- All message headers
+- Message body content
+
+This is particularly useful during development and troubleshooting to understand how messages are being routed and processed.
 
 ## Implementation Examples
 
@@ -143,15 +192,25 @@ public class MyHandler {
 
 ### Entity Event Publishing
 
-The library provides automatic event publishing for JPA entities through the `@EntityEventPublishes` annotation and `MessageDispatcherEntityListener`. This feature allows you to automatically publish events when entities are created or updated.
+The library provides automatic event publishing for JPA entities through the `@EntityEventPublishes` annotation and Hibernate integration. This feature allows you to automatically publish events when entities are created or updated.
 
 #### Configuration
 
-To enable entity event publishing, add the following to your properties file:
+To enable entity event publishing, add the following to your configuration:
 
-```properties
-    message.dispatcher.entity-listener = true
+```yaml
+message:
+  dispatcher:
+    entity-events:
+      enabled: true
+      exchange: app.entity.events
+      routing-key: entity.events
 ```
+
+This configuration:
+1. Enables the entity event publishing feature
+2. Specifies the exchange where entity events will be published
+3. Defines the routing key to use for the events
 
 #### Entity Example
 
@@ -338,6 +397,17 @@ message:
     reply-time-out: 15000
     mapped:
       headers: X-Request-ID,X-Correlation-ID,X-User-ID
+    # Modo somente publicador (sem criação de listener)
+    default-listener-enable: false
+    # Configuração de eventos de entidade
+    entity-events:
+      enabled: true
+      exchange: app.entity.events
+      routing-key: entity.events
+    # Configuração de logging de depuração
+    logging:
+      message-router:
+        enabled: true
 ```
 
 ### Mapeamento de Headers
@@ -356,6 +426,44 @@ message:
 ```
 
 Com esta configuração, se uma requisição HTTP chegar com um header `X-Request-ID`, esse valor será automaticamente incluído em qualquer mensagem publicada pelo serviço durante o processamento dessa requisição. Quando outro serviço receber a mensagem, ele poderá acessar o mesmo valor de header a partir do contexto ThreadLocal.
+
+### Modo Somente Publicador
+
+Se sua aplicação precisa apenas publicar mensagens sem consumi-las, você pode desabilitar a criação do listener padrão:
+
+```yaml
+message:
+  dispatcher:
+    default-listener-enable: false
+```
+
+Esta configuração é útil para aplicações que apenas precisam enviar mensagens ou publicar eventos de entidade sem configurar filas e exchanges para consumo de mensagens. No modo somente publicador, a biblioteca irá:
+
+1. Não criar nenhuma fila ou binding padrão
+2. Não registrar nenhum listener de mensagens
+3. Ainda permitir o uso do `MessagePublisher` para enviar mensagens
+4. Ainda permitir a publicação de eventos de entidade, se habilitada
+
+### Logging do Roteador de Mensagens
+
+Para fins de depuração, você pode habilitar o logging detalhado do roteamento de mensagens:
+
+```yaml
+message:
+  dispatcher:
+    logging:
+      message-router:
+        enabled: true
+```
+
+Quando habilitado, este recurso usa Spring AOP para interceptar todas as chamadas ao método `MessageRouter.routeMessage()` e registra informações detalhadas sobre cada mensagem:
+
+- A classe e o método que receberam a mensagem
+- Informações de exchange e routing key
+- Todos os headers da mensagem
+- Conteúdo do corpo da mensagem
+
+Isso é particularmente útil durante o desenvolvimento e solução de problemas para entender como as mensagens estão sendo roteadas e processadas.
 
 ## Exemplos de Implementação
 
@@ -393,15 +501,25 @@ public class MeuHandler {
 
 ### Publicação de Eventos de Entidade
 
-A biblioteca fornece publicação automática de eventos para entidades JPA através da anotação `@EntityEventPublishes` e `MessageDispatcherEntityListener`. Este recurso permite publicar eventos automaticamente quando entidades são criadas, atualizadas ou excluídas.
+A biblioteca fornece publicação automática de eventos para entidades JPA através da anotação `@EntityEventPublishes` e integração com o Hibernate. Este recurso permite publicar eventos automaticamente quando entidades são criadas, atualizadas ou excluídas.
 
 #### Configuração
 
 Para habilitar a publicação de eventos de entidade, adicione o seguinte à sua configuração:
 
-```properties
-    message.dispatcher.entity-listener = true
+```yaml
+message:
+  dispatcher:
+    entity-events:
+      enabled: true
+      exchange: app.entity.events
+      routing-key: entity.events
 ```
+
+Esta configuração:
+1. Habilita o recurso de publicação de eventos de entidade
+2. Especifica a exchange onde os eventos de entidade serão publicados
+3. Define a routing key a ser usada para os eventos
 
 #### Exemplo de Entidade
 
