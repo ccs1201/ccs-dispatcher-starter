@@ -55,6 +55,22 @@ Key architectural components include:
 </dependency>
 ```
 
+### Enabling the Starter
+
+To enable the Message Dispatcher starter, you need to add the `@EnableMessageDispatcher` annotation to your main application class or any configuration class:
+
+```java
+@SpringBootApplication
+@EnableMessageDispatcher
+public class MyApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(MyApplication.class, args);
+    }
+}
+```
+
+This annotation imports all the necessary configuration to set up the Message Dispatcher components.
+
 ### Basic Configuration
 
 ```yaml
@@ -363,6 +379,22 @@ Componentes arquiteturais principais incluem:
     <version>${version}</version>
 </dependency>
 ```
+
+### Habilitando o Starter
+
+Para habilitar o Message Dispatcher starter, você precisa adicionar a anotação `@EnableMessageDispatcher` à sua classe principal de aplicação ou a qualquer classe de configuração:
+
+```java
+@SpringBootApplication
+@EnableMessageDispatcher
+public class MinhaAplicacao {
+    public static void main(String[] args) {
+        SpringApplication.run(MinhaAplicacao.class, args);
+    }
+}
+```
+
+Esta anotação importa toda a configuração necessária para configurar os componentes do Message Dispatcher.
 
 ### Configuração Básica
 
