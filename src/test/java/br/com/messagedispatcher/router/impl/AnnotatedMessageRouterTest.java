@@ -7,7 +7,9 @@ import br.com.messagedispatcher.annotation.Query;
 import br.com.messagedispatcher.beandiscover.MessageDispatcherAnnotatedHandlerDiscover;
 import br.com.messagedispatcher.exceptions.MessageHandlerNotFoundException;
 import br.com.messagedispatcher.exceptions.MessageRouterMissingHeaderException;
+import br.com.messagedispatcher.util.context.MessageDispatcherContextHolder;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,9 +46,13 @@ class AnnotatedMessageRouterTest {
     @Mock
     private ApplicationContext applicationContext;
 
-    @Test
-    void routeMessage_shouldThrowExceptionWhenMessageTypeHeaderIsMissing() {
+    @AfterEach
+    void tearDown() {
+        MessageDispatcherContextHolder.clear();
+    }
 
+    @Test
+    void routeMessageShouldThrowExceptionWhenMessageTypeHeaderIsMissing() {
         Message message = createMessage(null, TestPayload.class.getName());
 
         assertThrows(MessageRouterMissingHeaderException.class, () -> router.routeMessage(message));
@@ -57,7 +63,7 @@ class AnnotatedMessageRouterTest {
     }
 
     @Test
-    void routeMessage_shouldThrowExceptionWhenPayloadClassHeaderIsMissing() {
+    void routeMessageShouldThrowExceptionWhenPayloadClassHeaderIsMissing() {
         Message message = createMessage(COMMAND.name(), null);
 
         assertThrows(MessageRouterMissingHeaderException.class, () -> router.routeMessage(message));
@@ -68,7 +74,7 @@ class AnnotatedMessageRouterTest {
     }
 
     @Test
-    void routeMessage_shouldThrowExceptionWhenHandlerNotFound() {
+    void routeMessageShouldThrowExceptionWhenHandlerNotFound() {
         Message message = createMessage(COMMAND.name(), TestPayload.class.getName());
         when(handlerDiscover.getHandler(any(), any())).thenThrow(MessageHandlerNotFoundException.class);
 
@@ -80,7 +86,7 @@ class AnnotatedMessageRouterTest {
     }
 
     @Test
-    void routeMessage_shouldInvokeCommandHandler() throws Exception {
+    void routeMessageShouldInvokeCommandHandler() throws Exception {
         Message message = createMessage(COMMAND.name(), TestPayload.class.getName());
         TestHandler handler = new TestHandler();
         Method method = TestHandler.class.getMethod("handleCommand", TestPayload.class);
@@ -104,7 +110,7 @@ class AnnotatedMessageRouterTest {
     }
 
     @Test
-    void routeMessage_shouldInvokeQueryHandler() throws Exception {
+    void routeMessageShouldInvokeQueryHandler() throws Exception {
         Message message = createMessage(QUERY.name(), TestPayload.class.getName());
         TestHandler handler = new TestHandler();
         Method method = TestHandler.class.getMethod("handleQuery", TestPayload.class);
@@ -128,7 +134,7 @@ class AnnotatedMessageRouterTest {
     }
 
     @Test
-    void routeMessage_shouldInvokeNotificationHandler() throws Exception {
+    void routeMessageShouldInvokeNotificationHandler() throws Exception {
         Message message = createMessage(NOTIFICATION.name(), TestPayload.class.getName());
         TestHandler handler = new TestHandler();
         Method method = TestHandler.class.getMethod("handleNotification", TestPayload.class);
@@ -152,7 +158,7 @@ class AnnotatedMessageRouterTest {
     }
 
     @Test
-    void routeMessage_shouldThrowTargetInvocationExceptionWhenInvokeHandler() throws Exception {
+    void routeMessageShouldThrowTargetInvocationExceptionWhenHandlerThrowsException() throws Exception {
         Message message = createMessage(NOTIFICATION.name(), TestPayload.class.getName());
         TestHandlerWithException handler = new TestHandlerWithException();
 
@@ -175,6 +181,62 @@ class AnnotatedMessageRouterTest {
         verify(handlerDiscover, times(1)).getHandler(eq(NOTIFICATION), eq(TestPayload.class.getName()));
         verify(objectMapper, times(1)).readValue(eq(message.getBody()), eq(TestPayload.class));
         verify(applicationContext, times(1)).getBean(eq(TestHandlerWithException.class));
+    }
+
+    @Test
+    void routeMessageShouldSetHeadersInContextHolder() throws Exception {
+        Map<String, Object> customHeaders = new HashMap<>();
+        customHeaders.put(HANDLER_TYPE.getHeaderName(), COMMAND.name());
+        customHeaders.put(BODY_TYPE.getHeaderName(), TestPayload.class.getName());
+        customHeaders.put("X-Custom-Header", "custom-value");
+        customHeaders.put("X-Correlation-ID", "123456");
+        
+        Message message = createMessageWithCustomHeaders(customHeaders);
+        TestHandler handler = new TestHandler();
+        Method method = TestHandler.class.getMethod("handleCommand", TestPayload.class);
+
+        when(handlerDiscover.getHandler(eq(COMMAND), eq(TestPayload.class.getName())))
+                .thenReturn(method);
+
+        when(objectMapper.readValue(eq(message.getBody()), eq(TestPayload.class)))
+                .thenReturn(new TestPayload());
+
+        when(applicationContext.getBean(eq(TestHandler.class)))
+                .thenReturn(handler);
+
+        router.routeMessage(message);
+
+        verify(handlerDiscover, times(1)).getHandler(eq(COMMAND), eq(TestPayload.class.getName()));
+    }
+
+    @Test
+    void routeMessageShouldClearHeadersInContextHolderAfterExecution() throws Exception {
+        Message message = createMessage(COMMAND.name(), TestPayload.class.getName());
+        TestHandler handler = new TestHandler();
+        Method method = TestHandler.class.getMethod("handleCommand", TestPayload.class);
+
+        when(handlerDiscover.getHandler(eq(COMMAND), eq(TestPayload.class.getName())))
+                .thenReturn(method);
+
+        when(objectMapper.readValue(eq(message.getBody()), eq(TestPayload.class)))
+                .thenReturn(new TestPayload());
+
+        when(applicationContext.getBean(eq(TestHandler.class)))
+                .thenReturn(handler);
+
+        router.routeMessage(message);
+
+        assertNull(MessageDispatcherContextHolder.getHeaders());
+    }
+
+    @Test
+    void routeMessageShouldClearHeadersInContextHolderEvenWhenExceptionIsThrown() {
+        Message message = createMessage(COMMAND.name(), TestPayload.class.getName());
+        when(handlerDiscover.getHandler(any(), any())).thenThrow(new RuntimeException("Test exception"));
+
+        assertThrows(RuntimeException.class, () -> router.routeMessage(message));
+
+        assertNull(MessageDispatcherContextHolder.getHeaders());
     }
 
     @MessageListener
@@ -202,10 +264,21 @@ class AnnotatedMessageRouterTest {
         return new Message("teste".getBytes(), props);
     }
 
+    private Message createMessageWithCustomHeaders(Map<String, Object> headers) {
+        MessageProperties props = new MessageProperties();
+        props.setHeaders(headers);
+        return new Message("teste".getBytes(), props);
+    }
+
+    @SuppressWarnings("unused")
     @MessageListener
     static class TestHandler {
         @Command
         public String handleCommand(TestPayload payload) {
+            Map<String, Object> headers = MessageDispatcherContextHolder.getHeaders();
+            if (headers != null && headers.containsKey("X-Custom-Header")) {
+                return "command handled with headers";
+            }
             return "command handled";
         }
 
@@ -216,10 +289,10 @@ class AnnotatedMessageRouterTest {
 
         @Notification
         public void handleNotification(TestPayload payload) {
-            // Do nothing
         }
     }
 
+    @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal", "unused"})
     static class TestPayload {
         private String data = "test";
 
