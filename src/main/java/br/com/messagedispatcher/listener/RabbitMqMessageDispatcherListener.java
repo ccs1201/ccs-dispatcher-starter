@@ -21,7 +21,7 @@ import br.com.messagedispatcher.MessageDispatcherListener;
 import br.com.messagedispatcher.exceptions.MessageDispatcherLoggerException;
 import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.router.MessageRouter;
-import br.com.messagedispatcher.util.EnvironmentUtils;
+import br.com.messagedispatcher.util.MessageDispatcherUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -108,7 +108,7 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
 
     private void setResponseHeaders(Message message) {
         message.getMessageProperties().setHeader(RESPONSE_TIME_STAMP.getHeaderName(), LocalDateTime.now());
-        message.getMessageProperties().setHeader(RESPONSE_FROM.getHeaderName(), EnvironmentUtils.getAppName());
+        message.getMessageProperties().setHeader(RESPONSE_FROM.getHeaderName(), MessageDispatcherUtils.getAppName());
     }
 
     private void log(Message message) {

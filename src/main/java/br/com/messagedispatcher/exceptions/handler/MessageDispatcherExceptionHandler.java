@@ -1,8 +1,9 @@
 package br.com.messagedispatcher.exceptions.handler;
 
 import br.com.messagedispatcher.exceptions.MessageDispatcherRemoteProcessException;
+import br.com.messagedispatcher.exceptions.MessageDispatcherRemoteResultException;
 import br.com.messagedispatcher.exceptions.MessagePublisherTimeOutException;
-import br.com.messagedispatcher.util.EnvironmentUtils;
+import br.com.messagedispatcher.util.MessageDispatcherUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,18 +18,30 @@ public class MessageDispatcherExceptionHandler {
 
     @ExceptionHandler(MessageDispatcherRemoteProcessException.class)
     public ResponseEntity<MessageDispatcherProblemDetailExceptionResponse> handle(MessageDispatcherRemoteProcessException e) {
-        logException(e.getMessage());
+        logException(e);
         return buildProblemDetailExceptionResponse(e.getStatus(), e.getMessage(), e.getRemoteService());
     }
 
     @ExceptionHandler(MessagePublisherTimeOutException.class)
     public ResponseEntity<MessageDispatcherProblemDetailExceptionResponse> handle(MessagePublisherTimeOutException e) {
-        logException(e.getMessage());
-        return buildProblemDetailExceptionResponse(e.getStatus(), e.getMessage(), EnvironmentUtils.getAppName());
+        logException(e);
+        return buildProblemDetailExceptionResponse(e.getStatus(), e.getMessage(), MessageDispatcherUtils.getAppName());
     }
 
-    private static void logException(String e) {
-        log.error("Ocorreu um erro no processamento remoto Message: {}", e);
+    @ExceptionHandler(MessageDispatcherRemoteResultException.class)
+    public ResponseEntity<MessageDispatcherProblemDetailExceptionResponse> handle(MessageDispatcherRemoteResultException e) {
+        logException(e);
+        return buildProblemDetailExceptionResponse(e.getRemoteExceptionType(), e.getStatus(), e.getMessage(), MessageDispatcherUtils.getAppName());
+    }
+
+    private static void logException(Exception e) {
+        log.error("Ocorreu um erro no processamento remoto Message: {}", e.getMessage(), e);
+    }
+
+    private ResponseEntity<MessageDispatcherProblemDetailExceptionResponse> buildProblemDetailExceptionResponse(String remoteExceptionType, HttpStatus status, String message, String appName) {
+        return ResponseEntity
+                .status(status)
+                .body(MessageDispatcherProblemDetailExceptionResponse.of(remoteExceptionType, status.name(), status.value(), message, appName));
     }
 
     private static ResponseEntity<MessageDispatcherProblemDetailExceptionResponse> buildProblemDetailExceptionResponse(HttpStatus httpStatus, String message, String orinService) {
@@ -38,13 +51,17 @@ public class MessageDispatcherExceptionHandler {
     }
 
     public record MessageDispatcherProblemDetailExceptionResponse(String type,
-                                                                   String title,
-                                                                   int status,
-                                                                   String detail,
-                                                                   String remoteService) {
+                                                                  String title,
+                                                                  int status,
+                                                                  String detail,
+                                                                  String remoteService) {
 
         static MessageDispatcherProblemDetailExceptionResponse of(String title, int status, String detail, String originService) {
             return new MessageDispatcherProblemDetailExceptionResponse("Error", title, status, detail, originService);
+        }
+
+        static MessageDispatcherProblemDetailExceptionResponse of(String type, String title, int status, String detail, String originService) {
+            return new MessageDispatcherProblemDetailExceptionResponse(type, title, status, detail, originService);
         }
     }
 }
