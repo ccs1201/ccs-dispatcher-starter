@@ -134,6 +134,23 @@ message:
 
 With this configuration, if an HTTP request comes in with an `X-Request-ID` header, that value will be automatically included in any messages published by the service during the processing of that request. When another service receives the message, it can access the same header value from the ThreadLocal context.
 
+#### Accessing Headers with MessageDispatcherContextHolder
+
+The `MessageDispatcherContextHolder` class provides a convenient way to access the mapped headers from anywhere in your application:
+
+```java
+// Get all headers as a Map
+Map<String, Object> allHeaders = MessageDispatcherContextHolder.getHeaders();
+
+// Get a specific header value
+String requestId = MessageDispatcherContextHolder.getHeader("X-Request-ID");
+
+// Clear the context when done (handled automatically)
+MessageDispatcherContextHolder.clear();
+```
+
+This ThreadLocal context is automatically populated when a message is received and cleared after processing is complete. It provides a thread-safe way to access message headers throughout your application without passing them as parameters between methods.
+
 ### Publisher-Only Mode
 
 If your application only needs to publish messages without consuming them, you can disable the default listener creation:
@@ -458,6 +475,23 @@ message:
 ```
 
 Com esta configuração, se uma requisição HTTP chegar com um header `X-Request-ID`, esse valor será automaticamente incluído em qualquer mensagem publicada pelo serviço durante o processamento dessa requisição. Quando outro serviço receber a mensagem, ele poderá acessar o mesmo valor de header a partir do contexto ThreadLocal.
+
+#### Acessando Headers com MessageDispatcherContextHolder
+
+A classe `MessageDispatcherContextHolder` fornece uma maneira conveniente de acessar os headers mapeados de qualquer lugar em sua aplicação:
+
+```java
+// Obter todos os headers como um Map
+Map<String, Object> todosHeaders = MessageDispatcherContextHolder.getHeaders();
+
+// Obter um valor de header específico
+String requestId = MessageDispatcherContextHolder.getHeader("X-Request-ID");
+
+// Limpar o contexto quando terminar (tratado automaticamente)
+MessageDispatcherContextHolder.clear();
+```
+
+Este contexto ThreadLocal é automaticamente populado quando uma mensagem é recebida e limpo após o processamento ser concluído. Ele fornece uma maneira thread-safe de acessar headers de mensagens em toda a sua aplicação sem precisar passá-los como parâmetros entre métodos.
 
 ### Modo Somente Publicador
 

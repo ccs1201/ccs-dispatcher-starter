@@ -31,7 +31,7 @@ public class MessageRouterAopLogging {
                     ########################################## Message Router com modo DEBUG ativo ##########################################
                 
                     Mensagens roteadas serão exibidas no log de depuração.
-                    Para desativar o modo debug, altere a propriedade 'message.dispatcher.logging.messagerouter.logging-enable' para 'false'
+                    Para desativar o modo debug, altere a propriedade 'message.dispatcher.logging.messagerouter.logging-enabled' para 'false'
                 
                     #########################################################################################################################
                 """);
