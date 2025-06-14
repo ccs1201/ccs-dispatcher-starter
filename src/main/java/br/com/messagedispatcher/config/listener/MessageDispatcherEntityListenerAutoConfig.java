@@ -1,5 +1,6 @@
 package br.com.messagedispatcher.config.listener;
 
+import br.com.messagedispatcher.config.properties.EntityEventsProperties;
 import br.com.messagedispatcher.listener.MessageDispatcherEntityEventsListener;
 import br.com.messagedispatcher.listener.MessageDispatcherEntityEventsListenerImpl;
 import br.com.messagedispatcher.publisher.MessagePublisher;
@@ -9,15 +10,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnProperty(value = "message.dispatcher.entity-listener.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "message.dispatcher.entity-events.enabled", havingValue = "true")
 public class MessageDispatcherEntityListenerAutoConfig {
 
     private final Logger log = org.slf4j.LoggerFactory.getLogger(MessageDispatcherEntityListenerAutoConfig.class);
 
 
     @Bean
-    public MessageDispatcherEntityEventsListener messageDispatcherEntityListener(MessagePublisher publisher) {
-        log.debug("Iniciando Entity Listener.");
-        return new MessageDispatcherEntityEventsListenerImpl(publisher);
+    public MessageDispatcherEntityEventsListener messageDispatcherEntityListener(MessagePublisher publisher, EntityEventsProperties properties) {
+        log.debug("Inicializando Entity Listener.");
+        return new MessageDispatcherEntityEventsListenerImpl(publisher, properties);
     }
 }

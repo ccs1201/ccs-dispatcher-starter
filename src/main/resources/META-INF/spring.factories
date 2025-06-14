@@ -1,4 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   br.com.messagedispatcher.config.MessageDispatcherAutoConfig,\
   br.com.messagedispatcher.config.listener.MessageDispatcherEntityListenerAutoConfig,\
-  br.com.messagedispatcher.config.properties.EntityListenerProperties
+  br.com.messagedispatcher.config.properties.EntityEventsProperties

@@ -48,7 +48,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  */
 
 @Component
-@ConditionalOnProperty(prefix = "message.dispatcher", name = "default-listener-enable", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "message.dispatcher", name = "default-listener-enabled", havingValue = "true", matchIfMissing = true)
 public class RabbitMqMessageDispatcherListener implements MessageDispatcherListener {
 
     private final Logger log = LoggerFactory.getLogger(RabbitMqMessageDispatcherListener.class);

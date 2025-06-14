@@ -12,7 +12,7 @@ import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.core.Queue;
 
-import static br.com.messagedispatcher.constants.Types.Exchange.DIRECT;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Exchange.DIRECT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;

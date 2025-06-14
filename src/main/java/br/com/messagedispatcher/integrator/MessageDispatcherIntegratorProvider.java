@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-@ConditionalOnProperty(value = "message.dispatcher.entity-listener.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "message.dispatcher.entity-events.enabled", havingValue = "true")
 public class MessageDispatcherIntegratorProvider implements IntegratorProvider {
 
     private final MessageDispatcherEntityEventsListener listener;

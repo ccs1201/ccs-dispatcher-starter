@@ -2,12 +2,14 @@ package br.com.messagedispatcher.config.rabbitmq;
 
 import br.com.messagedispatcher.exceptions.MessageDispatcherRetryableException;
 import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.api.RabbitListenerErrorHandler;
 import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,10 +23,16 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 
 @Configuration
+@ConditionalOnProperty(value = "message.dispatcher.default-listener-enabled", havingValue = "true", matchIfMissing = true)
 public class RabbitListenerErrorHandlerAutoConfig {
 
     private static final Logger log = LoggerFactory.getLogger(RabbitListenerErrorHandlerAutoConfig.class);
     private final List<String> retryableMessageTypes = List.of(QUERY.name(), COMMAND.name());
+
+    @PostConstruct
+    public void init() {
+        log.debug("Configurando RabbitListenerErrorHandler.");
+    }
 
     @Bean
     public RabbitListenerErrorHandler messageDispatcherErrorHandler() {
