@@ -86,7 +86,26 @@ message:
     max-interval: 10000
     prefetch-count: 10
     reply-time-out: 15000
+    mapped:
+      headers: X-Request-ID,X-Correlation-ID,X-User-ID
 ```
+
+### Header Mapping
+
+The `mapped.headers` property allows you to automatically map HTTP request headers to message headers. Headers specified in this property will be automatically extracted from the current HTTP request and included in all outgoing messages. This is particularly useful for maintaining context across service boundaries, such as for tracing and correlation IDs.
+
+When a service receives a message with these mapped headers, they are automatically made available in a ThreadLocal context, allowing you to access them anywhere in your application without having to pass them explicitly between methods.
+
+Example usage:
+
+```yaml
+message:
+  dispatcher:
+    mapped:
+      headers: X-Request-ID,X-Correlation-ID,X-User-ID,X-Tenant-ID
+```
+
+With this configuration, if an HTTP request comes in with an `X-Request-ID` header, that value will be automatically included in any messages published by the service during the processing of that request. When another service receives the message, it can access the same header value from the ThreadLocal context.
 
 ## Implementation Examples
 
@@ -317,7 +336,26 @@ message:
     max-interval: 10000
     prefetch-count: 10
     reply-time-out: 15000
+    mapped:
+      headers: X-Request-ID,X-Correlation-ID,X-User-ID
 ```
+
+### Mapeamento de Headers
+
+A propriedade `mapped.headers` permite mapear automaticamente headers de requisições HTTP para headers de mensagens. Os headers especificados nesta propriedade serão automaticamente extraídos da requisição HTTP atual e incluídos em todas as mensagens enviadas. Isso é particularmente útil para manter o contexto entre serviços, como IDs de rastreamento e correlação.
+
+Quando um serviço recebe uma mensagem com esses headers mapeados, eles são automaticamente disponibilizados em um contexto ThreadLocal, permitindo que você os acesse em qualquer lugar da sua aplicação sem precisar passá-los explicitamente entre métodos.
+
+Exemplo de uso:
+
+```yaml
+message:
+  dispatcher:
+    mapped:
+      headers: X-Request-ID,X-Correlation-ID,X-User-ID,X-Tenant-ID
+```
+
+Com esta configuração, se uma requisição HTTP chegar com um header `X-Request-ID`, esse valor será automaticamente incluído em qualquer mensagem publicada pelo serviço durante o processamento dessa requisição. Quando outro serviço receber a mensagem, ele poderá acessar o mesmo valor de header a partir do contexto ThreadLocal.
 
 ## Exemplos de Implementação
 
