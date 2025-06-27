@@ -47,7 +47,6 @@ public class RabbitMqMessageDispatcherListenerTest {
                 new RabbitMqMessageDispatcherListener(null, objectMapper));
     }
 
-
     /**
      * Tests the constructor of RabbitMqMessageDispatcherListener.
      * Verifies that the constructor initializes the messageRouter and objectMapper,
