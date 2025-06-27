@@ -1,4 +1,4 @@
-package br.com.messagedispatcher.listener;
+package br.com.messagedispatcher.listener.entity;
 
 import org.hibernate.event.spi.PostCommitInsertEventListener;
 import org.hibernate.event.spi.PostCommitUpdateEventListener;

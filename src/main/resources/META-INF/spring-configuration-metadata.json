@@ -202,7 +202,7 @@
       "defaultValue": "annotated"
     },
     {
-      "name": "message.dispatcher.default-listener-enable",
+      "name": "message.dispatcher.default-listener-enabled",
       "type": "java.lang.Boolean",
       "description": "Habilita o MessageDispatcherListener padrão.",
       "sourceType": "br.com.messagedispatcher.config.properties.MessageDispatcherProperties",

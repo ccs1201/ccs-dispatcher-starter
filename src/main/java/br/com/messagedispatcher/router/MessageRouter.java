@@ -1,5 +1,7 @@
 package br.com.messagedispatcher.router;
 
+import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
+
 public interface MessageRouter {
-    Object routeMessage(Object objectMessage);
+    MessageDispatcherRemoteInvocationResult routeMessage(Object objectMessage);
 }

@@ -1,6 +1,6 @@
 package br.com.messagedispatcher.integrator.hibernate;
 
-import br.com.messagedispatcher.listener.MessageDispatcherEntityEventsListener;
+import br.com.messagedispatcher.listener.entity.MessageDispatcherEntityEventsListener;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;

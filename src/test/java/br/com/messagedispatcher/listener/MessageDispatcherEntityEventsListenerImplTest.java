@@ -2,6 +2,7 @@ package br.com.messagedispatcher.listener;
 
 import br.com.messagedispatcher.annotation.EntityEventsPublish;
 import br.com.messagedispatcher.config.properties.EntityEventsProperties;
+import br.com.messagedispatcher.listener.entity.MessageDispatcherEntityEventsListenerImpl;
 import br.com.messagedispatcher.publisher.MessagePublisher;
 import org.hibernate.event.spi.PostInsertEvent;
 import org.hibernate.event.spi.PostUpdateEvent;

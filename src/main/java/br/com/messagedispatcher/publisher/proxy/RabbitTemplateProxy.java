@@ -128,13 +128,13 @@ public class RabbitTemplateProxy implements TemplateProxy {
         }
 
         if (log.isDebugEnabled()) {
-            logMessageTosend(body, message, exchange, routingKey);
+            logMessageToSend(body, message, exchange, routingKey);
         }
 
         return message;
     }
 
-    private void logMessageTosend(Object body, Message message, String exchange, String routingKey) {
+    private void logMessageToSend(Object body, Message message, String exchange, String routingKey) {
         try {
             log.debug("""
                             

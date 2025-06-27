@@ -1,4 +1,4 @@
-package br.com.messagedispatcher;
+package br.com.messagedispatcher.listener;
 
 import org.springframework.amqp.core.Message;
 

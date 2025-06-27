@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -24,7 +25,7 @@ import java.util.Map;
 import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType;
 import static java.util.Objects.isNull;
 
-@SuppressWarnings("unused")
+@Lazy
 @Component
 public class MessageDispatcherAnnotatedHandlerDiscoverImpl implements MessageDispatcherAnnotatedHandlerDiscover {
 

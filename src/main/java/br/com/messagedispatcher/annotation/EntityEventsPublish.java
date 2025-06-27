@@ -1,6 +1,6 @@
 package br.com.messagedispatcher.annotation;
 
-import br.com.messagedispatcher.listener.MessageDispatcherEntityEventsListenerImpl;
+import br.com.messagedispatcher.listener.entity.MessageDispatcherEntityEventsListenerImpl;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

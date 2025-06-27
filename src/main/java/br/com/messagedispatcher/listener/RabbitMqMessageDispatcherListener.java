@@ -17,11 +17,9 @@
 
 package br.com.messagedispatcher.listener;
 
-import br.com.messagedispatcher.MessageDispatcherListener;
 import br.com.messagedispatcher.exceptions.MessageDispatcherLoggerException;
 import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.router.MessageRouter;
-import br.com.messagedispatcher.util.MessageDispatcherUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -32,10 +30,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 import static br.com.messagedispatcher.constants.MessageDispatcherConstants.Headers.*;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * Classe responsável por receber as mensagens do RabbitMQ e despachá-las para a implementação de {@link MessageRouter}.
@@ -75,25 +71,11 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
             log(message);
         }
 
-        var resultProcess = messageRouter.routeMessage(message);
-
-        if (resultProcess == null) {
-            return null;
-        }
-
-        if (requiresReplyTo(message)) {
-            setResponseHeaders(message);
-            return buildResponse(resultProcess);
-        }
-
-        return null;
+         return messageRouter.routeMessage(message);
     }
 
-    private MessageDispatcherRemoteInvocationResult buildResponse(Object resultProcess) {
-        return MessageDispatcherRemoteInvocationResult.of(resultProcess);
-    }
 
-    @SuppressWarnings("unused")
+
     private static void sleep() {
         try {
             Thread.sleep(5000);
@@ -102,14 +84,6 @@ public class RabbitMqMessageDispatcherListener implements MessageDispatcherListe
         }
     }
 
-    private static boolean requiresReplyTo(Message message) {
-        return isNotBlank(message.getMessageProperties().getReplyTo());
-    }
-
-    private void setResponseHeaders(Message message) {
-        message.getMessageProperties().setHeader(RESPONSE_TIME_STAMP.getHeaderName(), LocalDateTime.now());
-        message.getMessageProperties().setHeader(RESPONSE_FROM.getHeaderName(), MessageDispatcherUtils.getAppName());
-    }
 
     private void log(Message message) {
         try {

@@ -1,6 +1,7 @@
 package br.com.messagedispatcher.impl;
 
 import br.com.messagedispatcher.exceptions.MessageRouterProcessingException;
+import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.model.MockedMessageWrapper;
 import br.com.messagedispatcher.router.impl.MockedMessageRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -304,12 +305,12 @@ public class MockedMessageRouterTest {
         when(objectMapper.readValue(any(byte[].class), eq(Object.class))).thenReturn(expectedResult);
 
         // Executing the method
-        Object result = router.routeMessage(message);
+        var result = router.routeMessage(message);
 
         // Verifying the result
         assertNotNull(result);
-        assertInstanceOf(Map.class, result);
-        assertEquals("value", ((Map<?, ?>) result).get("key"));
+        assertInstanceOf(MessageDispatcherRemoteInvocationResult.class, result);
+        assertEquals("value", (((Map<String, String>) result.value()).get("key")));
 
         // Verifying interactions
         verify(objectMapper).readValue(any(byte[].class), eq(MockedMessageWrapper.class));

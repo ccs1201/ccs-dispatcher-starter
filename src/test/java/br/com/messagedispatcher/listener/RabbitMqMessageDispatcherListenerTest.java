@@ -13,8 +13,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("unused")
 @ExtendWith(MockitoExtension.class)
@@ -36,9 +43,8 @@ public class RabbitMqMessageDispatcherListenerTest {
     @Test
     public void testConstructorWithNullMessageRouter() {
         ObjectMapper objectMapper = mock(ObjectMapper.class);
-        assertThrows(NullPointerException.class, () -> {
-            new RabbitMqMessageDispatcherListener(null, objectMapper);
-        });
+        assertThrows(NullPointerException.class, () ->
+                new RabbitMqMessageDispatcherListener(null, objectMapper));
     }
 
 
@@ -104,7 +110,7 @@ public class RabbitMqMessageDispatcherListenerTest {
         props.setReplyTo("replyQueue");
         Message message = new Message("test".getBytes(), props);
 
-        when(messageRouter.routeMessage(message)).thenReturn("processedResult");
+        when(messageRouter.routeMessage(message)).thenReturn(MessageDispatcherRemoteInvocationResult.of("processedResult"));
 
         var result = listener.onMessage(message);
 
@@ -138,7 +144,7 @@ public class RabbitMqMessageDispatcherListenerTest {
     @Test
     public void test_onMessage_whenNoReplyToProperty_shouldReturnNull() {
         Message message = new Message("test".getBytes(), new MessageProperties());
-        when(messageRouter.routeMessage(message)).thenReturn("some result");
+        when(messageRouter.routeMessage(message)).thenReturn(null);
 
         MessageDispatcherRemoteInvocationResult result = listener.onMessage(message);
 

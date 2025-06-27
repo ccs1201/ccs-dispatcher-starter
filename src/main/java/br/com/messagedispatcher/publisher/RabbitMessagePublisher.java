@@ -6,7 +6,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType;
-import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType.*;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType.COMMAND;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType.EVENT;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType.NOTIFICATION;
+import static br.com.messagedispatcher.constants.MessageDispatcherConstants.HandlerType.QUERY;
 
 @Component
 public final class RabbitMessagePublisher implements MessagePublisher {
@@ -24,12 +27,12 @@ public final class RabbitMessagePublisher implements MessagePublisher {
 
     @Override
     public void sendEvent(final Object body) {
-        this.sendEvent(DEFAULT_EXCHANGE, DEFAULT_ROUTING_KEY, body);
+        this.convertAndSend(DEFAULT_EXCHANGE, DEFAULT_ROUTING_KEY, body, EVENT);
     }
 
     @Override
     public void sendEvent(final String routingKey, final Object body) {
-        this.sendEvent(DEFAULT_EXCHANGE, routingKey, body);
+        this.convertAndSend(DEFAULT_EXCHANGE, routingKey, body, EVENT);
     }
 
     @Override
@@ -39,12 +42,12 @@ public final class RabbitMessagePublisher implements MessagePublisher {
 
     @Override
     public void sendCommand(Object body) {
-        this.sendCommand(DEFAULT_EXCHANGE, DEFAULT_ROUTING_KEY);
+        this.convertAndSend(DEFAULT_EXCHANGE, DEFAULT_ROUTING_KEY, body, COMMAND);
     }
 
     @Override
     public void sendCommand(String routingKey, Object body) {
-        this.sendCommand(DEFAULT_EXCHANGE, routingKey, body);
+        this.convertAndSend(DEFAULT_EXCHANGE, routingKey, body, COMMAND);
     }
 
     @Override

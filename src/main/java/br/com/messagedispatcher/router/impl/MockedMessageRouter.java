@@ -1,8 +1,10 @@
 package br.com.messagedispatcher.router.impl;
 
 import br.com.messagedispatcher.exceptions.MessageRouterProcessingException;
+import br.com.messagedispatcher.model.MessageDispatcherRemoteInvocationResult;
 import br.com.messagedispatcher.model.MockedMessageWrapper;
 import br.com.messagedispatcher.router.MessageRouter;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,7 @@ public class MockedMessageRouter implements MessageRouter {
         this.handlerAdapter = handlerAdapter;
     }
 
-    public Object routeMessage(Object message) {
+    public MessageDispatcherRemoteInvocationResult routeMessage(Object message) {
         var messageWrapper = getMessageWrapper(message);
         try {
             // Cria request com método e path
@@ -81,9 +83,9 @@ public class MockedMessageRouter implements MessageRouter {
             if (responseBody.length > 0) {
                 String responseContentType = response.getContentType();
                 if (responseContentType != null && responseContentType.contains(MessageProperties.CONTENT_TYPE_JSON)) {
-                    return objectMapper.readValue(responseBody, Object.class);
+                    return MessageDispatcherRemoteInvocationResult.of(objectMapper.readValue(responseBody, Object.class));
                 }
-                return responseBody;
+                return MessageDispatcherRemoteInvocationResult.of(objectMapper.readValue(responseBody, JsonNode.class));
             }
 
             return null;

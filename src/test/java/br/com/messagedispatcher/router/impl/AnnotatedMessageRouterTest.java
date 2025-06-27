@@ -1,6 +1,7 @@
 package br.com.messagedispatcher.router.impl;
 
 import br.com.messagedispatcher.annotation.Command;
+import br.com.messagedispatcher.annotation.Event;
 import br.com.messagedispatcher.annotation.MessageListener;
 import br.com.messagedispatcher.annotation.Notification;
 import br.com.messagedispatcher.annotation.Query;
@@ -53,7 +54,7 @@ class AnnotatedMessageRouterTest {
 
     @Test
     void routeMessageShouldThrowExceptionWhenMessageTypeHeaderIsMissing() {
-        Message message = createMessage(null, TestPayload.class.getName());
+        Message message = createMessage(null, TestPayload.class.getName(), true);
 
         assertThrows(MessageRouterMissingHeaderException.class, () -> router.routeMessage(message));
 
@@ -64,7 +65,7 @@ class AnnotatedMessageRouterTest {
 
     @Test
     void routeMessageShouldThrowExceptionWhenPayloadClassHeaderIsMissing() {
-        Message message = createMessage(COMMAND.name(), null);
+        Message message = createMessage(COMMAND.name(), null, false);
 
         assertThrows(MessageRouterMissingHeaderException.class, () -> router.routeMessage(message));
 
@@ -75,7 +76,7 @@ class AnnotatedMessageRouterTest {
 
     @Test
     void routeMessageShouldThrowExceptionWhenHandlerNotFound() {
-        Message message = createMessage(COMMAND.name(), TestPayload.class.getName());
+        Message message = createMessage(COMMAND.name(), TestPayload.class.getName(), false);
         when(handlerDiscover.getHandler(any(), any())).thenThrow(MessageHandlerNotFoundException.class);
 
         assertThrows(RuntimeException.class, () -> router.routeMessage(message));
@@ -87,7 +88,7 @@ class AnnotatedMessageRouterTest {
 
     @Test
     void routeMessageShouldInvokeCommandHandler() throws Exception {
-        Message message = createMessage(COMMAND.name(), TestPayload.class.getName());
+        Message message = createMessage(COMMAND.name(), TestPayload.class.getName(), true);
         TestHandler handler = new TestHandler();
         Method method = TestHandler.class.getMethod("handleCommand", TestPayload.class);
 
@@ -100,9 +101,9 @@ class AnnotatedMessageRouterTest {
         when(applicationContext.getBean(eq(TestHandler.class)))
                 .thenReturn(handler);
 
-        Object result = router.routeMessage(message);
+        var result = router.routeMessage(message);
 
-        assertEquals("command handled", result);
+        assertEquals("command handled", result.value());
 
         verify(handlerDiscover, times(1)).getHandler(eq(COMMAND), eq(TestPayload.class.getName()));
         verify(objectMapper, times(1)).readValue(eq(message.getBody()), eq(TestPayload.class));
@@ -111,7 +112,7 @@ class AnnotatedMessageRouterTest {
 
     @Test
     void routeMessageShouldInvokeQueryHandler() throws Exception {
-        Message message = createMessage(QUERY.name(), TestPayload.class.getName());
+        Message message = createMessage(QUERY.name(), TestPayload.class.getName(), true);
         TestHandler handler = new TestHandler();
         Method method = TestHandler.class.getMethod("handleQuery", TestPayload.class);
 
@@ -124,9 +125,9 @@ class AnnotatedMessageRouterTest {
         when(applicationContext.getBean(eq(TestHandler.class)))
                 .thenReturn(handler);
 
-        Object result = router.routeMessage(message);
+        var result = router.routeMessage(message);
 
-        assertEquals("query handled", result);
+        assertEquals("query handled", result.value());
 
         verify(handlerDiscover, times(1)).getHandler(eq(QUERY), eq(TestPayload.class.getName()));
         verify(objectMapper, times(1)).readValue(eq(message.getBody()), eq(TestPayload.class));
@@ -135,7 +136,7 @@ class AnnotatedMessageRouterTest {
 
     @Test
     void routeMessageShouldInvokeNotificationHandler() throws Exception {
-        Message message = createMessage(NOTIFICATION.name(), TestPayload.class.getName());
+        Message message = createMessage(NOTIFICATION.name(), TestPayload.class.getName(), false);
         TestHandler handler = new TestHandler();
         Method method = TestHandler.class.getMethod("handleNotification", TestPayload.class);
 
@@ -159,7 +160,7 @@ class AnnotatedMessageRouterTest {
 
     @Test
     void routeMessageShouldThrowTargetInvocationExceptionWhenHandlerThrowsException() throws Exception {
-        Message message = createMessage(NOTIFICATION.name(), TestPayload.class.getName());
+        Message message = createMessage(NOTIFICATION.name(), TestPayload.class.getName(), false);
         TestHandlerWithException handler = new TestHandlerWithException();
 
         Method method = TestHandlerWithException.class.getMethod("handleNotification", TestPayload.class);
@@ -181,6 +182,30 @@ class AnnotatedMessageRouterTest {
         verify(handlerDiscover, times(1)).getHandler(eq(NOTIFICATION), eq(TestPayload.class.getName()));
         verify(objectMapper, times(1)).readValue(eq(message.getBody()), eq(TestPayload.class));
         verify(applicationContext, times(1)).getBean(eq(TestHandlerWithException.class));
+    }
+
+    @Test
+    void routeMessageShouldInvokeEventHandler() throws Exception {
+        Message message = createMessage(EVENT.name(), TestPayload.class.getName(), false);
+        TestHandler handler = new TestHandler();
+        Method method = TestHandler.class.getMethod("handleNotification", TestPayload.class);
+
+        when(handlerDiscover.getHandler(eq(EVENT), eq(TestPayload.class.getName())))
+                .thenReturn(method);
+
+        when(objectMapper.readValue(eq(message.getBody()), eq(TestPayload.class)))
+                .thenReturn(new TestPayload());
+
+        when(applicationContext.getBean(eq(TestHandler.class)))
+                .thenReturn(handler);
+
+        Object result = router.routeMessage(message);
+
+        assertNull(result);
+
+        verify(handlerDiscover, times(1)).getHandler(eq(EVENT), eq(TestPayload.class.getName()));
+        verify(objectMapper, times(1)).readValue(eq(message.getBody()), eq(TestPayload.class));
+        verify(applicationContext, times(1)).getBean(eq(TestHandler.class));
     }
 
     @Test
@@ -211,7 +236,7 @@ class AnnotatedMessageRouterTest {
 
     @Test
     void routeMessageShouldClearHeadersInContextHolderAfterExecution() throws Exception {
-        Message message = createMessage(COMMAND.name(), TestPayload.class.getName());
+        Message message = createMessage(COMMAND.name(), TestPayload.class.getName(), false);
         TestHandler handler = new TestHandler();
         Method method = TestHandler.class.getMethod("handleCommand", TestPayload.class);
 
@@ -231,7 +256,7 @@ class AnnotatedMessageRouterTest {
 
     @Test
     void routeMessageShouldClearHeadersInContextHolderEvenWhenExceptionIsThrown() {
-        Message message = createMessage(COMMAND.name(), TestPayload.class.getName());
+        Message message = createMessage(COMMAND.name(), TestPayload.class.getName(), false);
         when(handlerDiscover.getHandler(any(), any())).thenThrow(new RuntimeException("Test exception"));
 
         assertThrows(RuntimeException.class, () -> router.routeMessage(message));
@@ -247,8 +272,9 @@ class AnnotatedMessageRouterTest {
         }
     }
 
-    private Message createMessage(String messageType, String payloadClass) {
+    private Message createMessage(String messageType, String payloadClass, Boolean replyTo) {
         MessageProperties props = new MessageProperties();
+        props.setReplyTo(replyTo != null ? replyTo.toString() : null);
         Map<String, Object> headers = new HashMap<>();
 
         if (messageType != null) {
@@ -270,7 +296,7 @@ class AnnotatedMessageRouterTest {
         return new Message("teste".getBytes(), props);
     }
 
-    @SuppressWarnings("unused")
+
     @MessageListener
     static class TestHandler {
         @Command
@@ -289,6 +315,10 @@ class AnnotatedMessageRouterTest {
 
         @Notification
         public void handleNotification(TestPayload payload) {
+        }
+
+        @Event
+        public void handleEvent(TestPayload payload) {
         }
     }
 

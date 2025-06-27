@@ -1,6 +1,6 @@
 package br.com.messagedispatcher.integrator;
 
-import br.com.messagedispatcher.listener.MessageDispatcherEntityEventsListener;
+import br.com.messagedispatcher.listener.entity.MessageDispatcherEntityEventsListener;
 import br.com.messagedispatcher.integrator.hibernate.MessageDispatcherHibernateIntegrator;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.jpa.boot.spi.IntegratorProvider;
