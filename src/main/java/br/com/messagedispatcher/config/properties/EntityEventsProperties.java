@@ -26,7 +26,7 @@ public class EntityEventsProperties {
     private MessageDispatcherConstants.Exchange exchangeType = MessageDispatcherConstants.Exchange.TOPIC;
 
     /**
-     * Habilita o listener de eventos de entidade
+     * Habilita o listener e publicação de eventos de entidade
      */
     private boolean enabled = false;
 
