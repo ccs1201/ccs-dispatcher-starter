@@ -20,29 +20,29 @@ public class MessageDispatcherEntityEventsListenerImpl implements MessageDispatc
         this.publisher = publisher;
         this.exchange = entityEventsProperties.getExchange();
         this.routingKey = entityEventsProperties.getRoutingKey();
-        log.debug("Entity Listener inicializada. Eventos de entidades serão publicados em Exchange: {}, RoutingKey: {}", exchange, routingKey);
+        log.debug("Entity Listener initialized. Entity events will be published to Exchange: {}, RoutingKey: {}", exchange, routingKey);
     }
 
     @Override
     public void onPostInsertCommitFailed(PostInsertEvent event) {
-        log.debug("Commit falhou para insert de: {}", event);
+        log.debug("Commit fail on insert for: {}", event.getEntity());
     }
 
     @Override
     public void onPostUpdateCommitFailed(PostUpdateEvent event) {
-        log.debug("Commit falhou para update de: {}", event);
+        log.debug("Commit fail on update for: {}", event.getEntity());
     }
 
     @Override
     public void onPostInsert(PostInsertEvent event) {
         if (shouldPublish(event.getEntity()) && event.getEntity().getClass().getAnnotation(EntityEventsPublish.class).publishCreate())
-            publish(event.getEntity(), "criada");
+            publish(event.getEntity(), Action.CREATED);
     }
 
     @Override
     public void onPostUpdate(PostUpdateEvent event) {
         if (shouldPublish(event.getEntity()) && event.getEntity().getClass().getAnnotation(EntityEventsPublish.class).publishUpdate())
-            publish(event.getEntity(), "atualizada");
+            publish(event.getEntity(), Action.UPDATED);
     }
 
     @Override
@@ -54,14 +54,14 @@ public class MessageDispatcherEntityEventsListenerImpl implements MessageDispatc
         return entity.getClass().isAnnotationPresent(EntityEventsPublish.class);
     }
 
-    private void publish(Object entity, String action) {
+    private void publish(Object entity, Action action) {
         publisher.sendEvent(exchange, routingKey, entity);
         if (log.isDebugEnabled()) {
-            try {
-                log.debug("Evento publicado Entity: {} {} ", entity.getClass().getSimpleName(), action);
-            } catch (Exception e) {
-                log.error("Erro ao tentar converter objeto para json.", e);
-            }
+            log.debug("Event Published Entity: {} {} ", entity.getClass().getSimpleName(), action);
         }
+    }
+
+    enum Action {
+        CREATED, UPDATED
     }
 }
